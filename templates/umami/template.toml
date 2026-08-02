@@ -1,0 +1,17 @@
+[template]
+id          = "umami"
+name        = "Umami"
+description = "Privacy-focused, self-hosted web analytics with PostgreSQL storage."
+version     = "latest"
+categories  = ["analytics", "monitoring"]
+tags        = ["web-analytics", "privacy", "postgresql"]
+icon        = "https://github.com/umami-software.png"
+website     = "https://umami.is"
+docs        = "https://umami.is/docs"
+source      = "https://github.com/umami-software/umami"
+license     = "MIT"
+
+[[ports]]
+container   = 3000
+description = "Web UI and tracker"
+primary     = true

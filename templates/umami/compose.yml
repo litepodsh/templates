@@ -1,0 +1,32 @@
+services:
+  umami:
+    image: docker.umami.is/umami-software/umami:postgresql-latest
+    restart: unless-stopped
+    init: true
+    ports:
+      - "${UMAMI_PORT}:3000"
+    environment:
+      DATABASE_URL: postgresql://${UMAMI_DB_USER}:${UMAMI_DB_PASSWORD}@db:5432/${UMAMI_DB_NAME}
+      APP_SECRET: ${UMAMI_APP_SECRET}
+      FORCE_SSL: ${UMAMI_FORCE_SSL}
+      DEFAULT_LOCALE: ${UMAMI_DEFAULT_LOCALE}
+    depends_on:
+      db:
+        condition: service_healthy
+  db:
+    image: docker.io/library/postgres:latest
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${UMAMI_DB_NAME}
+      POSTGRES_USER: ${UMAMI_DB_USER}
+      POSTGRES_PASSWORD: ${UMAMI_DB_PASSWORD}
+    volumes:
+      - umami_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${UMAMI_DB_USER} -d ${UMAMI_DB_NAME}"]
+      interval: ${UMAMI_DB_HEALTHCHECK_INTERVAL}
+      timeout: ${UMAMI_DB_HEALTHCHECK_TIMEOUT}
+      retries: ${UMAMI_DB_HEALTHCHECK_RETRIES}
+
+volumes:
+  umami_postgres_data:

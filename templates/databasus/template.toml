@@ -1,0 +1,17 @@
+[template]
+id          = "databasus"
+name        = "Databasus"
+description = "Self-hosted PostgreSQL backup manager with scheduling, verification, storage destinations and notifications."
+version     = "latest"
+categories  = ["database", "backup"]
+tags        = ["postgresql", "backup", "database", "s3", "scheduling"]
+website     = "https://databasus.com"
+icon        = "https://raw.githubusercontent.com/databasus/databasus/89e32a94c4c33b0a050d3e36835514bc9d644378/frontend/public/logo.svg"
+docs        = "https://databasus.com/installation"
+source      = "https://github.com/databasus/databasus"
+license     = "AGPL-3.0-only"
+
+[[ports]]
+container   = 4005
+description = "Web UI and API"
+primary     = true

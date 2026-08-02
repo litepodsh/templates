@@ -1,0 +1,22 @@
+services:
+  dashy:
+    image: docker.io/lissy93/dashy:latest
+    restart: unless-stopped
+    expose:
+      - "8080"
+    # Uncomment to publish the dashboard directly on the host instead of only exposing it to the Compose network.
+    # ports:
+    #   - "${DASHY_PORT}:8080"
+    environment:
+      BASE_URL: ${DASHY_BASE_URL}
+    volumes:
+      - dashy_data:/app/user-data
+    healthcheck:
+      test: ["CMD", "node", "/app/services/healthcheck.js"]
+      interval: ${DASHY_HEALTHCHECK_INTERVAL}
+      timeout: ${DASHY_HEALTHCHECK_TIMEOUT}
+      retries: ${DASHY_HEALTHCHECK_RETRIES}
+      start_period: ${DASHY_HEALTHCHECK_START_PERIOD}
+
+volumes:
+  dashy_data:

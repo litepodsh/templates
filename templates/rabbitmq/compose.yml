@@ -1,0 +1,20 @@
+services:
+  rabbitmq:
+    image: docker.io/library/rabbitmq:latest-management
+    restart: unless-stopped
+    ports:
+      - "${RABBITMQ_AMQP_PORT}:5672"
+    expose:
+      - "15672"
+    # Uncomment to publish the management UI directly on the host instead of only exposing it to the Compose network.
+    # ports:
+    #   - "${RABBITMQ_MANAGEMENT_PORT}:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
+      RABBITMQ_DEFAULT_VHOST: ${RABBITMQ_DEFAULT_VHOST}
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+
+volumes:
+  rabbitmq_data:

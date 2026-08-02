@@ -1,0 +1,25 @@
+services:
+  gitea:
+    image: docker.gitea.com/gitea:latest-rootless
+    restart: unless-stopped
+    ports:
+      - "${GITEA_SSH_PORT}:2222"
+    expose:
+      - "3000"
+    # Uncomment to publish the web UI and Git over HTTP directly on the host instead of only exposing it to the Compose network.
+    # ports:
+    #   - "${GITEA_HTTP_PORT}:3000"
+    environment:
+      GITEA__server__ROOT_URL: ${GITEA_ROOT_URL}
+      GITEA__server__DOMAIN: ${GITEA_DOMAIN}
+      GITEA__server__SSH_DOMAIN: ${GITEA_SSH_DOMAIN}
+      GITEA__server__SSH_PORT: ${GITEA_SSH_PORT}
+      GITEA__database__DB_TYPE: ${GITEA_DATABASE_TYPE}
+      GITEA__database__PATH: ${GITEA_DATABASE_PATH}
+    volumes:
+      - gitea_data:/var/lib/gitea
+      - gitea_config:/etc/gitea
+
+volumes:
+  gitea_data:
+  gitea_config:

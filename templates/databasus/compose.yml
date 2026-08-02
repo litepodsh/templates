@@ -1,0 +1,22 @@
+services:
+  databasus:
+    image: docker.io/databasus/databasus:latest
+    restart: unless-stopped
+    expose:
+      - "4005"
+    # Uncomment to publish the UI directly on the host instead of only exposing it to the Compose network.
+    # ports:
+    #   - "${DATABASUS_PORT}:4005"
+    volumes:
+      - databasus_data:/databasus-data
+    environment:
+      TZ: ${DATABASUS_TIMEZONE}
+    healthcheck:
+      test: ["CMD", "databasus", "healthcheck"]
+      interval: ${DATABASUS_HEALTHCHECK_INTERVAL}
+      timeout: ${DATABASUS_HEALTHCHECK_TIMEOUT}
+      retries: ${DATABASUS_HEALTHCHECK_RETRIES}
+      start_period: ${DATABASUS_HEALTHCHECK_START_PERIOD}
+
+volumes:
+  databasus_data:

@@ -1,0 +1,16 @@
+services:
+  uptime-kuma:
+    # `latest` tracks the 1.x branch upstream — the 2.x line ships under `2`.
+    # See setup.md before replacing an existing 2.x deployment.
+    image: docker.io/louislam/uptime-kuma:latest
+    restart: unless-stopped
+    expose:
+      - "3001"
+    # Uncomment to publish the UI directly on the host instead of only exposing it to the Compose network.
+    # ports:
+    #   - "${UPTIME_KUMA_PORT}:3001"
+    volumes:
+      - uptime_kuma_data:/app/data
+
+volumes:
+  uptime_kuma_data:

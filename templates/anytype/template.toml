@@ -1,0 +1,21 @@
+[template]
+id          = "anytype"
+name        = "Anytype"
+description = "P2P local-first workspace for notes, docs, projects, and a custom object graph. Self-hosted sync node via the any-sync bundle."
+version     = "latest"
+categories  = ["productivity", "p2p"]
+tags        = ["notes", "anytype", "sync", "p2p", "local-first"]
+icon        = "https://github.com/anyproto.png"
+website     = "https://anytype.io"
+docs        = "https://doc.anytype.io"
+source      = "https://github.com/anyproto/any-sync-bundle"
+license     = "Source-Available"
+
+[[ports]]
+container   = 33010
+description = "Sync (TCP)"
+primary     = true
+
+[[ports]]
+container   = 33020
+description = "Node discovery (UDP)"

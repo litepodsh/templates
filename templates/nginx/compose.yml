@@ -1,0 +1,9 @@
+services:
+  nginx:
+    image: docker.io/library/nginx:latest
+    restart: unless-stopped
+    expose:
+      - "80"
+    # Uncomment to publish Nginx directly on the host instead of only exposing it to the Compose network.
+    # ports:
+    #   - "${NGINX_PORT}:80"

@@ -1,0 +1,20 @@
+[template]
+id          = "tor-browser"
+name        = "Tor Browser"
+description = "Containerized Tor Browser accessed through a local noVNC web interface."
+version     = "latest"
+icon        = "https://github.com/TheTorProject.png"
+categories  = ["privacy", "developer-tools"]
+tags        = ["tor", "browser", "privacy", "vnc"]
+website     = "https://www.torproject.org/download/"
+docs        = "https://hub.docker.com/r/ich777/torbrowser"
+source      = "https://github.com/ich777/docker-torbrowser"
+license     = "Unknown"
+
+[files]
+setup = "setup.md"
+
+[[ports]]
+container   = 8080
+description = "noVNC browser session"
+primary     = true

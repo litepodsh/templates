@@ -1,0 +1,56 @@
+services:
+  docmost:
+    image: docker.io/docmost/docmost:latest
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    expose:
+      - "3000"
+    environment:
+      APP_URL: ${DOCMOST_APP_URL}
+      APP_SECRET: ${DOCMOST_APP_SECRET}
+      DATABASE_URL: postgresql://${DOCMOST_DB_USER}:${DOCMOST_DB_PASSWORD}@db:5432/${DOCMOST_DB_NAME}
+      REDIS_URL: redis://redis:6379
+    restart: unless-stopped
+    volumes:
+      - docmost_data:/app/data/storage
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  db:
+    image: docker.io/library/postgres:18
+    environment:
+      POSTGRES_DB: ${DOCMOST_DB_NAME}
+      POSTGRES_USER: ${DOCMOST_DB_USER}
+      POSTGRES_PASSWORD: ${DOCMOST_DB_PASSWORD}
+    restart: unless-stopped
+    volumes:
+      - docmost_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DOCMOST_DB_USER} -d ${DOCMOST_DB_NAME}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: docker.io/library/redis:8
+    command: ["redis-server", "--appendonly", "yes", "--maxmemory-policy", "noeviction"]
+    restart: unless-stopped
+    volumes:
+      - docmost_redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  docmost_data:
+  docmost_db_data:
+  docmost_redis_data:

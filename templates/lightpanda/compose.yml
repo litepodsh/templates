@@ -1,0 +1,7 @@
+services:
+  lightpanda:
+    image: docker.io/lightpanda/browser:nightly
+    restart: unless-stopped
+    ports:
+      - "${LIGHTPANDA_BIND_ADDRESS}:${LIGHTPANDA_PORT}:9222"
+    command: lightpanda serve --host ${LIGHTPANDA_LISTEN_ADDRESS} --port ${LIGHTPANDA_CONTAINER_PORT} --log_level ${LIGHTPANDA_LOG_LEVEL}

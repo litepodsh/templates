@@ -1,0 +1,24 @@
+[template]
+id          = "rustrak"
+name        = "Rustrak"
+description = "Ultra-lightweight, self-hosted error tracking compatible with Sentry SDKs."
+version     = "latest"
+categories  = ["developer-tools", "monitoring"]
+tags        = ["error-tracking", "sentry", "observability", "logging"]
+icon        = "https://github.com/rustrak.png"
+website     = "https://rustrak.github.io/rustrak/"
+docs        = "https://rustrak.github.io/rustrak/"
+source      = "https://github.com/rustrak/rustrak"
+license     = "GPL-3.0-only"
+
+[files]
+setup = "setup.md"
+
+[[ports]]
+container   = 3000
+description = "Web dashboard"
+primary     = true
+
+[[ports]]
+container   = 8080
+description = "Sentry-compatible ingestion API"

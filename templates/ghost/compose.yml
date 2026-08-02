@@ -1,0 +1,39 @@
+services:
+  ghost:
+    image: docker.io/ghost:latest
+    restart: unless-stopped
+    expose:
+      - "2368"
+    # Uncomment to publish Ghost directly on the host instead of only exposing it to the Compose network.
+    # ports:
+    #   - "${GHOST_PORT}:2368"
+    environment:
+      database__client: mysql
+      database__connection__host: db
+      database__connection__user: root
+      database__connection__password: ${MYSQL_ROOT_PASSWORD}
+      database__connection__database: ${MYSQL_DATABASE}
+      url: ${GHOST_URL}
+      mail__transport: ${GHOST_MAIL_TRANSPORT}
+      mail__from: ${GHOST_MAIL_FROM}
+      mail__options__host: ${GHOST_MAIL_HOST}
+      mail__options__port: ${GHOST_MAIL_PORT}
+      mail__options__auth__user: ${GHOST_MAIL_USER}
+      mail__options__auth__pass: ${GHOST_MAIL_PASSWORD}
+    volumes:
+      - ghost_content:/var/lib/ghost/content
+    depends_on:
+      - db
+
+  db:
+    image: docker.io/mysql:8.4.11
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+volumes:
+  ghost_content:
+  mysql_data:

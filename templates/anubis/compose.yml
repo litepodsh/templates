@@ -1,0 +1,31 @@
+services:
+  anubis:
+    image: ghcr.io/techarohq/anubis:latest
+    restart: unless-stopped
+    ports:
+      - "${ANUBIS_PORT}:8923"
+    expose:
+      - "9090"
+    environment:
+      BIND: ${ANUBIS_BIND}
+      TARGET: ${ANUBIS_TARGET}
+      DIFFICULTY: ${ANUBIS_DIFFICULTY}
+      COOKIE_DOMAIN: ${ANUBIS_PUBLIC_DOMAIN}
+      METRICS_BIND: ${ANUBIS_METRICS_BIND}
+      REDIRECT_DOMAINS: ${ANUBIS_PUBLIC_DOMAIN}
+      SLOG_LEVEL: ${ANUBIS_SLOG_LEVEL}
+      USE_REMOTE_ADDRESS: ${ANUBIS_USE_REMOTE_ADDRESS}
+    healthcheck:
+      test: ["CMD-SHELL", "/ko-app/anubis --healthcheck"]
+      interval: 5s
+      timeout: 30s
+      retries: 5
+      start_period: 500ms
+    depends_on:
+      - demo-web
+
+  # demo-web:
+  #   image: docker.io/nginx:alpine
+  #   restart: unless-stopped
+  #   expose:
+  #     - "80"

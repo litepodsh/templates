@@ -1,0 +1,17 @@
+[template]
+id          = "anythingllm"
+name        = "AnythingLLM"
+description = "All-in-one desktop & Docker LLM app. RAG, agents, multi-model, and a built-in document store."
+version     = "latest"
+categories  = ["ai", "developer-tools"]
+tags        = ["llm", "rag", "vector-db", "agents"]
+icon        = "https://github.com/Mintplex-Labs.png"
+website     = "https://anythingllm.com"
+docs        = "https://docs.anythingllm.com"
+source      = "https://github.com/Mintplex-Labs/anything-llm"
+license     = "MIT"
+
+[[ports]]
+container   = 3001
+description = "Web UI & API"
+primary     = true

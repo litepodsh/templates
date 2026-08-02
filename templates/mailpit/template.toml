@@ -1,0 +1,27 @@
+[template]
+id          = "mailpit"
+name        = "Mailpit"
+description = "Email & SMTP testing tool with a web UI. Captures outgoing mail from your apps so nothing reaches real inboxes."
+version     = "1.27"
+categories  = ["email", "developer-tools"]
+tags        = ["smtp", "testing", "mail"]
+icon        = "logo.svg"
+website     = "https://mailpit.axllent.org"
+docs        = "https://mailpit.axllent.org/docs/"
+source      = "https://github.com/axllent/mailpit"
+license     = "MIT"
+
+# Maps the manifest to the files on disk. Both default to
+# compose.yml / .env, so a simple template can omit this table.
+[files]
+compose = "compose.yml"
+env     = ".env"
+
+[[ports]]
+container   = 8025
+description = "Web UI"
+primary     = true
+
+[[ports]]
+container   = 1025
+description = "SMTP"

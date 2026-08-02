@@ -1,0 +1,17 @@
+[template]
+id          = "surrealdb"
+name        = "SurrealDB"
+description = "Multi-model database: documents, graphs, vectors, and SQL over a single engine. WebSocket and HTTP APIs."
+version     = "latest"
+categories  = ["database"]
+tags        = ["surrealdb", "graph", "multi-model", "nosql", "vectors"]
+icon        = "https://github.com/surrealdb.png"
+website     = "https://surrealdb.com"
+docs        = "https://surrealdb.com/docs"
+source      = "https://github.com/surrealdb/surrealdb"
+license     = "BSL-1.1"
+
+[[ports]]
+container   = 8000
+description = "HTTP & WebSocket"
+primary     = true

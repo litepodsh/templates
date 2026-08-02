@@ -1,0 +1,18 @@
+services:
+  anythingllm:
+    image: docker.io/mintplexlabs/anythingllm:latest
+    restart: unless-stopped
+    ports:
+      - "${ANYTHINGLLM_PORT}:3001"
+    environment:
+      STORAGE_DIR: /app/server/storage
+    volumes:
+      - anythingllm_storage:/app/server/storage
+    # SYS_ADMIN is required by AnythingLLM's built-in document parser
+    # (unshare/pid-namespace for safe PDF/docx processing). Podman rootless
+    # may need `--security-opt seccomp=unconfined` or a privileged profile.
+    cap_add:
+      - SYS_ADMIN
+
+volumes:
+  anythingllm_storage:

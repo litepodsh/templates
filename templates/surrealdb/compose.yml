@@ -1,0 +1,12 @@
+services:
+  surrealdb:
+    image: docker.io/surrealdb/surrealdb:latest
+    restart: unless-stopped
+    ports:
+      - "${SURREAL_PORT}:8000"
+    command: start --log info --user ${SURREAL_USER} --pass ${SURREAL_PASS} surrealdb://data/database
+    volumes:
+      - surrealdb_data:/data
+
+volumes:
+  surrealdb_data:

@@ -1,0 +1,17 @@
+[template]
+id          = "nocodb"
+name        = "NocoDB"
+description = "Open-source Airtable alternative — spreadsheets, forms, views, and APIs on top of Postgres (bundled here, or point at any external instance)."
+version     = "latest"
+categories  = ["database", "developer-tools"]
+tags        = ["nocodb", "airtable", "spreadsheet", "low-code", "postgres"]
+icon        = "https://github.com/nocodb.png"
+website     = "https://nocodb.com"
+docs        = "https://docs.nocodb.com"
+source      = "https://github.com/nocodb/nocodb"
+license     = "AGPL-3.0"
+
+[[ports]]
+container   = 8080
+description = "Web UI & API"
+primary     = true

@@ -1,0 +1,17 @@
+services:
+  syncthing:
+    image: docker.io/syncthing/syncthing:latest
+    restart: unless-stopped
+    hostname: ${SYNCTHING_HOSTNAME}
+    ports:
+      - "${SYNCTHING_GUI_BIND_ADDRESS}:${SYNCTHING_GUI_PORT}:8384"
+      - "${SYNCTHING_SYNC_PORT}:22000/tcp"
+      - "${SYNCTHING_SYNC_PORT}:22000/udp"
+      - "${SYNCTHING_DISCOVERY_PORT}:21027/udp"
+    volumes:
+      - syncthing_config:/var/syncthing/config
+      - syncthing_data:/var/syncthing/data
+
+volumes:
+  syncthing_config:
+  syncthing_data:

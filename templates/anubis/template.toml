@@ -1,0 +1,24 @@
+[template]
+id          = "anubis"
+name        = "Anubis"
+description = "Self-hosted anti-bot gateway that challenges scraper traffic before proxying requests to your application."
+version     = "latest"
+categories  = ["security", "networking"]
+tags        = ["anubis", "anti-bot", "proxy", "scraper", "web-firewall"]
+icon        = "https://raw.githubusercontent.com/TecharoHQ/anubis/main/docs/static/img/happy.webp"
+website     = "https://anubis.techaro.lol"
+docs        = "https://anubis.techaro.lol/docs/admin/"
+source      = "https://github.com/TecharoHQ/anubis"
+license     = "MIT"
+
+[files]
+setup = "setup.md"
+
+[[ports]]
+container   = 8923
+description = "HTTP anti-bot gateway"
+primary     = true
+
+[[ports]]
+container   = 9090
+description = "Metrics and health checks (internal only)"

@@ -1,0 +1,15 @@
+[template]
+id          = "cloudflared"
+name        = "Cloudflared"
+description = "Cloudflare Tunnel connector for securely publishing private services without inbound firewall ports."
+version     = "latest"
+categories  = ["networking", "security"]
+tags        = ["cloudflare", "tunnel", "reverse-proxy", "zero-trust"]
+icon        = "https://github.com/cloudflare.png"
+website     = "https://developers.cloudflare.com/tunnel/"
+docs        = "https://developers.cloudflare.com/tunnel/setup/"
+source      = "https://github.com/cloudflare/cloudflared"
+license     = "Apache-2.0"
+
+[files]
+setup = "setup.md"

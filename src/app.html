@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="text-scale" content="scale" />
+		<script
+			defer
+			src="https://umami.sebasgc.xyz/script.js"
+			data-website-id="1e89627c-4271-4d92-993e-3067fd3b51d7"
+			data-performance="true"
+		></script>
+		<script
+			defer
+			src="https://umami.sebasgc.xyz/recorder.js"
+			data-website-id="1e89627c-4271-4d92-993e-3067fd3b51d7"
+		></script>
+		<script>
+			window.op =
+				window.op ||
+				function () {
+					var queue = [];
+					return new Proxy(function () {
+						arguments.length && queue.push([].slice.call(arguments));
+					}, {
+						get: function (_target, property) {
+							return property === 'q'
+								? queue
+								: function () {
+									queue.push([property].concat([].slice.call(arguments)));
+								};
+						},
+						has: function (_target, property) {
+							return property === 'q';
+						}
+					});
+				};
+
+			window.op('init', {
+				apiUrl: 'https://op.sebasgc.xyz/api',
+				clientId: 'def4d178-ccdb-4b47-8636-7ac140bc7fc1',
+				trackScreenViews: true,
+				trackOutgoingLinks: true,
+				trackAttributes: true,
+				sessionReplay: {
+					enabled: true
+				}
+			});
+		</script>
+		<script src="https://openpanel.dev/op1.js" defer async></script>
+		%sveltekit.head%
+	</head>
+	<body data-sveltekit-preload-data="hover">
+		<div style="display: contents">%sveltekit.body%</div>
+	</body>
+</html>

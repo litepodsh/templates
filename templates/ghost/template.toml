@@ -1,0 +1,17 @@
+[template]
+id          = "ghost"
+name        = "Ghost"
+description = "Modern publishing platform for newsletters, blogs, and member-only content."
+version     = "latest"
+categories  = ["blog", "cms"]
+tags        = ["ghost", "publishing", "newsletter", "mysql"]
+icon        = "https://github.com/TryGhost.png"
+website     = "https://ghost.org"
+docs        = "https://ghost.org/docs/"
+source      = "https://github.com/TryGhost/Ghost"
+license     = "MIT"
+
+[[ports]]
+container   = 2368
+description = "Web UI & API"
+primary     = true

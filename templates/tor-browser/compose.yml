@@ -1,0 +1,20 @@
+services:
+  tor-browser:
+    image: docker.io/ich777/torbrowser:latest
+    restart: unless-stopped
+    ports:
+      - "${TOR_BROWSER_BIND_ADDRESS}:${TOR_BROWSER_PORT}:8080"
+    environment:
+      TOR_V: ${TOR_BROWSER_VERSION}
+      CUSTOM_RES_W: ${TOR_BROWSER_WIDTH}
+      CUSTOM_RES_H: ${TOR_BROWSER_HEIGHT}
+      UID: ${TOR_BROWSER_UID}
+      GID: ${TOR_BROWSER_GID}
+      UMASK: ${TOR_BROWSER_UMASK}
+      DATA_PERM: ${TOR_BROWSER_DATA_PERMISSIONS}
+      TURBOVNC_PARAMS: ${TOR_BROWSER_VNC_PARAMETERS}
+    volumes:
+      - tor_browser_data:/torbrowser
+
+volumes:
+  tor_browser_data:

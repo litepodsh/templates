@@ -1,0 +1,29 @@
+services:
+  server:
+    image: docker.io/rustrak/rustrak-server:latest
+    restart: unless-stopped
+    ports:
+      - "${RUSTRAK_SERVER_PORT}:8080"
+    volumes:
+      - rustrak_data:/data
+    environment:
+      # Generate RUSTRAK_SESSION_SECRET_KEY with: openssl rand -hex 32
+      SESSION_SECRET_KEY: ${RUSTRAK_SESSION_SECRET_KEY}
+      # Format: email:strong-password
+      CREATE_SUPERUSER: ${RUSTRAK_CREATE_SUPERUSER}
+
+  ui:
+    image: docker.io/rustrak/rustrak-ui:latest
+    restart: unless-stopped
+    expose:
+      - "3000"
+    # Uncomment to publish the UI directly on the host instead of only exposing it to the Compose network.
+    # ports:
+    #   - "${RUSTRAK_UI_PORT}:3000"
+    environment:
+      RUSTRAK_API_URL: ${RUSTRAK_API_URL}
+    depends_on:
+      - server
+
+volumes:
+  rustrak_data:

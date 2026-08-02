@@ -1,0 +1,41 @@
+services:
+  pastefy:
+    image: docker.io/interaapps/pastefy:latest
+    restart: unless-stopped
+    ports:
+      - "${PASTEFY_PORT}:80"
+    environment:
+      HTTP_SERVER_PORT: ${PASTEFY_CONTAINER_PORT}
+      HTTP_SERVER_CORS: ${PASTEFY_CORS_ORIGINS}
+      SERVER_NAME: ${PASTEFY_SERVER_NAME}
+      DATABASE_DRIVER: ${PASTEFY_DATABASE_DRIVER}
+      DATABASE_NAME: ${PASTEFY_DATABASE_NAME}
+      DATABASE_USER: ${PASTEFY_DATABASE_USER}
+      DATABASE_PASSWORD: ${PASTEFY_DATABASE_PASSWORD}
+      DATABASE_HOST: ${PASTEFY_DATABASE_HOST}
+      DATABASE_PORT: ${PASTEFY_DATABASE_PORT}
+      PASTEFY_AUTOMIGRATE: ${PASTEFY_AUTOMIGRATE}
+      AUTH_PROVIDER: ${PASTEFY_AUTH_PROVIDER}
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: docker.io/library/mysql:latest
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${PASTEFY_DATABASE_NAME}
+      MYSQL_USER: ${PASTEFY_DATABASE_USER}
+      MYSQL_PASSWORD: ${PASTEFY_DATABASE_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${PASTEFY_MYSQL_ROOT_PASSWORD}
+    volumes:
+      - pastefy_mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root --password=${PASTEFY_MYSQL_ROOT_PASSWORD}"]
+      interval: ${PASTEFY_DATABASE_HEALTHCHECK_INTERVAL}
+      timeout: ${PASTEFY_DATABASE_HEALTHCHECK_TIMEOUT}
+      retries: ${PASTEFY_DATABASE_HEALTHCHECK_RETRIES}
+      start_period: ${PASTEFY_DATABASE_HEALTHCHECK_START_PERIOD}
+
+volumes:
+  pastefy_mysql_data:

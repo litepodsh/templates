@@ -1,0 +1,21 @@
+[template]
+id          = "forgejo-postgres"
+name        = "Forgejo + PostgreSQL"
+description = "Community-maintained self-hosted Git forge with PostgreSQL, web UI and embedded SSH server."
+version     = "16"
+categories  = ["developer-tools", "collaboration"]
+tags        = ["git", "forge", "code-hosting", "postgresql", "forgejo"]
+icon        = "https://codeberg.org/forgejo/forgejo/raw/branch/forgejo/assets/logo.svg"
+website     = "https://forgejo.org"
+docs        = "https://forgejo.org/docs/latest/admin/installation/docker/"
+source      = "https://codeberg.org/forgejo/forgejo"
+license     = "GPL-3.0-only"
+
+[[ports]]
+container   = 3000
+description = "Web UI and Git over HTTP"
+primary     = true
+
+[[ports]]
+container   = 2222
+description = "Git over SSH"

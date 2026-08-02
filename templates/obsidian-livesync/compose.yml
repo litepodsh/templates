@@ -1,0 +1,16 @@
+services:
+  couchdb:
+    image: docker.io/library/couchdb:latest
+    restart: unless-stopped
+    ports:
+      - "${LIVESYNC_PORT}:5984"
+    environment:
+      COUCHDB_USER: ${LIVESYNC_COUCHDB_USER}
+      COUCHDB_PASSWORD: ${LIVESYNC_COUCHDB_PASSWORD}
+    volumes:
+      - livesync_couchdb_data:/opt/couchdb/data
+      - livesync_couchdb_config:/opt/couchdb/etc/local.d
+
+volumes:
+  livesync_couchdb_data:
+  livesync_couchdb_config:

@@ -1,0 +1,17 @@
+[template]
+id          = "docmost"
+name        = "Docmost"
+description = "Open-source collaborative wiki and documentation software with real-time editing, diagrams, and permissions — an alternative to Confluence and Notion."
+version     = "latest"
+categories  = ["wiki", "productivity"]
+tags        = ["documentation", "collaboration", "wiki", "knowledge-base", "drawio"]
+icon        = "https://raw.githubusercontent.com/docmost/docmost/main/apps/client/public/icons/app-icon-512x512.png"
+website     = "https://docmost.com"
+docs        = "https://docmost.com/docs"
+source      = "https://github.com/docmost/docmost"
+license     = "AGPL-3.0"
+
+[[ports]]
+container   = 3000
+description = "Web UI"
+primary     = true

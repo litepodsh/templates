@@ -1,0 +1,24 @@
+[template]
+id          = "wgeasyvpn"
+name        = "wg-easy VPN"
+description = "WireGuard VPN server with a browser-based client management interface."
+version     = "15"
+categories  = ["networking", "security"]
+tags        = ["wireguard", "vpn", "mesh", "remote-access"]
+icon        = "https://github.com/wg-easy.png"
+website     = "https://wg-easy.github.io/wg-easy/"
+docs        = "https://wg-easy.github.io/wg-easy/v15.3/getting-started/"
+source      = "https://github.com/wg-easy/wg-easy"
+license     = "AGPL-3.0-only"
+
+[files]
+setup = "setup.md"
+
+[[ports]]
+container   = 51821
+description = "Web administration UI"
+primary     = true
+
+[[ports]]
+container   = 51820
+description = "WireGuard VPN (UDP)"

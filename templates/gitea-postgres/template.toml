@@ -1,0 +1,21 @@
+[template]
+id          = "gitea-postgres"
+name        = "Gitea + PostgreSQL"
+description = "Lightweight self-hosted Git forge with PostgreSQL, web UI and built-in SSH server."
+version     = "latest"
+categories  = ["developer-tools", "collaboration"]
+tags        = ["git", "forge", "code-hosting", "postgresql", "ci"]
+icon        = "https://github.com/go-gitea.png"
+website     = "https://about.gitea.com"
+docs        = "https://docs.gitea.com/installation/install-with-docker-rootless"
+source      = "https://github.com/go-gitea/gitea"
+license     = "MIT"
+
+[[ports]]
+container   = 3000
+description = "Web UI and Git over HTTP"
+primary     = true
+
+[[ports]]
+container   = 2222
+description = "Git over SSH"

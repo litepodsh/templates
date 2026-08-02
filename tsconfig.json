@@ -1,0 +1,31 @@
+{
+	"extends": "$app/tsconfig",
+	"compilerOptions": {
+		"rewriteRelativeImportExtensions": true,
+		"allowJs": true,
+		"checkJs": true,
+		"esModuleInterop": true,
+		"forceConsistentCasingInFileNames": true,
+		"resolveJsonModule": true,
+		"skipLibCheck": true,
+		"sourceMap": true,
+		"strict": true,
+		"moduleResolution": "bundler",
+		"paths": {
+			"$lib": ["./src/lib"],
+			"$lib/*": ["./src/lib/*"],
+			"@pkg": ["./package.json"]
+		}
+	},
+	// The Kit base config sets no `include`, so TypeScript would otherwise pull in
+	// the whole project root — including the minified `build/` output, which blows
+	// the stack during `svelte-check`.
+	"include": [
+		"src/**/*.js",
+		"src/**/*.ts",
+		"src/**/*.svelte",
+		".svelte-kit/types/**/*.ts",
+		"vite.config.ts"
+	],
+	"exclude": ["node_modules/**", "build/**", "src/service-worker"]
+}

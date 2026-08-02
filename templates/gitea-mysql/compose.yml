@@ -1,0 +1,49 @@
+services:
+  gitea:
+    image: docker.gitea.com/gitea:latest-rootless
+    restart: unless-stopped
+    ports:
+      - "${GITEA_SSH_PORT}:2222"
+    expose:
+      - "3000"
+    # Uncomment to publish the web UI and Git over HTTP directly on the host instead of only exposing it to the Compose network.
+    # ports:
+    #   - "${GITEA_HTTP_PORT}:3000"
+    environment:
+      GITEA__server__ROOT_URL: ${GITEA_ROOT_URL}
+      GITEA__server__DOMAIN: ${GITEA_DOMAIN}
+      GITEA__server__SSH_DOMAIN: ${GITEA_SSH_DOMAIN}
+      GITEA__server__SSH_PORT: ${GITEA_SSH_PORT}
+      GITEA__database__DB_TYPE: ${GITEA_DATABASE_TYPE}
+      GITEA__database__HOST: ${GITEA_DATABASE_HOST}
+      GITEA__database__NAME: ${GITEA_DATABASE_NAME}
+      GITEA__database__USER: ${GITEA_DATABASE_USER}
+      GITEA__database__PASSWD: ${GITEA_DATABASE_PASSWORD}
+    volumes:
+      - gitea_data:/var/lib/gitea
+      - gitea_config:/etc/gitea
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: docker.io/library/mysql:latest
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${GITEA_DATABASE_NAME}
+      MYSQL_USER: ${GITEA_DATABASE_USER}
+      MYSQL_PASSWORD: ${GITEA_DATABASE_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${GITEA_MYSQL_ROOT_PASSWORD}
+    volumes:
+      - gitea_mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root --password=${GITEA_MYSQL_ROOT_PASSWORD}"]
+      interval: ${GITEA_DATABASE_HEALTHCHECK_INTERVAL}
+      timeout: ${GITEA_DATABASE_HEALTHCHECK_TIMEOUT}
+      retries: ${GITEA_DATABASE_HEALTHCHECK_RETRIES}
+      start_period: ${GITEA_DATABASE_HEALTHCHECK_START_PERIOD}
+
+volumes:
+  gitea_data:
+  gitea_config:
+  gitea_mysql_data:

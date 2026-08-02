@@ -1,0 +1,17 @@
+[template]
+id          = "nginx"
+name        = "Nginx"
+description = "High-performance web server and reverse proxy, deployed with the default Nginx image."
+version     = "latest"
+icon        = "https://github.com/nginx.png"
+categories  = ["networking", "developer-tools"]
+tags        = ["web-server", "reverse-proxy", "http"]
+website     = "https://nginx.org"
+docs        = "https://hub.docker.com/_/nginx"
+source      = "https://github.com/nginx/nginx"
+license     = "BSD-2-Clause"
+
+[[ports]]
+container   = 80
+description = "HTTP"
+primary     = true

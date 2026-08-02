@@ -1,0 +1,17 @@
+[template]
+id          = "plausible"
+name        = "Plausible Analytics"
+description = "Privacy-friendly web analytics with PostgreSQL and ClickHouse."
+version     = "latest"
+icon        = "https://github.com/plausible.png"
+categories  = ["analytics", "monitoring"]
+tags        = ["web-analytics", "privacy", "clickhouse", "postgresql"]
+website     = "https://plausible.io"
+docs        = "https://github.com/plausible/community-edition"
+source      = "https://github.com/plausible/community-edition"
+license     = "MIT"
+
+[[ports]]
+container   = 8000
+description = "Web UI and tracker"
+primary     = true

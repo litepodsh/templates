@@ -1,0 +1,20 @@
+[template]
+id          = "appwrite"
+name        = "Appwrite"
+description = "Self-hosted backend platform for authentication, databases, storage and APIs."
+version     = "latest"
+categories  = ["developer-tools", "backend"]
+tags        = ["backend", "api", "auth", "database", "storage"]
+icon        = "https://github.com/appwrite.png"
+website     = "https://appwrite.io"
+docs        = "https://appwrite.io/docs/advanced/self-hosting"
+source      = "https://github.com/appwrite/appwrite"
+license     = "BSD-3-Clause"
+
+[files]
+setup = "setup.md"
+
+[[ports]]
+container   = 80
+description = "Appwrite API"
+primary     = true

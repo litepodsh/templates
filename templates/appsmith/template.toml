@@ -1,0 +1,17 @@
+[template]
+id          = "appsmith"
+name        = "Appsmith"
+description = "Open-source low-code platform for building internal tools, dashboards, and CRUD apps on top of any database or API."
+version     = "2.2"
+categories  = ["developer-tools", "low-code"]
+tags        = ["appsmith", "internal-tools", "low-code", "dashboards"]
+icon        = "https://github.com/appsmithorg.png"
+website     = "https://www.appsmith.com"
+docs        = "https://docs.appsmith.com"
+source      = "https://github.com/appsmithorg/appsmith"
+license     = "Apache-2.0"
+
+[[ports]]
+container   = 8080
+description = "Web UI & API"
+primary     = true

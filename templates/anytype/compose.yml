@@ -1,0 +1,17 @@
+# Any-Sync-Bundle — all-in-one image with embedded MongoDB and Redis.
+# Use one service, no DB sidecar needed.
+services:
+  any-sync-bundle:
+    image: ghcr.io/grishy/any-sync-bundle:latest
+    restart: unless-stopped
+    ports:
+      - "${ANYTYPE_PORT}:33010"
+      - "${ANYTYPE_DISCOVERY_PORT}:33020/udp"
+    environment:
+      # Address clients use to reach the node. Must be reachable from peers.
+      ANY_SYNC_BUNDLE_INIT_EXTERNAL_ADDRS: ${ANYTYPE_EXTERNAL_ADDR}
+    volumes:
+      - anytype_data:/data
+
+volumes:
+  anytype_data:

@@ -1,0 +1,17 @@
+[template]
+id          = "pocketbase"
+name        = "PocketBase"
+description = "Lightweight backend with embedded database, authentication, file storage and admin UI."
+version     = "latest"
+icon        = "https://github.com/pocketbase.png"
+categories  = ["developer-tools", "database"]
+tags        = ["backend", "sqlite", "api", "auth"]
+website     = "https://pocketbase.io"
+docs        = "https://pocketbase.io/docs"
+source      = "https://github.com/pocketbase/pocketbase"
+license     = "MIT"
+
+[[ports]]
+container   = 8090
+description = "API and admin UI"
+primary     = true

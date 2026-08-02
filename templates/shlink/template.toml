@@ -1,0 +1,17 @@
+[template]
+id          = "shlink"
+name        = "Shlink"
+description = "Self-hosted URL shortener with visit analytics and an API."
+version     = "stable"
+icon        = "https://github.com/shlinkio.png"
+categories  = ["productivity", "analytics"]
+tags        = ["url-shortener", "links", "analytics", "mariadb"]
+website     = "https://shlink.io"
+docs        = "https://shlink.io/documentation/install-docker-image/"
+source      = "https://github.com/shlinkio/shlink"
+license     = "MIT"
+
+[[ports]]
+container   = 8080
+description = "URL shortener API"
+primary     = true

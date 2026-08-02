@@ -1,0 +1,20 @@
+[template]
+id          = "obsidian-livesync"
+name        = "Obsidian LiveSync"
+description = "CouchDB server for the Self-hosted LiveSync Obsidian community plugin."
+version     = "latest"
+icon        = "https://github.com/vrtmrz.png"
+categories  = ["productivity", "storage"]
+tags        = ["obsidian", "notes", "sync", "couchdb"]
+website     = "https://github.com/vrtmrz/obsidian-livesync"
+docs        = "https://github.com/vrtmrz/obsidian-livesync/blob/main/docs/setup_own_server.md"
+source      = "https://github.com/vrtmrz/obsidian-livesync"
+license     = "MIT"
+
+[files]
+setup = "setup.md"
+
+[[ports]]
+container   = 5984
+description = "CouchDB sync endpoint"
+primary     = true

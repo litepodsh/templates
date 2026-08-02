@@ -1,0 +1,38 @@
+services:
+  shlink:
+    image: docker.io/shlinkio/shlink:stable
+    restart: unless-stopped
+    ports:
+      - "${SHLINK_PORT}:8080"
+    environment:
+      DEFAULT_DOMAIN: ${SHLINK_DEFAULT_DOMAIN}
+      IS_HTTPS_ENABLED: ${SHLINK_HTTPS_ENABLED}
+      GEOLITE_LICENSE_KEY: ${SHLINK_GEOLITE_LICENSE_KEY}
+      DB_DRIVER: ${SHLINK_DB_DRIVER}
+      DB_NAME: ${SHLINK_DB_NAME}
+      DB_USER: ${SHLINK_DB_USER}
+      DB_PASSWORD: ${SHLINK_DB_PASSWORD}
+      DB_HOST: ${SHLINK_DB_HOST}
+      DB_PORT: ${SHLINK_DB_PORT}
+      INITIAL_API_KEY: ${SHLINK_INITIAL_API_KEY}
+    depends_on:
+      db:
+        condition: service_healthy
+  db:
+    image: docker.io/library/mariadb:latest
+    restart: unless-stopped
+    environment:
+      MARIADB_DATABASE: ${SHLINK_DB_NAME}
+      MARIADB_USER: ${SHLINK_DB_USER}
+      MARIADB_PASSWORD: ${SHLINK_DB_PASSWORD}
+      MARIADB_ROOT_PASSWORD: ${SHLINK_DB_ROOT_PASSWORD}
+    volumes:
+      - shlink_mariadb_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mariadb-admin ping -h localhost -u root --password=${SHLINK_DB_ROOT_PASSWORD}"]
+      interval: ${SHLINK_DB_HEALTHCHECK_INTERVAL}
+      timeout: ${SHLINK_DB_HEALTHCHECK_TIMEOUT}
+      retries: ${SHLINK_DB_HEALTHCHECK_RETRIES}
+
+volumes:
+  shlink_mariadb_data:

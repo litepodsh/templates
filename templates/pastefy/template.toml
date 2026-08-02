@@ -1,0 +1,20 @@
+[template]
+id          = "pastefy"
+name        = "Pastefy"
+description = "Open-source self-hosted Pastebin with syntax highlighting, sharing controls and optional OAuth login."
+version     = "latest"
+categories  = ["developer-tools", "productivity"]
+tags        = ["pastebin", "snippets", "sharing", "code", "mysql"]
+icon        = "https://github.com/interaapps.png"
+website     = "https://pastefy.app"
+docs        = "https://docs.pastefy.app/self-hosting/configuration.html"
+source      = "https://github.com/interaapps/pastefy"
+license     = "MIT"
+
+[files]
+setup = "setup.md"
+
+[[ports]]
+container   = 80
+description = "Web UI"
+primary     = true

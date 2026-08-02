@@ -1,0 +1,17 @@
+[template]
+id          = "lightpanda"
+name        = "Lightpanda"
+description = "Fast, low-memory headless browser with a Chrome DevTools Protocol endpoint for automation and agents."
+version     = "nightly"
+icon        = "https://github.com/lightpanda-io.png"
+categories  = ["developer-tools", "automation"]
+tags        = ["browser", "headless", "cdp", "playwright", "scraping"]
+website     = "https://lightpanda.io"
+docs        = "https://docs.lightpanda.io/"
+source      = "https://github.com/lightpanda-io/browser"
+license     = "AGPL-3.0-only"
+
+[[ports]]
+container   = 9222
+description = "Chrome DevTools Protocol"
+primary     = true

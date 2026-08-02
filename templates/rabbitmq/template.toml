@@ -1,0 +1,21 @@
+[template]
+id          = "rabbitmq"
+name        = "RabbitMQ"
+description = "Message broker with AMQP support and the RabbitMQ management interface."
+version     = "latest-management"
+icon        = "https://github.com/rabbitmq.png"
+categories  = ["developer-tools", "database"]
+tags        = ["message-queue", "amqp", "broker", "management"]
+website     = "https://www.rabbitmq.com"
+docs        = "https://www.rabbitmq.com/docs"
+source      = "https://github.com/rabbitmq/rabbitmq-server"
+license     = "MPL-2.0"
+
+[[ports]]
+container   = 15672
+description = "Management UI"
+primary     = true
+
+[[ports]]
+container   = 5672
+description = "AMQP"

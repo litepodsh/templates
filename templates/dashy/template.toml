@@ -1,0 +1,17 @@
+[template]
+id          = "dashy"
+name        = "Dashy"
+description = "Customizable self-hosted dashboard for your homelab, links, widgets and status checks."
+version     = "latest"
+categories  = ["dashboard", "productivity"]
+tags        = ["homepage", "dashboard", "homelab", "widgets"]
+icon        = "https://github.com/lissy93.png"
+website     = "https://dashy.to"
+docs        = "https://dashy.to/docs/"
+source      = "https://github.com/Lissy93/dashy"
+license     = "MIT"
+
+[[ports]]
+container   = 8080
+description = "Web dashboard"
+primary     = true

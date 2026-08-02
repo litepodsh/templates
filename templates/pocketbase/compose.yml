@@ -1,0 +1,23 @@
+services:
+  pocketbase:
+    image: ghcr.io/muchobien/pocketbase:latest
+    restart: unless-stopped
+    ports:
+      - "${POCKETBASE_PORT}:8090"
+    environment:
+      PB_HOST: ${POCKETBASE_HOST}
+      PB_PORT: ${POCKETBASE_CONTAINER_PORT}
+      PB_ADMIN_EMAIL: ${POCKETBASE_ADMIN_EMAIL}
+      PB_ADMIN_PASSWORD: ${POCKETBASE_ADMIN_PASSWORD}
+      ENCRYPTION: ${POCKETBASE_ENCRYPTION_KEY}
+      TZ: ${POCKETBASE_TIMEZONE}
+    command: ["--encryptionEnv", "ENCRYPTION"]
+    volumes:
+      - pocketbase_data:/pb_data
+      - pocketbase_public:/pb_public
+      - pocketbase_hooks:/pb_hooks
+
+volumes:
+  pocketbase_data:
+  pocketbase_public:
+  pocketbase_hooks:

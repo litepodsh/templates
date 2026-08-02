@@ -1,0 +1,21 @@
+[template]
+id          = "rustfs"
+name        = "RustFS"
+description = "High-performance S3-compatible object storage with an optional browser console."
+version     = "latest"
+icon        = "https://github.com/rustfs.png"
+categories  = ["storage", "database"]
+tags        = ["s3", "object-storage", "rust", "minio-compatible"]
+website     = "https://rustfs.com"
+docs        = "https://docs.rustfs.com/installation/docker/"
+source      = "https://github.com/rustfs/rustfs"
+license     = "Apache-2.0"
+
+[[ports]]
+container   = 9001
+description = "Web console"
+primary     = true
+
+[[ports]]
+container   = 9000
+description = "S3 API"

@@ -1,0 +1,25 @@
+[template]
+id          = "syncthing"
+name        = "Syncthing"
+description = "Continuous peer-to-peer file synchronization with a browser management UI."
+version     = "latest"
+icon        = "https://github.com/syncthing.png"
+categories  = ["storage", "productivity"]
+tags        = ["sync", "files", "p2p", "backup"]
+website     = "https://syncthing.net"
+docs        = "https://docs.syncthing.net"
+source      = "https://github.com/syncthing/syncthing"
+license     = "MPL-2.0"
+
+[[ports]]
+container   = 8384
+description = "Web UI"
+primary     = true
+
+[[ports]]
+container   = 22000
+description = "Sync protocol (TCP and UDP)"
+
+[[ports]]
+container   = 21027
+description = "Local discovery (UDP)"

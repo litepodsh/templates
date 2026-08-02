@@ -1,0 +1,48 @@
+services:
+  forgejo:
+    image: codeberg.org/forgejo/forgejo:16-rootless
+    restart: unless-stopped
+    ports:
+      - "${FORGEJO_SSH_PORT}:2222"
+    expose:
+      - "3000"
+    # Uncomment to publish the web UI and Git over HTTP directly on the host instead of only exposing it to the Compose network.
+    # ports:
+    #   - "${FORGEJO_HTTP_PORT}:3000"
+    environment:
+      FORGEJO__server__ROOT_URL: ${FORGEJO_ROOT_URL}
+      FORGEJO__server__DOMAIN: ${FORGEJO_DOMAIN}
+      FORGEJO__server__SSH_DOMAIN: ${FORGEJO_SSH_DOMAIN}
+      FORGEJO__server__SSH_PORT: ${FORGEJO_SSH_PORT}
+      FORGEJO__database__DB_TYPE: ${FORGEJO_DATABASE_TYPE}
+      FORGEJO__database__HOST: ${FORGEJO_DATABASE_HOST}
+      FORGEJO__database__NAME: ${FORGEJO_DATABASE_NAME}
+      FORGEJO__database__USER: ${FORGEJO_DATABASE_USER}
+      FORGEJO__database__PASSWD: ${FORGEJO_DATABASE_PASSWORD}
+    volumes:
+      - forgejo_data:/var/lib/gitea
+      - forgejo_config:/etc/gitea
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: docker.io/library/postgres:latest
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${FORGEJO_DATABASE_NAME}
+      POSTGRES_USER: ${FORGEJO_DATABASE_USER}
+      POSTGRES_PASSWORD: ${FORGEJO_DATABASE_PASSWORD}
+    volumes:
+      - forgejo_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${FORGEJO_DATABASE_USER} -d ${FORGEJO_DATABASE_NAME}"]
+      interval: ${FORGEJO_DATABASE_HEALTHCHECK_INTERVAL}
+      timeout: ${FORGEJO_DATABASE_HEALTHCHECK_TIMEOUT}
+      retries: ${FORGEJO_DATABASE_HEALTHCHECK_RETRIES}
+      start_period: ${FORGEJO_DATABASE_HEALTHCHECK_START_PERIOD}
+
+volumes:
+  forgejo_data:
+  forgejo_config:
+  forgejo_postgres_data:

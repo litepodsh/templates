@@ -1,0 +1,17 @@
+[template]
+id          = "docling-serve"
+name        = "Docling Serve"
+description = "Universal document format conversion powered by deep-learning models — supports PDF, Word, HTML, images, and more via a REST API and built-in UI."
+version     = "latest"
+categories  = ["ai", "developer-tools"]
+tags        = ["document", "pdf", "conversion", "ocr"]
+icon        = "https://raw.githubusercontent.com/docling-project/docling/main/docs/assets/logo.svg"
+website     = "https://ds4sd.github.io/docling/"
+docs        = "https://ds4sd.github.io/docling/"
+source      = "https://github.com/docling-project/docling-serve"
+license     = "MIT"
+
+[[ports]]
+container   = 5001
+description = "REST API and UI"
+primary     = true
