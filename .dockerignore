@@ -1,0 +1,8 @@
+node_modules
+.git
+.svelte-kit
+build
+tests
+.DS_Store
+Dockerfile
+.dockerignore
