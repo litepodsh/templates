@@ -63,6 +63,10 @@
 	});
 </script>
 
+<svelte:head>
+	<title>Templates — LitePod.sh</title>
+</svelte:head>
+
 <PageContainer>
 	{@const templates = page.data.templates as TemplateSummary[]}
 		{@const categoryOptions = categoriesOf(templates)}
