@@ -29,6 +29,31 @@ export async function getDragonfly(): Promise<DragonflyClient | null> {
 	}
 }
 
+/**
+ * Validates the cache at startup and logs the outcome, so a missing or broken
+ * cache is visible in the logs before the first request is handled. Called from
+ * `hooks.server.ts`.
+ */
+export async function validateCache(): Promise<void> {
+	const redis = await getDragonfly();
+	if (!redis) {
+		// `connect()` already logs the specific failure reason when a connection
+		// was attempted; log here only when no cache is configured at all.
+		if (!readSetting('DRAGONFLY_URL')) {
+			console.warn('[dragonfly] cache not configured (DRAGONFLY_URL missing); using local fallback');
+		}
+		return;
+	}
+
+	try {
+		await redis.ping();
+		console.log('[dragonfly] cache ready');
+	} catch (error) {
+		markUnavailable(redis);
+		console.error(`[dragonfly] cache check failed: ${messageOf(error)}`);
+	}
+}
+
 /** Executes an operation against Dragonfly and degrades gracefully on outage. */
 export async function withDragonfly<T>(operation: (redis: DragonflyClient) => Promise<T>): Promise<T | null> {
 	const redis = await getDragonfly();
