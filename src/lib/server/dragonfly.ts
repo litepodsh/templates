@@ -69,21 +69,24 @@ export async function withDragonfly<T>(operation: (redis: DragonflyClient) => Pr
 }
 
 async function connect(url: string): Promise<DragonflyClient | null> {
-	const candidate = createClient({
-		url: normalizeRedisUrl(url),
-		socket: { connectTimeout: 2_000, reconnectStrategy: false },
-	});
-	// node-redis requires an error listener even though connection failures are
-	// handled below and requests have a local fallback.
-	candidate.on('error', () => undefined);
-
+	let candidate: DragonflyClient | undefined;
 	try {
+		// `createClient` parses the URL synchronously and throws on a malformed
+		// one (e.g. missing `@` before the host) — keep it inside the try too.
+		candidate = createClient({
+			url: normalizeRedisUrl(url),
+			socket: { connectTimeout: 2_000, reconnectStrategy: false },
+		});
+		// node-redis requires an error listener even though connection failures are
+		// handled below and requests have a local fallback.
+		candidate.on('error', () => undefined);
+
 		await candidate.connect();
 		client = candidate;
 		return candidate;
 	} catch (error) {
 		retryAfter = Date.now() + RETRY_DELAY_MS;
-		if (candidate.isOpen) candidate.destroy();
+		if (candidate?.isOpen) candidate.destroy();
 		console.warn(`[dragonfly] unavailable; using local fallback: ${messageOf(error)}`);
 		return null;
 	}
