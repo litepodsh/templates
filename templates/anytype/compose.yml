@@ -9,6 +9,7 @@ services:
       - "${ANYTYPE_DISCOVERY_PORT}:33020/udp"
     environment:
       # Address clients use to reach the node. Must be reachable from peers.
+      # Must be IP, not domain — any-sync-bundle transport (yamux/quic) does not resolve hostnames here.
       ANY_SYNC_BUNDLE_INIT_EXTERNAL_ADDRS: ${ANYTYPE_EXTERNAL_ADDR}
     volumes:
       - anytype_data:/data
