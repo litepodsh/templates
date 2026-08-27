@@ -64,7 +64,7 @@
 </script>
 
 <svelte:head>
-	<title>Templates — LitePod.sh</title>
+	<title>Templates — litepod.sh</title>
 </svelte:head>
 
 <PageContainer>

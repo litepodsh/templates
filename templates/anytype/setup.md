@@ -8,8 +8,8 @@ The bundle writes a client config to `/data/client-config.yml` inside the contai
 
 Grab it any of these ways:
 
-- **LitePod Terminal tab** — open the service's Terminal tab and run `cat /data/client-config.yml`, then copy the output.
-- **LitePod Volumes tab** — browse the `anytype_data` volume and download `client-config.yml` directly.
+- **litepod Terminal tab** — open the service's Terminal tab and run `cat /data/client-config.yml`, then copy the output.
+- **litepod Volumes tab** — browse the `anytype_data` volume and download `client-config.yml` directly.
 - **Docker**, from a shell:
   ```bash
   docker cp <container-id>:/data/client-config.yml ./client-config.yml
