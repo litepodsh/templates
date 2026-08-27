@@ -24,7 +24,7 @@ services:
       start_period: 30s
 
   db:
-    image: docker.io/library/postgres:18
+    image: docker.io/library/postgres:16-alpine
     environment:
       POSTGRES_DB: ${DOCMOST_DB_NAME}
       POSTGRES_USER: ${DOCMOST_DB_USER}
