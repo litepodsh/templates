@@ -1,5 +1,5 @@
 [template]
-id          = "poste.io"
+id          = "posteio"
 name        = "Poste.io"
 description = "All-in-one mail server — SMTP, IMAP, POP3, webmail, antispam and antivirus in a single container, managed from a web admin UI."
 version     = "latest"
