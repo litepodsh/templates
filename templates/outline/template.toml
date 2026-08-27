@@ -1,0 +1,20 @@
+[template]
+id          = "outline"
+name        = "Outline"
+description = "Fast, collaborative knowledge base and team wiki with a real-time Markdown editor, nested documents, and full-text search."
+version     = "latest"
+categories  = ["wiki", "productivity"]
+tags        = ["wiki", "knowledge-base", "documentation", "postgresql", "redis"]
+icon        = "https://github.com/outline.png"
+website     = "https://www.getoutline.com"
+docs        = "https://docs.getoutline.com/s/hosting"
+source      = "https://github.com/outline/outline"
+license     = "BSL-1.1"
+
+[files]
+setup = "setup.md"
+
+[[ports]]
+container   = 3000
+description = "Web UI & API"
+primary     = true

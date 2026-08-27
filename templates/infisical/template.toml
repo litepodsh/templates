@@ -1,0 +1,20 @@
+[template]
+id          = "infisical"
+name        = "Infisical"
+description = "Open-source secrets management platform — store, sync, and rotate application secrets across environments, with a CLI, SDKs, and Kubernetes operator."
+version     = "latest"
+categories  = ["security", "developer-tools"]
+tags        = ["secrets", "vault", "env", "postgresql", "redis"]
+icon        = "https://github.com/Infisical.png"
+website     = "https://infisical.com"
+docs        = "https://infisical.com/docs/self-hosting/deployment-options/docker-compose"
+source      = "https://github.com/Infisical/infisical"
+license     = "MIT"
+
+[files]
+setup = "setup.md"
+
+[[ports]]
+container   = 8080
+description = "Web UI & API"
+primary     = true

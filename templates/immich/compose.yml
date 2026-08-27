@@ -1,0 +1,84 @@
+# Based on the official Immich release compose, adapted to named volumes.
+#
+# Upstream bind-mounts a host directory for the photo/video library
+# (${UPLOAD_LOCATION}:/data). This template uses the immich_upload named volume
+# instead so it works rootless. If you want the library on a specific host path,
+# replace `immich_upload:/data` with `/your/path:/data` in the immich-server
+# service. The `db` image is pinned because it bundles specific vector
+# extensions — do not swap it for stock postgres.
+services:
+  immich-server:
+    image: ghcr.io/immich-app/immich-server:release
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    expose:
+      - "2283"
+    # Uncomment to publish Immich directly on the host instead of only exposing it to the Compose network.
+    # ports:
+    #   - "${IMMICH_PORT}:2283"
+    environment:
+      DB_HOSTNAME: db
+      DB_USERNAME: ${IMMICH_DB_USER}
+      DB_PASSWORD: ${IMMICH_DB_PASSWORD}
+      DB_DATABASE_NAME: ${IMMICH_DB_NAME}
+      REDIS_HOSTNAME: redis
+      TZ: ${IMMICH_TZ}
+    volumes:
+      - immich_upload:/data
+    healthcheck:
+      test: ["CMD-SHELL", "immich-healthcheck"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  immich-machine-learning:
+    image: ghcr.io/immich-app/immich-machine-learning:release
+    restart: unless-stopped
+    volumes:
+      - immich_model_cache:/cache
+    healthcheck:
+      test: ["CMD-SHELL", "immich-healthcheck"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  redis:
+    image: docker.io/valkey/valkey:8
+    restart: unless-stopped
+    volumes:
+      - immich_redis_data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli ping | grep -q PONG"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  db:
+    image: ghcr.io/immich-app/postgres:14-vectorchord0.4.3-pgvectors0.2.0
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${IMMICH_DB_NAME}
+      POSTGRES_USER: ${IMMICH_DB_USER}
+      POSTGRES_PASSWORD: ${IMMICH_DB_PASSWORD}
+      POSTGRES_INITDB_ARGS: '--data-checksums'
+    shm_size: 128mb
+    volumes:
+      - immich_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${IMMICH_DB_USER} -d ${IMMICH_DB_NAME}"]
+      interval: ${IMMICH_DB_HEALTHCHECK_INTERVAL}
+      timeout: ${IMMICH_DB_HEALTHCHECK_TIMEOUT}
+      retries: ${IMMICH_DB_HEALTHCHECK_RETRIES}
+      start_period: 5m
+
+volumes:
+  immich_upload:
+  immich_model_cache:
+  immich_redis_data:
+  immich_db_data:

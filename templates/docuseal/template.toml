@@ -1,0 +1,17 @@
+[template]
+id          = "docuseal"
+name        = "DocuSeal"
+description = "Open-source document signing platform — build PDF forms, send them for signature, and verify signed documents. An alternative to DocuSign."
+version     = "latest"
+categories  = ["productivity", "business"]
+tags        = ["e-signature", "documents", "pdf", "forms", "docusign"]
+icon        = "https://github.com/docusealco.png"
+website     = "https://www.docuseal.com"
+docs        = "https://www.docuseal.com/docs"
+source      = "https://github.com/docusealco/docuseal"
+license     = "AGPL-3.0"
+
+[[ports]]
+container   = 3000
+description = "Web UI & API"
+primary     = true

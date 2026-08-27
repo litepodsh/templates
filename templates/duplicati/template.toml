@@ -1,0 +1,20 @@
+[template]
+id          = "duplicati"
+name        = "Duplicati"
+description = "Encrypted, incremental, deduplicated backups to local disk, SMB/NFS, S3, B2, and many cloud providers, managed from a web UI."
+version     = "latest"
+categories  = ["backup", "storage"]
+tags        = ["backup", "encryption", "restore", "s3", "scheduler"]
+icon        = "https://github.com/duplicati.png"
+website     = "https://www.duplicati.com"
+docs        = "https://docs.duplicati.com"
+source      = "https://github.com/duplicati/duplicati"
+license     = "MIT"
+
+[files]
+setup = "setup.md"
+
+[[ports]]
+container   = 8200
+description = "Web UI"
+primary     = true

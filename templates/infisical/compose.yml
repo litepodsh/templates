@@ -1,0 +1,55 @@
+services:
+  infisical:
+    image: docker.io/infisical/infisical:latest
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    expose:
+      - "8080"
+    # Uncomment to publish Infisical directly on the host instead of only exposing it to the Compose network.
+    # ports:
+    #   - "${INFISICAL_PORT}:8080"
+    environment:
+      NODE_ENV: production
+      # openssl rand -hex 16  → 32 hex chars. Encrypts secrets at rest.
+      ENCRYPTION_KEY: ${INFISICAL_ENCRYPTION_KEY}
+      # openssl rand -base64 32. Signs auth tokens.
+      AUTH_SECRET: ${INFISICAL_AUTH_SECRET}
+      DB_CONNECTION_URI: postgresql://${INFISICAL_DB_USER}:${INFISICAL_DB_PASSWORD}@db:5432/${INFISICAL_DB_NAME}
+      REDIS_URL: redis://redis:6379
+      SITE_URL: ${INFISICAL_SITE_URL}
+      TELEMETRY_ENABLED: ${INFISICAL_TELEMETRY_ENABLED}
+
+  db:
+    image: docker.io/library/postgres:17
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${INFISICAL_DB_NAME}
+      POSTGRES_USER: ${INFISICAL_DB_USER}
+      POSTGRES_PASSWORD: ${INFISICAL_DB_PASSWORD}
+    volumes:
+      - infisical_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${INFISICAL_DB_USER} -d ${INFISICAL_DB_NAME}"]
+      interval: ${INFISICAL_DB_HEALTHCHECK_INTERVAL}
+      timeout: ${INFISICAL_DB_HEALTHCHECK_TIMEOUT}
+      retries: ${INFISICAL_DB_HEALTHCHECK_RETRIES}
+
+  redis:
+    image: docker.io/library/redis:8
+    command: ["redis-server", "--appendonly", "yes"]
+    restart: unless-stopped
+    volumes:
+      - infisical_redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  infisical_db_data:
+  infisical_redis_data:

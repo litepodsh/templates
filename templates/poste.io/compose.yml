@@ -1,0 +1,30 @@
+# Poste.io is a full mail server: it needs the standard mail ports published on
+# the host with their real numbers (MX and mail clients expect 25/465/587/993/…),
+# so these are direct mappings rather than the usual expose + reverse proxy.
+services:
+  posteio:
+    image: docker.io/analogic/poste.io:latest
+    restart: unless-stopped
+    hostname: ${POSTEIO_HOSTNAME}
+    ports:
+      - "${POSTEIO_HTTP_PORT}:80"
+      - "${POSTEIO_HTTPS_PORT}:443"
+      - "25:25"
+      - "110:110"
+      - "143:143"
+      - "465:465"
+      - "587:587"
+      - "993:993"
+      - "995:995"
+    environment:
+      TZ: ${POSTEIO_TZ}
+      # OFF when a reverse proxy terminates TLS for the admin UI / webmail.
+      HTTPS: ${POSTEIO_HTTPS}
+      # ClamAV needs ~1 GB RAM; set TRUE on small hosts.
+      DISABLE_CLAMAV: ${POSTEIO_DISABLE_CLAMAV}
+      DISABLE_RSPAMD: ${POSTEIO_DISABLE_RSPAMD}
+    volumes:
+      - posteio_data:/data
+
+volumes:
+  posteio_data:

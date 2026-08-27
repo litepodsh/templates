@@ -1,0 +1,28 @@
+[template]
+id          = "garage"
+name        = "Garage"
+description = "Lightweight S3-compatible object storage designed for self-hosting across several machines, with a companion web UI for buckets, keys, and cluster layout."
+version     = "2.0.0"
+categories  = ["storage", "developer-tools"]
+tags        = ["s3", "object-storage", "minio-alternative", "distributed"]
+icon        = "https://github.com/deuxfleurs-org.png"
+website     = "https://garagehq.deuxfleurs.fr"
+docs        = "https://garagehq.deuxfleurs.fr/documentation/quick-start/"
+source      = "https://git.deuxfleurs.fr/Deuxfleurs/garage"
+license     = "AGPL-3.0"
+
+[files]
+setup = "setup.md"
+
+[[ports]]
+container   = 3909
+description = "Web UI"
+primary     = true
+
+[[ports]]
+container   = 3900
+description = "S3 API"
+
+[[ports]]
+container   = 3903
+description = "Admin API"

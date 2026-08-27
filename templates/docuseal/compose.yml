@@ -1,0 +1,43 @@
+# DocuSeal with the bundled SQLite database (stored in the docuseal_data volume).
+#
+# To use PostgreSQL instead, uncomment the `db` service + its volume below and
+# set DOCUSEAL_DATABASE_URL in .env to
+#   postgresql://docuseal:<password>@db:5432/docuseal
+services:
+  docuseal:
+    image: docker.io/docuseal/docuseal:latest
+    restart: unless-stopped
+    expose:
+      - "3000"
+    # Uncomment to publish DocuSeal directly on the host instead of only exposing it to the Compose network.
+    # ports:
+    #   - "${DOCUSEAL_PORT}:3000"
+    environment:
+      HOST: ${DOCUSEAL_HOST}
+      FORCE_SSL: ${DOCUSEAL_FORCE_SSL}
+      DATABASE_URL: ${DOCUSEAL_DATABASE_URL}
+      SECRET_KEY_BASE: ${DOCUSEAL_SECRET_KEY_BASE}
+    volumes:
+      - docuseal_data:/data
+    # depends_on:
+    #   db:
+    #     condition: service_healthy
+
+  # db:
+  #   image: docker.io/library/postgres:17
+  #   restart: unless-stopped
+  #   environment:
+  #     POSTGRES_DB: ${DOCUSEAL_DB_NAME}
+  #     POSTGRES_USER: ${DOCUSEAL_DB_USER}
+  #     POSTGRES_PASSWORD: ${DOCUSEAL_DB_PASSWORD}
+  #   volumes:
+  #     - docuseal_db_data:/var/lib/postgresql/data
+  #   healthcheck:
+  #     test: ["CMD-SHELL", "pg_isready -U ${DOCUSEAL_DB_USER} -d ${DOCUSEAL_DB_NAME}"]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 10
+
+volumes:
+  docuseal_data:
+  # docuseal_db_data:   # uncomment with the bundled `db` service above

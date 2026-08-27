@@ -1,0 +1,20 @@
+[template]
+id          = "documenso"
+name        = "Documenso"
+description = "Open-source document signing — upload a PDF, place fields, send it for signature, and get a cryptographically signed document back. An alternative to DocuSign."
+version     = "latest"
+categories  = ["productivity", "business"]
+tags        = ["e-signature", "documents", "pdf", "postgresql", "docusign"]
+icon        = "https://github.com/documenso.png"
+website     = "https://documenso.com"
+docs        = "https://docs.documenso.com/docs/self-hosting"
+source      = "https://github.com/documenso/documenso"
+license     = "AGPL-3.0"
+
+[files]
+setup = "setup.md"
+
+[[ports]]
+container   = 3000
+description = "Web UI & API"
+primary     = true

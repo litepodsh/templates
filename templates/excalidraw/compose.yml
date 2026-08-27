@@ -1,0 +1,12 @@
+# Excalidraw is a static, client-only app — scenes live in the browser's local
+# storage or in files the user exports. No volume, no database. Real-time
+# collaboration needs the separate excalidraw-room server, which is not included.
+services:
+  excalidraw:
+    image: docker.io/excalidraw/excalidraw:latest
+    restart: unless-stopped
+    expose:
+      - "80"
+    # Uncomment to publish Excalidraw directly on the host instead of only exposing it to the Compose network.
+    # ports:
+    #   - "${EXCALIDRAW_PORT}:80"

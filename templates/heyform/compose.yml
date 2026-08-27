@@ -1,0 +1,52 @@
+# Image versions match HeyForm's documented self-hosting stack: Percona Server
+# for MongoDB 4.4 and KeyDB (a Redis-compatible drop-in).
+services:
+  heyform:
+    image: docker.io/heyform/community-edition:latest
+    restart: unless-stopped
+    depends_on:
+      mongo:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    expose:
+      - "8000"
+    # Uncomment to publish HeyForm directly on the host instead of only exposing it to the Compose network.
+    # ports:
+    #   - "${HEYFORM_PORT}:8000"
+    environment:
+      APP_HOMEPAGE_URL: ${HEYFORM_APP_HOMEPAGE_URL}
+      SESSION_KEY: ${HEYFORM_SESSION_KEY}
+      FORM_ENCRYPTION_KEY: ${HEYFORM_FORM_ENCRYPTION_KEY}
+      MONGO_URI: mongodb://mongo:27017/${HEYFORM_DB_NAME}
+      REDIS_HOST: redis
+      REDIS_PORT: "6379"
+    volumes:
+      - heyform_assets:/app/static/upload
+
+  mongo:
+    image: docker.io/percona/percona-server-mongodb:4.4
+    restart: unless-stopped
+    volumes:
+      - heyform_mongo_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongo", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+
+  redis:
+    image: docker.io/eqalpha/keydb:6.3.3
+    restart: unless-stopped
+    volumes:
+      - heyform_keydb_data:/data
+    healthcheck:
+      test: ["CMD", "keydb-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  heyform_assets:
+  heyform_mongo_data:
+  heyform_keydb_data:

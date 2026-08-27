@@ -1,0 +1,23 @@
+# Grist stores everything (documents as SQLite files, home DB, config) under
+# /persist in the grist_data volume. No external database needed.
+services:
+  grist:
+    image: docker.io/gristlabs/grist:latest
+    restart: unless-stopped
+    expose:
+      - "8484"
+    # Uncomment to publish Grist directly on the host instead of only exposing it to the Compose network.
+    # ports:
+    #   - "${GRIST_PORT}:8484"
+    environment:
+      APP_HOME_URL: ${GRIST_APP_HOME_URL}
+      GRIST_SESSION_SECRET: ${GRIST_SESSION_SECRET}
+      GRIST_DEFAULT_EMAIL: ${GRIST_DEFAULT_EMAIL}
+      GRIST_FORCE_LOGIN: ${GRIST_FORCE_LOGIN}
+      GRIST_SANDBOX_FLAVOR: ${GRIST_SANDBOX_FLAVOR}
+      GRIST_SINGLE_ORG: ${GRIST_SINGLE_ORG}
+    volumes:
+      - grist_data:/persist
+
+volumes:
+  grist_data:

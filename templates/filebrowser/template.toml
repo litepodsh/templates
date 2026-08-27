@@ -1,0 +1,20 @@
+[template]
+id          = "filebrowser"
+name        = "File Browser"
+description = "Web file manager for a single directory tree — browse, upload, edit, share links, and manage users from the browser."
+version     = "latest"
+categories  = ["storage", "productivity"]
+tags        = ["files", "file-manager", "upload", "sharing", "web"]
+icon        = "https://github.com/filebrowser.png"
+website     = "https://filebrowser.org"
+docs        = "https://filebrowser.org/installation"
+source      = "https://github.com/filebrowser/filebrowser"
+license     = "Apache-2.0"
+
+[files]
+setup = "setup.md"
+
+[[ports]]
+container   = 80
+description = "Web UI"
+primary     = true

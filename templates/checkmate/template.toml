@@ -1,0 +1,17 @@
+[template]
+id          = "checkmate"
+name        = "Checkmate"
+description = "Self-hosted monitoring for uptime, response time, incidents, server hardware, Docker containers, and public status pages."
+version     = "latest"
+categories  = ["monitoring", "devops"]
+tags        = ["uptime", "monitoring", "status-page", "incidents", "mongodb"]
+icon        = "https://github.com/bluewave-labs.png"
+website     = "https://checkmate.so"
+docs        = "https://docs.checkmate.so"
+source      = "https://github.com/bluewave-labs/Checkmate"
+license     = "AGPL-3.0"
+
+[[ports]]
+container   = 52345
+description = "Web UI & API"
+primary     = true

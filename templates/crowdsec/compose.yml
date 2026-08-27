@@ -1,0 +1,31 @@
+# CrowdSec engine + Local API. Bouncers (nginx, Caddy, firewall, …) run
+# separately and talk to the LAPI on port 8080 with a key issued by
+# `cscli bouncers add`.
+#
+# Log acquisition normally means giving the container read access to the log
+# files it should parse. Named volumes can't reach host paths, so this template
+# ships the engine only — see setup.md for adding acquisition sources.
+services:
+  crowdsec:
+    image: docker.io/crowdsecurity/crowdsec:latest
+    restart: unless-stopped
+    expose:
+      - "8080"
+    # Uncomment to publish the LAPI / metrics directly on the host instead of only exposing them to the Compose network.
+    # ports:
+    #   - "${CROWDSEC_LAPI_PORT}:8080"
+    #   - "${CROWDSEC_METRICS_PORT}:6060"
+    environment:
+      # Space-separated hub collections installed on first start.
+      COLLECTIONS: ${CROWDSEC_COLLECTIONS}
+      GID: ${CROWDSEC_GID}
+      TZ: ${CROWDSEC_TZ}
+      # Set to true to run fully offline (no community blocklist push/pull).
+      DISABLE_ONLINE_API: ${CROWDSEC_DISABLE_ONLINE_API}
+    volumes:
+      - crowdsec_config:/etc/crowdsec
+      - crowdsec_data:/var/lib/crowdsec/data
+
+volumes:
+  crowdsec_config:
+  crowdsec_data:

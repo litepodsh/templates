@@ -1,0 +1,14 @@
+services:
+  drawio:
+    image: docker.io/jgraph/drawio:latest
+    restart: unless-stopped
+    expose:
+      - "8080"
+    # Uncomment to publish the editor directly on the host instead of only exposing it to the Compose network.
+    # ports:
+    #   - "${DRAWIO_PORT}:8080"
+    environment:
+      PUBLIC_HOST: ${DRAWIO_PUBLIC_HOST}
+      DRAWIO_BASE_URL: ${DRAWIO_BASE_URL}
+      DRAWIO_CSP_HEADER: ${DRAWIO_CSP_HEADER}
+      LETS_ENCRYPT_ENABLED: ${DRAWIO_LETS_ENCRYPT_ENABLED}

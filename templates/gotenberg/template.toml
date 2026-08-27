@@ -1,0 +1,17 @@
+[template]
+id          = "gotenberg"
+name        = "Gotenberg"
+description = "Stateless API for converting HTML, Markdown, and Office documents to PDF (Chromium and LibreOffice under the hood)."
+version     = "8"
+categories  = ["developer-tools", "productivity"]
+tags        = ["pdf", "conversion", "api", "chromium", "libreoffice"]
+icon        = "https://github.com/gotenberg.png"
+website     = "https://gotenberg.dev"
+docs        = "https://gotenberg.dev/docs/getting-started/introduction"
+source      = "https://github.com/gotenberg/gotenberg"
+license     = "MIT"
+
+[[ports]]
+container   = 3000
+description = "Conversion API"
+primary     = true

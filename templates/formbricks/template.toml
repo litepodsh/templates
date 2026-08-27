@@ -1,0 +1,20 @@
+[template]
+id          = "formbricks"
+name        = "Formbricks"
+description = "Open-source experience management — in-app and link surveys, feedback widgets, and NPS, with all response data on your own infrastructure."
+version     = "latest"
+categories  = ["forms", "analytics"]
+tags        = ["surveys", "forms", "feedback", "postgresql", "nps"]
+icon        = "https://github.com/formbricks.png"
+website     = "https://formbricks.com"
+docs        = "https://formbricks.com/docs/self-hosting/setup/docker"
+source      = "https://github.com/formbricks/formbricks"
+license     = "AGPL-3.0"
+
+[files]
+setup = "setup.md"
+
+[[ports]]
+container   = 3000
+description = "Web UI, API & survey embeds"
+primary     = true

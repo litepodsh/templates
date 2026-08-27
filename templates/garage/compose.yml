@@ -1,0 +1,81 @@
+# Garage S3 storage + garage-webui.
+#
+# Garage is configured from /etc/garage.toml. Bind mounts don't work rootless,
+# so the file is inlined below as a compose `config` (the supabase template uses
+# the same trick). Compose interpolates ${...} in config content from .env;
+# there are no literal `$` in this file so none need doubling.
+x-garage-config: &garage-config |
+  metadata_dir = "/var/lib/garage/meta"
+  data_dir = "/var/lib/garage/data"
+  db_engine = "lmdb"
+
+  metadata_auto_snapshot_interval = "6h"
+
+  replication_factor = 1
+  consistency_mode = "consistent"
+
+  rpc_bind_addr = "[::]:3901"
+  rpc_public_addr = "127.0.0.1:3901"
+  rpc_secret = "${GARAGE_RPC_SECRET}"
+
+  [s3_api]
+  s3_region = "${GARAGE_REGION}"
+  api_bind_addr = "[::]:3900"
+  root_domain = "${GARAGE_S3_ROOT_DOMAIN}"
+
+  [s3_web]
+  bind_addr = "[::]:3902"
+  root_domain = "${GARAGE_WEB_ROOT_DOMAIN}"
+  index = "index.html"
+
+  [admin]
+  api_bind_addr = "[::]:3903"
+  admin_token = "${GARAGE_ADMIN_TOKEN}"
+  metrics_token = "${GARAGE_METRICS_TOKEN}"
+
+configs:
+  garage_config:
+    content: *garage-config
+
+services:
+  garage:
+    image: docker.io/dxflrs/garage:v2.0.0
+    restart: unless-stopped
+    expose:
+      - "3900"
+      - "3901"
+      - "3902"
+      - "3903"
+    # Uncomment to publish the S3 / admin APIs directly on the host instead of only exposing them to the Compose network.
+    # ports:
+    #   - "${GARAGE_S3_PORT}:3900"
+    #   - "${GARAGE_ADMIN_PORT}:3903"
+    configs:
+      - source: garage_config
+        target: /etc/garage.toml
+    volumes:
+      - garage_meta:/var/lib/garage/meta
+      - garage_data:/var/lib/garage/data
+
+  garage-webui:
+    image: docker.io/khairul169/garage-webui:latest
+    restart: unless-stopped
+    depends_on:
+      - garage
+    expose:
+      - "3909"
+    # Uncomment to publish the web UI directly on the host instead of only exposing it to the Compose network.
+    # ports:
+    #   - "${GARAGE_WEBUI_PORT}:3909"
+    configs:
+      - source: garage_config
+        target: /etc/garage.toml
+    environment:
+      API_BASE_URL: http://garage:3903
+      S3_ENDPOINT_URL: http://garage:3900
+      # Basic-auth for the UI itself, "user:password".
+      AUTH_USER_PASS: ${GARAGE_WEBUI_AUTH_USER_PASS}
+
+volumes:
+  garage_meta:
+  garage_data:

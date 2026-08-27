@@ -1,0 +1,15 @@
+# Gotenberg is a stateless conversion API — no volume, no database.
+services:
+  gotenberg:
+    image: docker.io/gotenberg/gotenberg:8
+    restart: unless-stopped
+    expose:
+      - "3000"
+    # Uncomment to publish the API directly on the host instead of only exposing it to the Compose network.
+    # ports:
+    #   - "${GOTENBERG_PORT}:3000"
+    command:
+      - "gotenberg"
+      - "--api-port=3000"
+      - "--api-timeout=${GOTENBERG_API_TIMEOUT}"
+      - "--log-level=${GOTENBERG_LOG_LEVEL}"

@@ -1,0 +1,40 @@
+[template]
+id          = "poste.io"
+name        = "Poste.io"
+description = "All-in-one mail server — SMTP, IMAP, POP3, webmail, antispam and antivirus in a single container, managed from a web admin UI."
+version     = "latest"
+categories  = ["email", "communication"]
+tags        = ["mail-server", "smtp", "imap", "webmail", "antispam"]
+icon        = "https://github.com/analogic.png"
+website     = "https://poste.io"
+docs        = "https://poste.io/doc/getting-started"
+source      = "https://github.com/analogic/mailserver"
+license     = "Proprietary"
+
+[files]
+setup = "setup.md"
+
+[[ports]]
+container   = 80
+description = "Admin UI & webmail"
+primary     = true
+
+[[ports]]
+container   = 25
+description = "SMTP"
+
+[[ports]]
+container   = 465
+description = "SMTP (implicit TLS)"
+
+[[ports]]
+container   = 587
+description = "Submission (STARTTLS)"
+
+[[ports]]
+container   = 993
+description = "IMAPS"
+
+[[ports]]
+container   = 995
+description = "POP3S"

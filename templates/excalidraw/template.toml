@@ -1,0 +1,17 @@
+[template]
+id          = "excalidraw"
+name        = "Excalidraw"
+description = "Virtual hand-drawn style whiteboard for sketches and diagrams. Runs entirely in the browser; scenes are stored in local storage or exported as files."
+version     = "latest"
+categories  = ["productivity", "collaboration"]
+tags        = ["whiteboard", "drawing", "diagrams", "excalidraw"]
+icon        = "https://github.com/excalidraw.png"
+website     = "https://excalidraw.com"
+docs        = "https://github.com/excalidraw/excalidraw/blob/master/docs/self-hosting.md"
+source      = "https://github.com/excalidraw/excalidraw"
+license     = "MIT"
+
+[[ports]]
+container   = 80
+description = "Web UI"
+primary     = true

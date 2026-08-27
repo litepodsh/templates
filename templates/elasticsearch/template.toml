@@ -1,0 +1,20 @@
+[template]
+id          = "elasticsearch"
+name        = "Elasticsearch"
+description = "Distributed search and analytics engine — full-text search, vector search, logs and metrics storage. Single-node configuration."
+version     = "9.5.1"
+categories  = ["database", "developer-tools"]
+tags        = ["search", "analytics", "full-text", "vector-search", "lucene"]
+icon        = "https://github.com/elastic.png"
+website     = "https://www.elastic.co/elasticsearch"
+docs        = "https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html"
+source      = "https://github.com/elastic/elasticsearch"
+license     = "Elastic-2.0"
+
+[files]
+setup = "setup.md"
+
+[[ports]]
+container   = 9200
+description = "REST API"
+primary     = true

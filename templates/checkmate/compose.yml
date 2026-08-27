@@ -1,0 +1,40 @@
+# Checkmate ships as a single image (client + server) that talks to MongoDB.
+# The container serves the UI and API on 52345 and a health endpoint on 52346.
+services:
+  checkmate:
+    image: ghcr.io/bluewave-labs/checkmate:latest
+    restart: unless-stopped
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    expose:
+      - "52345"
+    # Uncomment to publish Checkmate directly on the host instead of only exposing it to the Compose network.
+    # ports:
+    #   - "${CHECKMATE_PORT}:52345"
+    environment:
+      DB_CONNECTION_STRING: mongodb://mongodb:27017/${CHECKMATE_DB_NAME}
+      CLIENT_HOST: ${CHECKMATE_CLIENT_HOST}
+      JWT_SECRET: ${CHECKMATE_JWT_SECRET}
+    stop_grace_period: 60s
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:52346/livez',r=>process.exit(r.statusCode===200?0:1)).on('error',()=>process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 60s
+
+  mongodb:
+    image: docker.io/library/mongo:8.0
+    restart: unless-stopped
+    command: ["mongod", "--quiet", "--bind_ip_all"]
+    volumes:
+      - checkmate_mongo_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+
+volumes:
+  checkmate_mongo_data:

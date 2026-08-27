@@ -1,0 +1,17 @@
+[template]
+id          = "grist"
+name        = "Grist"
+description = "Modern relational spreadsheet — combines the flexibility of a spreadsheet with the structure of a database, with Python formulas and a REST API."
+version     = "latest"
+categories  = ["database", "productivity"]
+tags        = ["spreadsheet", "low-code", "airtable", "database", "python"]
+icon        = "https://github.com/gristlabs.png"
+website     = "https://www.getgrist.com"
+docs        = "https://support.getgrist.com/self-managed/"
+source      = "https://github.com/gristlabs/grist-core"
+license     = "Apache-2.0"
+
+[[ports]]
+container   = 8484
+description = "Web UI & API"
+primary     = true

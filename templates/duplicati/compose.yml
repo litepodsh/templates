@@ -1,0 +1,25 @@
+services:
+  duplicati:
+    image: docker.io/duplicati/duplicati:latest
+    restart: unless-stopped
+    expose:
+      - "8200"
+    # Uncomment to publish the UI directly on the host instead of only exposing it to the Compose network.
+    # ports:
+    #   - "${DUPLICATI_PORT}:8200"
+    environment:
+      TZ: ${DUPLICATI_TZ}
+      # Password for the web UI. Remove to run without a UI login (not recommended).
+      DUPLICATI__WEBSERVICE_PASSWORD: ${DUPLICATI_WEBSERVICE_PASSWORD}
+      # Bind the internal server to all interfaces so the reverse proxy can reach it.
+      DUPLICATI__WEBSERVICE_INTERFACE: ${DUPLICATI_WEBSERVICE_INTERFACE}
+      # Encrypts the local job/config database. Keep a copy — without it a restore
+      # of Duplicati itself is impossible.
+      SETTINGS_ENCRYPTION_KEY: ${DUPLICATI_SETTINGS_ENCRYPTION_KEY}
+    volumes:
+      - duplicati_config:/data
+      # Add the named volumes of other stacks here (read-only) to back them up, e.g.:
+      #   - some_app_data:/source/some_app:ro
+
+volumes:
+  duplicati_config:

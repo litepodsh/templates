@@ -1,0 +1,24 @@
+[template]
+id          = "crowdsec"
+name        = "CrowdSec"
+description = "Collaborative intrusion-prevention engine — parses logs, detects aggressive behaviour, and shares anonymised signals with the community. Bouncers enforce the decisions."
+version     = "latest"
+categories  = ["security", "networking"]
+tags        = ["ips", "waf", "fail2ban", "security", "lapi"]
+icon        = "https://github.com/crowdsecurity.png"
+website     = "https://www.crowdsec.net"
+docs        = "https://docs.crowdsec.net/docs/getting_started/install_crowdsec_docker/"
+source      = "https://github.com/crowdsecurity/crowdsec"
+license     = "MIT"
+
+[files]
+setup = "setup.md"
+
+[[ports]]
+container   = 8080
+description = "Local API (LAPI) for bouncers"
+primary     = true
+
+[[ports]]
+container   = 6060
+description = "Prometheus metrics"

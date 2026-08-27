@@ -1,0 +1,80 @@
+# Trimmed Formbricks stack: the app, its Postgres (needs the pgvector extension),
+# Redis, and a one-shot migration job. Upstream's full compose additionally ships
+# Cube.js + Formbricks Hub for the analytics dashboards and mounts model files
+# from the repo; run that compose directly if you need those (see setup.md).
+services:
+  formbricks-migrate:
+    image: ghcr.io/formbricks/formbricks:latest
+    restart: "no"
+    command: ["node", "packages/database/dist/scripts/apply-migrations.js"]
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://${FORMBRICKS_DB_USER}:${FORMBRICKS_DB_PASSWORD}@db:5432/${FORMBRICKS_DB_NAME}
+
+  formbricks:
+    image: ghcr.io/formbricks/formbricks:latest
+    restart: unless-stopped
+    depends_on:
+      formbricks-migrate:
+        condition: service_completed_successfully
+      redis:
+        condition: service_healthy
+    expose:
+      - "3000"
+    # Uncomment to publish Formbricks directly on the host instead of only exposing it to the Compose network.
+    # ports:
+    #   - "${FORMBRICKS_PORT}:3000"
+    environment:
+      WEBAPP_URL: ${FORMBRICKS_WEBAPP_URL}
+      NEXTAUTH_URL: ${FORMBRICKS_WEBAPP_URL}
+      NEXTAUTH_SECRET: ${FORMBRICKS_NEXTAUTH_SECRET}
+      ENCRYPTION_KEY: ${FORMBRICKS_ENCRYPTION_KEY}
+      CRON_SECRET: ${FORMBRICKS_CRON_SECRET}
+      DATABASE_URL: postgresql://${FORMBRICKS_DB_USER}:${FORMBRICKS_DB_PASSWORD}@db:5432/${FORMBRICKS_DB_NAME}
+      REDIS_URL: redis://redis:6379
+      SKIP_STARTUP_MIGRATION: "true"
+      EMAIL_VERIFICATION_DISABLED: ${FORMBRICKS_EMAIL_VERIFICATION_DISABLED}
+      PASSWORD_RESET_DISABLED: ${FORMBRICKS_PASSWORD_RESET_DISABLED}
+      MAIL_FROM: ${FORMBRICKS_MAIL_FROM}
+      MAIL_FROM_NAME: ${FORMBRICKS_MAIL_FROM_NAME}
+      SMTP_HOST: ${FORMBRICKS_SMTP_HOST}
+      SMTP_PORT: ${FORMBRICKS_SMTP_PORT}
+      SMTP_USER: ${FORMBRICKS_SMTP_USER}
+      SMTP_PASSWORD: ${FORMBRICKS_SMTP_PASSWORD}
+      SMTP_SECURE_ENABLED: ${FORMBRICKS_SMTP_SECURE_ENABLED}
+    volumes:
+      - formbricks_uploads:/home/nextjs/apps/web/uploads
+
+  db:
+    image: docker.io/pgvector/pgvector:pg18
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${FORMBRICKS_DB_NAME}
+      POSTGRES_USER: ${FORMBRICKS_DB_USER}
+      POSTGRES_PASSWORD: ${FORMBRICKS_DB_PASSWORD}
+    volumes:
+      - formbricks_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${FORMBRICKS_DB_USER} -d ${FORMBRICKS_DB_NAME}"]
+      interval: ${FORMBRICKS_DB_HEALTHCHECK_INTERVAL}
+      timeout: ${FORMBRICKS_DB_HEALTHCHECK_TIMEOUT}
+      retries: ${FORMBRICKS_DB_HEALTHCHECK_RETRIES}
+
+  redis:
+    image: docker.io/library/redis:8
+    command: ["redis-server", "--appendonly", "yes", "--maxmemory-policy", "noeviction"]
+    restart: unless-stopped
+    volumes:
+      - formbricks_redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  formbricks_uploads:
+  formbricks_db_data:
+  formbricks_redis_data:

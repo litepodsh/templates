@@ -1,0 +1,17 @@
+[template]
+id          = "drawio"
+name        = "draw.io"
+description = "Self-hosted diagram editor (flowcharts, UML, network diagrams). Fully client-side — no diagram data leaves the browser."
+version     = "latest"
+categories  = ["productivity", "developer-tools"]
+tags        = ["diagrams", "drawio", "flowchart", "uml", "whiteboard"]
+icon        = "https://github.com/jgraph.png"
+website     = "https://www.drawio.com"
+docs        = "https://www.drawio.com/doc/faq/configure-diagram-editor"
+source      = "https://github.com/jgraph/docker-drawio"
+license     = "Apache-2.0"
+
+[[ports]]
+container   = 8080
+description = "Web editor"
+primary     = true

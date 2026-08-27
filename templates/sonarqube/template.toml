@@ -1,0 +1,20 @@
+[template]
+id          = "sonarqube"
+name        = "SonarQube"
+description = "Continuous code quality and security analysis — static analysis for bugs, code smells, vulnerabilities, coverage, and duplication, with PR decoration. Community build."
+version     = "community"
+categories  = ["developer-tools", "devops"]
+tags        = ["code-quality", "static-analysis", "sast", "ci", "postgresql"]
+icon        = "https://github.com/SonarSource.png"
+website     = "https://www.sonarsource.com/products/sonarqube/"
+docs        = "https://docs.sonarsource.com/sonarqube-community-build/setup-and-upgrade/install-the-server/introduction/"
+source      = "https://github.com/SonarSource/docker-sonarqube"
+license     = "LGPL-3.0"
+
+[files]
+setup = "setup.md"
+
+[[ports]]
+container   = 9000
+description = "Web UI & API"
+primary     = true
