@@ -1,14 +1,21 @@
-# Poste.io is a full mail server: it needs the standard mail ports published on
-# the host with their real numbers (MX and mail clients expect 25/465/587/993/…),
-# so these are direct mappings rather than the usual expose + reverse proxy.
+# Poste.io is a full mail server. The mail protocol ports must be published on
+# the host with their real numbers (MX and mail clients expect 25/465/587/993/…)
+# — a reverse proxy can't carry SMTP/IMAP/POP.
+#
+# The admin UI / webmail is plain HTTP on container port 80 and is meant to sit
+# behind LitePod's Caddy, which terminates TLS and does the HTTP->HTTPS
+# redirect. So no host 80/443 mapping here. Publish host 80 (commented below)
+# only if you want Poste.io's built-in Let's Encrypt client to issue the
+# certificate for the mail ports itself; otherwise feed it Caddy's certificate
+# (see setup.md).
 services:
   posteio:
     image: docker.io/analogic/poste.io:latest
     restart: unless-stopped
     hostname: ${POSTEIO_HOSTNAME}
+    expose:
+      - "80"
     ports:
-      - "${POSTEIO_HTTP_PORT}:80"
-      - "${POSTEIO_HTTPS_PORT}:443"
       - "25:25"
       - "110:110"
       - "143:143"
@@ -16,9 +23,13 @@ services:
       - "587:587"
       - "993:993"
       - "995:995"
+    # Uncomment to publish the admin UI / webmail on the host (standalone use), or
+    # to let Poste.io run its own ACME HTTP-01 challenge for the mail-port certs.
+    # ports:
+    #   - "${POSTEIO_HTTP_PORT}:80"
     environment:
       TZ: ${POSTEIO_TZ}
-      # OFF when a reverse proxy terminates TLS for the admin UI / webmail.
+      # OFF: Caddy terminates TLS for the admin UI / webmail and forwards plain HTTP.
       HTTPS: ${POSTEIO_HTTPS}
       # ClamAV needs ~1 GB RAM; set TRUE on small hosts.
       DISABLE_CLAMAV: ${POSTEIO_DISABLE_CLAMAV}

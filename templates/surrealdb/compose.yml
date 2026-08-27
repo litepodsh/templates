@@ -2,9 +2,23 @@ services:
   surrealdb:
     image: docker.io/surrealdb/surrealdb:latest
     restart: unless-stopped
-    ports:
-      - "${SURREAL_PORT}:8000"
-    command: start --log info --user ${SURREAL_USER} --pass ${SURREAL_PASS} surrealdb://data/database
+    # The image runs as a distroless `nonroot` user that cannot write to a
+    # root-owned named volume. Running as root (which maps to the invoking host
+    # user under rootless Podman, so it is not privileged on the host) lets
+    # SurrealDB create its RocksDB directory under /data.
+    user: root
+    expose:
+      - "8000"
+    # HTTP and the WebSocket RPC endpoint (/rpc) share port 8000, so the reverse
+    # proxy can route a domain straight to it - `wss://<domain>/rpc` works with no
+    # extra config. Uncomment to ALSO publish it directly on the host; the two can
+    # coexist.
+    # ports:
+    #   - "${SURREAL_PORT}:8000"
+    # `rocksdb:/data/database` is the on-disk storage backend under the mounted
+    # volume; `--bind` makes the server listen on all interfaces so both the proxy
+    # network and the optional host port can reach it.
+    command: start --log ${SURREAL_LOG_LEVEL} --user ${SURREAL_USER} --pass ${SURREAL_PASS} --bind 0.0.0.0:8000 rocksdb:/data/database
     volumes:
       - surrealdb_data:/data
 

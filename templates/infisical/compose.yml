@@ -40,7 +40,6 @@ services:
 
   redis:
     image: docker.io/library/redis:8
-    command: ["redis-server", "--appendonly", "yes"]
     restart: unless-stopped
     volumes:
       - infisical_redis_data:/data

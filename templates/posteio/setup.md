@@ -18,18 +18,36 @@ A working mail server needs, for `mail.example.com` serving `example.com`:
 Port 25 must be reachable inbound and allowed outbound — many cloud providers
 block it by default and require a support request.
 
+# Ports 80 / 443 and LitePod's Caddy
+
+You do **not** publish host `80` / `443` for this template. Caddy owns `443`,
+does the HTTP→HTTPS redirect, and reverse-proxies the admin UI / webmail to the
+container's plain-HTTP port `80` over the Compose network (`HTTPS=OFF` tells
+Poste.io to trust the proxy). That covers all web traffic and redirection.
+
+The mail ports (`25`, `465`, `587`, `143`, `993`, `110`, `995`) are still mapped
+directly on the host — Caddy is an HTTP proxy and cannot carry SMTP/IMAP/POP.
+
 # First run
 
-Open `http://<host>:<POSTEIO_HTTP_PORT>/admin` and complete the first-run wizard
-(creates the admin account and the first domain). All mailboxes, config, TLS
-certs and logs live in the `posteio_data` volume.
+Reach `/admin` through the domain Caddy routes to this container and complete the
+first-run wizard (creates the admin account and the first domain). All mailboxes,
+config, TLS certs and logs live in the `posteio_data` volume.
 
-# TLS
+# TLS for the mail ports
 
-With `POSTEIO_HTTPS=OFF` Poste.io serves the UI/webmail over plain HTTP and
-expects LitePod's reverse proxy to add TLS. For the mail ports it can obtain its
-own Let's Encrypt certificate from the admin UI (needs port 80 reachable), or you
-can import certificates there.
+The web side is handled by Caddy. The mail ports (`465`/`587`/`993`/…) present
+Poste.io's *own* certificate. Two options:
+
+1. **Reuse Caddy's certificate** (recommended, no extra ports). Caddy already
+   holds a Let's Encrypt cert for the mail hostname; copy it into the
+   `posteio_data` volume at `/data/ssl/server.crt` + `/data/ssl/server.key` (or
+   import it in the admin UI) and re-copy after each renewal — same pattern as
+   the `documenso` template.
+2. **Let Poste.io run its own ACME.** Uncomment the `${POSTEIO_HTTP_PORT}:80`
+   mapping in `compose.yml` so the HTTP-01 challenge on the mail hostname can
+   reach the container, then request the certificate from the admin UI. This
+   means Poste.io, not Caddy, must answer port 80 for that hostname.
 
 # Resources
 
