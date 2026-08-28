@@ -1,0 +1,20 @@
+[template]
+id          = "prometheus"
+name        = "Prometheus"
+description = "Time-series database and monitoring system — scrapes metrics from configured targets, stores them, and serves PromQL queries and alerting rules. Pairs with Grafana."
+version     = "latest"
+categories  = ["monitoring", "devops"]
+tags        = ["metrics", "monitoring", "time-series", "promql", "alerting"]
+icon        = "https://github.com/prometheus.png"
+website     = "https://prometheus.io"
+docs        = "https://prometheus.io/docs/prometheus/latest/installation/"
+source      = "https://github.com/prometheus/prometheus"
+license     = "Apache-2.0"
+
+[files]
+setup = "setup.md"
+
+[[ports]]
+container   = 9090
+description = "Web UI & API"
+primary     = true

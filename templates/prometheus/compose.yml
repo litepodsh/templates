@@ -1,0 +1,55 @@
+# prometheus.yml is inlined as a compose `config` (bind mounts don't work
+# rootless — same approach as the supabase template). Edit the scrape targets
+# in `x-prometheus-config` below and redeploy, or POST to /-/reload
+# (--web.enable-lifecycle is on).
+#
+# NOTE: setting `command:` replaces the image's default arguments entirely, so
+# --config.file and --storage.tsdb.path must be repeated here or Prometheus
+# falls back to a relative `prometheus.yml` that doesn't exist and crash-loops.
+x-prometheus-config: &prometheus-config |
+  global:
+    scrape_interval: ${PROMETHEUS_SCRAPE_INTERVAL}
+    evaluation_interval: ${PROMETHEUS_SCRAPE_INTERVAL}
+
+  scrape_configs:
+    - job_name: prometheus
+      static_configs:
+        - targets: ["localhost:9090"]
+
+    # Add your own targets, e.g.:
+    # - job_name: node
+    #   static_configs:
+    #     - targets: ["node-exporter:9100"]
+
+configs:
+  prometheus_config:
+    content: *prometheus-config
+
+services:
+  prometheus:
+    image: docker.io/prom/prometheus:latest
+    restart: unless-stopped
+    expose:
+      - "9090"
+    # Uncomment to publish the UI/API directly on the host instead of only exposing it to the Compose network.
+    # ports:
+    #   - "${PROMETHEUS_PORT}:9090"
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--storage.tsdb.retention.time=${PROMETHEUS_RETENTION_TIME}"
+      - "--web.enable-lifecycle"
+    configs:
+      - source: prometheus_config
+        target: /etc/prometheus/prometheus.yml
+    volumes:
+      - prometheus_data:/prometheus
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:9090/-/healthy"]
+      interval: ${PROMETHEUS_HEALTHCHECK_INTERVAL}
+      timeout: ${PROMETHEUS_HEALTHCHECK_TIMEOUT}
+      retries: ${PROMETHEUS_HEALTHCHECK_RETRIES}
+      start_period: ${PROMETHEUS_HEALTHCHECK_START_PERIOD}
+
+volumes:
+  prometheus_data:

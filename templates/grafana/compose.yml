@@ -26,12 +26,18 @@ services:
   #     - loki_data:/tmp/loki
 
   # Optional Prometheus metrics store. Uncomment this service and its volume below to enable it.
+  # A `command:` replaces the image's default args entirely, so --config.file must
+  # be kept or Prometheus crash-loops looking for a relative prometheus.yml. The
+  # image ships a self-scrape default at that path; for real scrape targets use
+  # the dedicated `prometheus` template (it inlines an editable config).
   # prometheus:
   #   image: docker.io/prom/prometheus:latest
   #   restart: unless-stopped
   #   ports:
   #     - "${PROMETHEUS_PORT}:9090"
-  #   command: --storage.tsdb.path=/prometheus
+  #   command:
+  #     - "--config.file=/etc/prometheus/prometheus.yml"
+  #     - "--storage.tsdb.path=/prometheus"
   #   volumes:
   #     - prometheus_data:/prometheus
 
