@@ -2,3 +2,5 @@
 /.svelte-kit
 /.agents
 /.claude
+/docs
+/build

@@ -48,26 +48,33 @@
 	<Toaster />
 {/if}
 
-<div class="min-h-svh bg-background text-foreground">
-	<header class="border-b">
-		<div class="mx-auto flex h-14 w-full max-w-7xl items-center justify-between gap-4 px-4 sm:px-6">
-			<a href="/" class="flex items-center gap-2 font-semibold">
-				<BoxesIcon class="size-5" />
-				Templates
-			</a>
-			<div class="flex items-center gap-1">
-				<Button variant="ghost" size="sm" href="/docs">
-					<FileJsonIcon class="size-4" />
-					API docs
-				</Button>
-				<span
-					class="font-mono text-xs text-muted-foreground"
-					title="{APP_NAME} v{APP_VERSION}"
-				>v{APP_VERSION}</span>
-				<ThemeToggle />
-			</div>
-		</div>
-	</header>
+<div class="relative min-h-svh overflow-hidden bg-background text-foreground">
+	<div class="litepod-ambient" aria-hidden="true">
+		<div class="litepod-orb litepod-orb--one"></div>
+		<div class="litepod-orb litepod-orb--two"></div>
+	</div>
 
-	{@render children()}
+	<div class="relative z-10">
+		<header class="border-b border-border/80 bg-background/75 backdrop-blur-md">
+			<div class="mx-auto flex h-14 w-full max-w-7xl items-center justify-between gap-4 px-4 sm:px-6">
+				<a href="/" class="flex items-center gap-2 font-semibold tracking-tight">
+					<BoxesIcon class="size-5" />
+					Templates
+				</a>
+				<div class="flex items-center gap-1">
+					<Button variant="ghost" size="sm" href="/docs">
+						<FileJsonIcon class="size-4" />
+						API docs
+					</Button>
+					<span
+						class="font-mono text-xs text-muted-foreground"
+						title="{APP_NAME} v{APP_VERSION}"
+					>v{APP_VERSION}</span>
+					<ThemeToggle />
+				</div>
+			</div>
+		</header>
+
+		{@render children()}
+	</div>
 </div>
