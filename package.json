@@ -13,8 +13,8 @@
 		"preview": "vite preview",
 		"start": "node build/index.js",
 		"prepare": "svelte-kit sync || echo ''",
-		"format": "oxfmt --write .",
-		"format:check": "oxfmt --check .",
+		"format": "oxfmt --write src tests package.json vite.config.ts",
+		"format:check": "oxfmt --check src tests package.json vite.config.ts",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch"
 	},
