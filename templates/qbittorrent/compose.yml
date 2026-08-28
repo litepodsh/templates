@@ -1,0 +1,27 @@
+services:
+  qbittorrent:
+    image: lscr.io/linuxserver/qbittorrent:latest
+    restart: unless-stopped
+    expose:
+      - "${QBITTORRENT_WEBUI_PORT}"
+    # The peer port must reach the host for inbound connections. Forward it on your
+    # router too, and set the same value as qBittorrent's listening port in the Web UI.
+    ports:
+      - "${QBITTORRENT_TORRENTING_PORT}:6881/tcp"
+      - "${QBITTORRENT_TORRENTING_PORT}:6881/udp"
+    # Uncomment to publish the Web UI directly on the host instead of only exposing it to the Compose network.
+    # ports:
+    #   - "${QBITTORRENT_WEBUI_PORT}:${QBITTORRENT_WEBUI_PORT}"
+    environment:
+      PUID: ${PUID}
+      PGID: ${PGID}
+      TZ: ${TZ}
+      WEBUI_PORT: ${QBITTORRENT_WEBUI_PORT}
+      TORRENTING_PORT: "6881"
+    volumes:
+      - qbittorrent_config:/config
+      - qbittorrent_downloads:/downloads
+
+volumes:
+  qbittorrent_config:
+  qbittorrent_downloads:

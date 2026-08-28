@@ -1,0 +1,20 @@
+[template]
+id          = "stirling-pdf"
+name        = "Stirling PDF"
+description = "Locally hosted web toolkit for PDF operations — merge, split, convert, OCR, sign, compress and 50+ more, all offline."
+version     = "latest"
+categories  = ["productivity", "documents"]
+tags        = ["pdf", "ocr", "documents", "conversion", "self-hosted"]
+icon        = "https://github.com/Stirling-Tools.png"
+website     = "https://www.stirlingpdf.com"
+docs        = "https://docs.stirlingpdf.com"
+source      = "https://github.com/Stirling-Tools/Stirling-PDF"
+license     = "MIT"
+
+[files]
+setup = "setup.md"
+
+[[ports]]
+container   = 8080
+description = "Web UI"
+primary     = true

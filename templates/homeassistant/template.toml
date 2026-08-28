@@ -1,0 +1,20 @@
+[template]
+id          = "homeassistant"
+name        = "Home Assistant"
+description = "Open-source home automation hub that puts local control and privacy first, with a web dashboard and thousands of integrations."
+version     = "stable"
+categories  = ["home-automation", "iot"]
+tags        = ["smart-home", "automation", "iot", "mqtt", "zigbee"]
+icon        = "https://github.com/home-assistant.png"
+website     = "https://www.home-assistant.io"
+docs        = "https://www.home-assistant.io/installation/linux#docker-compose"
+source      = "https://github.com/home-assistant/core"
+license     = "Apache-2.0"
+
+[files]
+setup = "setup.md"
+
+[[ports]]
+container   = 8123
+description = "Web UI & API"
+primary     = true

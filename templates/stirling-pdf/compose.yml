@@ -1,0 +1,28 @@
+services:
+  stirling-pdf:
+    image: docker.io/stirlingtools/stirling-pdf:latest
+    restart: unless-stopped
+    expose:
+      - "8080"
+    # Uncomment to publish Stirling PDF directly on the host instead of only exposing it to the Compose network.
+    # ports:
+    #   - "${STIRLING_PDF_PORT}:8080"
+    environment:
+      DISABLE_ADDITIONAL_FEATURES: ${STIRLING_PDF_DISABLE_ADDITIONAL_FEATURES}
+      DOCKER_ENABLE_SECURITY: ${STIRLING_PDF_ENABLE_SECURITY}
+      LANGS: ${STIRLING_PDF_LANGS}
+      SYSTEM_DEFAULTLOCALE: ${STIRLING_PDF_LOCALE}
+    volumes:
+      - stirling_tessdata:/usr/share/tessdata
+      - stirling_configs:/configs
+      - stirling_custom:/customFiles
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/api/v1/info/status || exit 1"]
+      interval: ${STIRLING_PDF_HEALTHCHECK_INTERVAL}
+      timeout: ${STIRLING_PDF_HEALTHCHECK_TIMEOUT}
+      retries: ${STIRLING_PDF_HEALTHCHECK_RETRIES}
+
+volumes:
+  stirling_tessdata:
+  stirling_configs:
+  stirling_custom:

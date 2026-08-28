@@ -1,0 +1,29 @@
+services:
+  code-server:
+    image: docker.io/codercom/code-server:latest
+    restart: unless-stopped
+    expose:
+      - "8080"
+    # Uncomment to publish the editor directly on the host instead of only exposing it to the Compose network.
+    # ports:
+    #   - "${CODE_SERVER_PORT}:8080"
+    environment:
+      PASSWORD: ${CODE_SERVER_PASSWORD}
+      SUDO_PASSWORD: ${CODE_SERVER_SUDO_PASSWORD}
+      TZ: ${CODE_SERVER_TZ}
+    volumes:
+      - code_server_data:/home/coder
+    depends_on:
+      init-perms:
+        condition: service_completed_successfully
+
+  # Fresh named volumes mount as root; code-server runs as uid 1000 and would
+  # not be able to write to /home/coder. Seed ownership once before it starts.
+  init-perms:
+    image: docker.io/library/busybox:latest
+    command: ["chown", "-R", "1000:1000", "/home/coder"]
+    volumes:
+      - code_server_data:/home/coder
+
+volumes:
+  code_server_data:

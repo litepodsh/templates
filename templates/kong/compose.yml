@@ -1,0 +1,78 @@
+# Kong Gateway OSS (the community `kong/kong` image — NOT `kong/kong-gateway`,
+# which is Enterprise). Runs on PostgreSQL so Kong Manager can create and edit
+# config, not just view it. See setup.md before exposing the Admin API.
+services:
+  kong:
+    image: docker.io/kong/kong:latest
+    restart: unless-stopped
+    expose:
+      - "8000"
+      - "8001"
+      - "8002"
+    # Kong Manager (:8002) calls the Admin API (:8001) FROM YOUR BROWSER. Both
+    # must be reachable at the URLs set in .env — either publish them here, or
+    # route those hostnames through a reverse proxy to this service. The proxy
+    # (:8000) is where your own APIs get served.
+    # ports:
+    #   - "${KONG_PROXY_PORT}:8000"
+    #   - "${KONG_ADMIN_PORT}:8001"
+    #   - "${KONG_MANAGER_PORT}:8002"
+    environment:
+      KONG_DATABASE: postgres
+      KONG_PG_HOST: db
+      KONG_PG_PORT: "5432"
+      KONG_PG_USER: ${KONG_PG_USER}
+      KONG_PG_PASSWORD: ${KONG_PG_PASSWORD}
+      KONG_PG_DATABASE: ${KONG_PG_DATABASE}
+      KONG_PROXY_LISTEN: 0.0.0.0:8000
+      KONG_ADMIN_LISTEN: 0.0.0.0:8001
+      KONG_ADMIN_GUI_LISTEN: 0.0.0.0:8002
+      KONG_ADMIN_GUI_URL: ${KONG_MANAGER_URL}
+      KONG_ADMIN_GUI_API_URL: ${KONG_ADMIN_URL}
+      KONG_PROXY_ACCESS_LOG: /dev/stdout
+      KONG_ADMIN_ACCESS_LOG: /dev/stdout
+      KONG_PROXY_ERROR_LOG: /dev/stderr
+      KONG_ADMIN_ERROR_LOG: /dev/stderr
+    healthcheck:
+      test: ["CMD", "kong", "health"]
+      interval: ${KONG_HEALTHCHECK_INTERVAL}
+      timeout: ${KONG_HEALTHCHECK_TIMEOUT}
+      retries: ${KONG_HEALTHCHECK_RETRIES}
+    depends_on:
+      db:
+        condition: service_healthy
+      kong-migrations:
+        condition: service_completed_successfully
+
+  kong-migrations:
+    image: docker.io/kong/kong:latest
+    command: kong migrations bootstrap
+    restart: on-failure
+    environment:
+      KONG_DATABASE: postgres
+      KONG_PG_HOST: db
+      KONG_PG_PORT: "5432"
+      KONG_PG_USER: ${KONG_PG_USER}
+      KONG_PG_PASSWORD: ${KONG_PG_PASSWORD}
+      KONG_PG_DATABASE: ${KONG_PG_DATABASE}
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: docker.io/library/postgres:17
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${KONG_PG_DATABASE}
+      POSTGRES_USER: ${KONG_PG_USER}
+      POSTGRES_PASSWORD: ${KONG_PG_PASSWORD}
+    volumes:
+      - kong_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${KONG_PG_USER} -d ${KONG_PG_DATABASE}"]
+      interval: ${KONG_DB_HEALTHCHECK_INTERVAL}
+      timeout: ${KONG_DB_HEALTHCHECK_TIMEOUT}
+      retries: ${KONG_DB_HEALTHCHECK_RETRIES}
+
+volumes:
+  kong_db_data:

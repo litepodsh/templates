@@ -1,0 +1,39 @@
+services:
+  wordpress:
+    image: docker.io/library/wordpress:latest
+    restart: unless-stopped
+    expose:
+      - "80"
+    # Uncomment to publish WordPress directly on the host instead of only exposing it to the Compose network.
+    # ports:
+    #   - "${WORDPRESS_PORT}:80"
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_NAME: ${WORDPRESS_DB_NAME}
+      WORDPRESS_DB_USER: ${WORDPRESS_DB_USER}
+      WORDPRESS_DB_PASSWORD: ${WORDPRESS_DB_PASSWORD}
+    volumes:
+      - wordpress_data:/var/www/html
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: docker.io/library/mariadb:11
+    restart: unless-stopped
+    environment:
+      MARIADB_DATABASE: ${WORDPRESS_DB_NAME}
+      MARIADB_USER: ${WORDPRESS_DB_USER}
+      MARIADB_PASSWORD: ${WORDPRESS_DB_PASSWORD}
+      MARIADB_ROOT_PASSWORD: ${WORDPRESS_DB_ROOT_PASSWORD}
+    volumes:
+      - mariadb_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: ${WORDPRESS_DB_HEALTHCHECK_INTERVAL}
+      timeout: ${WORDPRESS_DB_HEALTHCHECK_TIMEOUT}
+      retries: ${WORDPRESS_DB_HEALTHCHECK_RETRIES}
+
+volumes:
+  wordpress_data:
+  mariadb_data:

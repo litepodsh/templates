@@ -1,0 +1,28 @@
+[template]
+id          = "kong"
+name        = "Kong Gateway"
+description = "Cloud-native API gateway (OSS/community edition) with the built-in Kong Manager web UI, backed by PostgreSQL."
+version     = "latest"
+categories  = ["networking", "developer-tools"]
+tags        = ["api-gateway", "reverse-proxy", "kong", "postgres", "microservices"]
+icon        = "https://github.com/Kong.png"
+website     = "https://konghq.com"
+docs        = "https://developer.konghq.com/gateway/install/docker/"
+source      = "https://github.com/Kong/kong"
+license     = "Apache-2.0"
+
+[files]
+setup = "setup.md"
+
+[[ports]]
+container   = 8002
+description = "Kong Manager (web UI)"
+primary     = true
+
+[[ports]]
+container   = 8000
+description = "Proxy — your APIs are served here"
+
+[[ports]]
+container   = 8001
+description = "Admin API"

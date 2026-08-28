@@ -1,0 +1,20 @@
+[template]
+id          = "code-server"
+name        = "code-server"
+description = "VS Code running in the browser — a full IDE on a remote machine, accessed from any device."
+version     = "latest"
+categories  = ["developer-tools", "productivity"]
+tags        = ["vscode", "ide", "editor", "remote-development"]
+icon        = "https://github.com/coder.png"
+website     = "https://coder.com/docs/code-server"
+docs        = "https://coder.com/docs/code-server/install"
+source      = "https://github.com/coder/code-server"
+license     = "MIT"
+
+[files]
+setup = "setup.md"
+
+[[ports]]
+container   = 8080
+description = "Editor UI"
+primary     = true

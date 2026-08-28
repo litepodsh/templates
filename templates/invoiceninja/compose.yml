@@ -1,0 +1,132 @@
+# Invoice Ninja ships as PHP-FPM only, so it needs an nginx front-end. The nginx
+# vhost is seeded into a named volume on first start (no bind mounts); edit it in
+# the `invoiceninja_nginx` volume afterwards if needed.
+services:
+  app:
+    image: docker.io/invoiceninja/invoiceninja-debian:latest
+    restart: unless-stopped
+    environment:
+      IS_DOCKER: "true"
+      APP_ENV: production
+      APP_DEBUG: ${INVOICENINJA_APP_DEBUG}
+      APP_URL: ${INVOICENINJA_APP_URL}
+      APP_KEY: ${INVOICENINJA_APP_KEY}
+      REQUIRE_HTTPS: ${INVOICENINJA_REQUIRE_HTTPS}
+      TRUSTED_PROXIES: "*"
+      PDF_GENERATOR: snappdf
+      CACHE_DRIVER: file
+      SESSION_DRIVER: file
+      QUEUE_CONNECTION: database
+      DB_CONNECTION: mysql
+      DB_HOST: db
+      DB_PORT: "3306"
+      DB_DATABASE: ${INVOICENINJA_DB_NAME}
+      DB_USERNAME: ${INVOICENINJA_DB_USER}
+      DB_PASSWORD: ${INVOICENINJA_DB_PASSWORD}
+      IN_USER_EMAIL: ${INVOICENINJA_ADMIN_EMAIL}
+      IN_PASSWORD: ${INVOICENINJA_ADMIN_PASSWORD}
+      MAIL_MAILER: ${INVOICENINJA_MAIL_MAILER}
+      MAIL_HOST: ${INVOICENINJA_MAIL_HOST}
+      MAIL_PORT: ${INVOICENINJA_MAIL_PORT}
+      MAIL_USERNAME: ${INVOICENINJA_MAIL_USERNAME}
+      MAIL_PASSWORD: ${INVOICENINJA_MAIL_PASSWORD}
+      MAIL_ENCRYPTION: ${INVOICENINJA_MAIL_ENCRYPTION}
+      MAIL_FROM_ADDRESS: ${INVOICENINJA_MAIL_FROM_ADDRESS}
+      MAIL_FROM_NAME: ${INVOICENINJA_MAIL_FROM_NAME}
+    volumes:
+      - invoiceninja_public:/var/www/html/public
+      - invoiceninja_storage:/var/www/html/storage
+    depends_on:
+      db:
+        condition: service_healthy
+
+  nginx-config:
+    image: docker.io/library/busybox:latest
+    command:
+      - sh
+      - -c
+      - |
+        set -e
+        [ -f /conf/laravel.conf ] || cat > /conf/laravel.conf <<'EOF'
+        server {
+            listen 80 default_server;
+            server_name _;
+            root /var/www/html/public;
+            index index.php;
+            charset utf-8;
+            client_max_body_size 20M;
+
+            add_header X-Frame-Options "SAMEORIGIN";
+            add_header X-Content-Type-Options "nosniff";
+
+            location / {
+                try_files $$uri $$uri/ /index.php?$$query_string;
+            }
+
+            location = /favicon.ico { access_log off; log_not_found off; }
+            location = /robots.txt  { access_log off; log_not_found off; }
+
+            error_page 404 /index.php;
+
+            location ~ \.php$$ {
+                fastcgi_pass app:9000;
+                fastcgi_param SCRIPT_FILENAME $$realpath_root$$fastcgi_script_name;
+                include fastcgi_params;
+            }
+
+            location ~ /\.(?!well-known).* {
+                deny all;
+            }
+        }
+        EOF
+        [ -f /conf/tuning.conf ] || cat > /conf/tuning.conf <<'EOF'
+        client_body_buffer_size 16k;
+        server_tokens off;
+        fastcgi_buffers 32 16K;
+        gzip on;
+        gzip_comp_level 2;
+        gzip_proxied any;
+        gzip_types text/plain text/css application/json application/javascript text/xml application/xml image/svg+xml;
+        EOF
+    volumes:
+      - invoiceninja_nginx:/conf
+
+  nginx:
+    image: docker.io/library/nginx:alpine
+    restart: unless-stopped
+    expose:
+      - "80"
+    # Uncomment to publish Invoice Ninja directly on the host instead of only exposing it to the Compose network.
+    # ports:
+    #   - "${INVOICENINJA_PORT}:80"
+    volumes:
+      - invoiceninja_nginx:/etc/nginx/conf.d:ro
+      - invoiceninja_public:/var/www/html/public:ro
+      - invoiceninja_storage:/var/www/html/storage:ro
+    depends_on:
+      nginx-config:
+        condition: service_completed_successfully
+      app:
+        condition: service_started
+
+  db:
+    image: docker.io/library/mysql:8
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${INVOICENINJA_DB_NAME}
+      MYSQL_USER: ${INVOICENINJA_DB_USER}
+      MYSQL_PASSWORD: ${INVOICENINJA_DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${INVOICENINJA_DB_ROOT_PASSWORD}
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${INVOICENINJA_DB_ROOT_PASSWORD}"]
+      interval: ${INVOICENINJA_DB_HEALTHCHECK_INTERVAL}
+      timeout: ${INVOICENINJA_DB_HEALTHCHECK_TIMEOUT}
+      retries: ${INVOICENINJA_DB_HEALTHCHECK_RETRIES}
+
+volumes:
+  invoiceninja_nginx:
+  invoiceninja_public:
+  invoiceninja_storage:
+  mysql_data:

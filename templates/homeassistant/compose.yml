@@ -1,0 +1,19 @@
+# Bridge networking — the Web UI works everywhere, but Home Assistant cannot
+# auto-discover LAN devices (Matter, HomeKit, Chromecast, mDNS/SSDP). Add those
+# integrations by IP, or switch this service to `network_mode: host` (see setup.md).
+services:
+  homeassistant:
+    image: ghcr.io/home-assistant/home-assistant:stable
+    restart: unless-stopped
+    expose:
+      - "8123"
+    # Uncomment to publish Home Assistant directly on the host instead of only exposing it to the Compose network.
+    # ports:
+    #   - "${HOMEASSISTANT_PORT}:8123"
+    environment:
+      TZ: ${HOMEASSISTANT_TZ}
+    volumes:
+      - homeassistant_config:/config
+
+volumes:
+  homeassistant_config:

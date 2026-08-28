@@ -1,0 +1,32 @@
+[template]
+id          = "ente"
+name        = "Ente Photos"
+description = "End-to-end encrypted photo storage and backup — a self-hosted Google Photos alternative with a web app, mobile apps and albums."
+version     = "latest"
+categories  = ["photos", "storage"]
+tags        = ["photos", "backup", "encryption", "e2ee", "gallery"]
+icon        = "https://github.com/ente-io.png"
+website     = "https://ente.io"
+docs        = "https://ente.io/help/self-hosting/"
+source      = "https://github.com/ente-io/ente"
+license     = "AGPL-3.0"
+
+[files]
+setup = "setup.md"
+
+[[ports]]
+container   = 3000
+description = "Photos web app"
+primary     = true
+
+[[ports]]
+container   = 3002
+description = "Public albums web app"
+
+[[ports]]
+container   = 8080
+description = "Museum API server"
+
+[[ports]]
+container   = 3201
+description = "MinIO console (object storage UI)"

@@ -1,0 +1,20 @@
+[template]
+id          = "invoiceninja"
+name        = "Invoice Ninja"
+description = "Open-source invoicing, billing and payments platform — quotes, recurring invoices, expenses, time tracking and a client portal."
+version     = "latest"
+categories  = ["finance", "business"]
+tags        = ["invoicing", "billing", "payments", "accounting", "php"]
+icon        = "https://github.com/invoiceninja.png"
+website     = "https://www.invoiceninja.com"
+docs        = "https://invoiceninja.github.io/docs/self-host-installation/"
+source      = "https://github.com/invoiceninja/invoiceninja"
+license     = "Elastic-2.0"
+
+[files]
+setup = "setup.md"
+
+[[ports]]
+container   = 80
+description = "Web UI, client portal & API"
+primary     = true

@@ -1,0 +1,24 @@
+[template]
+id          = "qbittorrent"
+name        = "qBittorrent"
+description = "Free BitTorrent client with a full-featured Web UI, RSS auto-download and search plugins."
+version     = "latest"
+categories  = ["downloads", "networking"]
+tags        = ["bittorrent", "torrent", "downloads", "webui"]
+icon        = "https://github.com/qbittorrent.png"
+website     = "https://www.qbittorrent.org"
+docs        = "https://docs.linuxserver.io/images/docker-qbittorrent/"
+source      = "https://github.com/qbittorrent/qBittorrent"
+license     = "GPL-2.0-or-later"
+
+[files]
+setup = "setup.md"
+
+[[ports]]
+container   = 8080
+description = "Web UI"
+primary     = true
+
+[[ports]]
+container   = 6881
+description = "BitTorrent peer traffic (TCP/UDP)"
