@@ -14,7 +14,7 @@ This stack shares its secrets across every service. Replace these in `.env`
 **before** bringing it up in anything reachable from a network:
 
 - `POSTGRES_PASSWORD` — Postgres superuser; also applied to `authenticator`,
-  `supabase_auth_admin`, `supabase_storage_admin` and friends by the init scripts
+  `supabase_auth_admin`, `supabase_storage_admin` and friends by the bootstrap service
 - `JWT_SECRET` — must be **32+ random characters**; rotate after leaks
 - `SECRET_KEY_BASE` — Phoenix signing salt for Realtime; **64+ characters**
 - `PG_META_CRYPTO_KEY` — encrypts the connection strings postgres-meta stores
@@ -68,11 +68,17 @@ podman compose -f templates/supabase/compose.yml \
 podman compose -f templates/supabase/compose.yml logs -f db
 ```
 
-The `db` container does a one-time init the first time it writes to
-`supabase_db_data`: it applies the role passwords, the JWT settings, the
-`_realtime` schema and the Database Webhooks schema, all shipped inline in
-`compose.yml` as compose configs. Wait for `database system is ready to accept
-connections` before opening Studio. Endpoints:
+`db-bootstrap`, `kong-bootstrap`, and `functions-bootstrap` must finish with
+exit code 0 before the dependent services start. `db-bootstrap` safely applies
+the role passwords, JWT settings, `_realtime` schema, and Database Webhooks
+schema on both new and existing database volumes. This avoids Compose `configs`,
+which Podman rootless does not mount reliably. Check it before opening Studio:
+
+```sh
+podman compose -f templates/supabase/compose.yml logs db-bootstrap kong-bootstrap functions-bootstrap
+```
+
+Endpoints:
 
 - **Studio**: <http://localhost:3000>
 - **REST/Auth/Realtime/Storage/Functions**: <http://localhost:8000>
@@ -81,9 +87,10 @@ connections` before opening Studio. Endpoints:
 ## Edge Functions
 
 `compose.yml` ships only the `main` dispatcher, which verifies the JWT and
-forwards `/functions/v1/<name>` to `/home/deno/functions/<name>`. To deploy your
-own functions, mount them into that path — e.g. add a named volume to the
-`functions` service and populate it, or bake them into a derived image. Set
+forwards `/functions/v1/<name>` to `/home/deno/functions/<name>`. The dispatcher
+lives in the named `supabase_functions_data` volume so it also works rootless.
+To deploy your own functions, populate that named volume with a one-shot service
+or bake them into a derived image. Set
 `FUNCTIONS_VERIFY_JWT=false` to accept unauthenticated calls.
 
 ## OAuth (optional)
@@ -107,3 +114,8 @@ All state lives in named volumes:
 ```sh
 podman compose -f templates/supabase/compose.yml down -v
 ```
+
+For a failed deployment created by an earlier version of this template, first
+redeploy this version without deleting volumes: `db-bootstrap` repairs the
+missing internal role passwords. Use the reset command only when its database
+data can be discarded.

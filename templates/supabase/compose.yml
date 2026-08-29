@@ -6,9 +6,10 @@
 # Auth, REST, Realtime, Storage, and Functions.
 #
 # Upstream ships the gateway config, the Postgres bootstrap SQL and the edge
-# functions entrypoint as bind mounts. Bind mounts don't work rootless, so they
-# are inlined as compose `configs` instead. Compose interpolates config content,
-# so every literal `$` below is written `$$`.
+# functions entrypoint as bind mounts. Bind mounts and Compose `configs` don't
+# work reliably in rootless Podman, so one-shot services write runtime files to
+# named volumes and run the database bootstrap. Compose interpolates those
+# values, so every literal `$` below is written `$$`.
 x-kong-config: &kong-config |
   _format_version: "2.1"
 
@@ -141,7 +142,7 @@ x-webhooks-sql: &webhooks-sql |
     CREATE FUNCTION supabase_functions.http_request()
       RETURNS trigger
       LANGUAGE plpgsql
-      AS $$function$$
+      AS $$$$function$$$$
       DECLARE
         request_id bigint;
         payload jsonb;
@@ -212,9 +213,9 @@ x-webhooks-sql: &webhooks-sql |
 
         RETURN NEW;
       END
-    $$function$$;
+    $$$$function$$$$;
     DO
-    $$$$
+    $$$$$$$$
     BEGIN
       IF NOT EXISTS (
         SELECT 1
@@ -225,7 +226,7 @@ x-webhooks-sql: &webhooks-sql |
         CREATE USER supabase_functions_admin NOINHERIT CREATEROLE LOGIN NOREPLICATION;
       END IF;
     END
-    $$$$;
+    $$$$$$$$;
     GRANT ALL PRIVILEGES ON SCHEMA supabase_functions TO supabase_functions_admin;
     GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA supabase_functions TO supabase_functions_admin;
     GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA supabase_functions TO supabase_functions_admin;
@@ -235,7 +236,7 @@ x-webhooks-sql: &webhooks-sql |
     ALTER function "supabase_functions".http_request() OWNER TO supabase_functions_admin;
     GRANT supabase_functions_admin TO postgres;
     DO
-    $$$$
+    $$$$$$$$
     BEGIN
       IF EXISTS (
         SELECT 1
@@ -248,9 +249,9 @@ x-webhooks-sql: &webhooks-sql |
         DROP ROLE supabase_pg_net_admin;
       END IF;
     END
-    $$$$;
+    $$$$$$$$;
     DO
-    $$$$
+    $$$$$$$$
     BEGIN
       IF EXISTS (
         SELECT 1
@@ -269,11 +270,11 @@ x-webhooks-sql: &webhooks-sql |
         GRANT EXECUTE ON FUNCTION net.http_post(url text, body jsonb, params jsonb, headers jsonb, timeout_milliseconds integer) TO supabase_functions_admin, postgres, anon, authenticated, service_role;
       END IF;
     END
-    $$$$;
+    $$$$$$$$;
     CREATE OR REPLACE FUNCTION extensions.grant_pg_net_access()
     RETURNS event_trigger
     LANGUAGE plpgsql
-    AS $$$$
+    AS $$$$$$$$
     BEGIN
       IF EXISTS (
         SELECT 1
@@ -294,10 +295,10 @@ x-webhooks-sql: &webhooks-sql |
         GRANT EXECUTE ON FUNCTION net.http_post(url text, body jsonb, params jsonb, headers jsonb, timeout_milliseconds integer) TO supabase_functions_admin, postgres, anon, authenticated, service_role;
       END IF;
     END;
-    $$$$;
+    $$$$$$$$
     COMMENT ON FUNCTION extensions.grant_pg_net_access IS 'Grants access to pg_net';
     DO
-    $$$$
+    $$$$$$$$
     BEGIN
       IF NOT EXISTS (
         SELECT 1
@@ -308,7 +309,7 @@ x-webhooks-sql: &webhooks-sql |
         EXECUTE PROCEDURE extensions.grant_pg_net_access();
       END IF;
     END
-    $$$$;
+    $$$$$$$$;
     INSERT INTO supabase_functions.migrations (version) VALUES ('20210809183423_update_grants');
     ALTER function supabase_functions.http_request() SECURITY DEFINER;
     ALTER function supabase_functions.http_request() SET search_path = supabase_functions;
@@ -377,27 +378,61 @@ x-functions-main: &functions-main |
     }
   })
 
-configs:
-  kong_config:
-    content: *kong-config
-  db_roles_sql:
-    content: *roles-sql
-  db_jwt_sql:
-    content: *jwt-sql
-  db_realtime_sql:
-    content: *realtime-sql
-  db_webhooks_sql:
-    content: *webhooks-sql
-  functions_main:
-    content: *functions-main
-
 services:
+  # Podman Compose rootless does not mount Compose `configs` created from
+  # `content`. These one-shot services materialize the two runtime files in
+  # named volumes and bootstrap database settings after the database is ready.
+  kong-bootstrap:
+    image: docker.io/library/alpine:3.22
+    restart: "no"
+    environment:
+      KONG_CONFIG_CONTENT: *kong-config
+    volumes:
+      - supabase_kong_config:/config
+    command:
+      ["/bin/sh", "-ec", "printf '%s\\n' \"$$KONG_CONFIG_CONTENT\" > /config/kong.yml"]
+
+  functions-bootstrap:
+    image: docker.io/library/alpine:3.22
+    restart: "no"
+    environment:
+      FUNCTIONS_MAIN_SOURCE: *functions-main
+    volumes:
+      - supabase_functions_data:/home/deno/functions
+    command:
+      ["/bin/sh", "-ec", "mkdir -p /home/deno/functions/main && printf '%s\\n' \"$$FUNCTIONS_MAIN_SOURCE\" > /home/deno/functions/main/index.ts"]
+
+  db-bootstrap:
+    image: docker.io/supabase/postgres:17.6.1.136
+    restart: "no"
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      PGHOST: ${POSTGRES_HOST}
+      PGPORT: ${POSTGRES_PORT}
+      PGDATABASE: ${POSTGRES_DB}
+      PGUSER: postgres
+      PGPASSWORD: ${POSTGRES_PASSWORD}
+      DB_ROLES_SQL: *roles-sql
+      DB_JWT_SQL: *jwt-sql
+      DB_REALTIME_SQL: *realtime-sql
+      DB_WEBHOOKS_SQL: *webhooks-sql
+    command:
+      - /bin/sh
+      - -ec
+      - |
+        if [ "$$(psql -Atqc \"SELECT NOT EXISTS (SELECT 1 FROM pg_namespace WHERE nspname = 'supabase_functions')\")" = "t" ]; then
+          printf '%s\n' "$$DB_WEBHOOKS_SQL" | psql -v ON_ERROR_STOP=1
+        fi
+        printf '%s\n%s\n%s\n' "$$DB_ROLES_SQL" "$$DB_JWT_SQL" "$$DB_REALTIME_SQL" | psql -v ON_ERROR_STOP=1
+
   studio:
     image: docker.io/supabase/studio:2026.07.07-sha-a6a04f2
     restart: unless-stopped
     depends_on:
-      db:
-        condition: service_healthy
+      db-bootstrap:
+        condition: service_completed_successfully
     expose:
       - "3000"
     # Uncomment to publish Studio directly on the host instead of only exposing it to the Compose network.
@@ -429,6 +464,9 @@ services:
   kong:
     image: docker.io/kong/kong:3.9.1
     restart: unless-stopped
+    depends_on:
+      kong-bootstrap:
+        condition: service_completed_successfully
     ports:
       - "${KONG_HTTP_PORT}:8000"
       - "${KONG_HTTPS_PORT}:8443"
@@ -448,16 +486,15 @@ services:
       SUPABASE_SERVICE_KEY: ${SERVICE_ROLE_KEY}
       DASHBOARD_USERNAME: ${DASHBOARD_USERNAME}
       DASHBOARD_PASSWORD: ${DASHBOARD_PASSWORD}
-    configs:
-      - source: kong_config
-        target: /var/lib/kong/kong.yml
+    volumes:
+      - supabase_kong_config:/var/lib/kong
 
   auth:
     image: docker.io/supabase/gotrue:v2.189.0
     restart: unless-stopped
     depends_on:
-      db:
-        condition: service_healthy
+      db-bootstrap:
+        condition: service_completed_successfully
     environment:
       GOTRUE_API_HOST: 0.0.0.0
       GOTRUE_API_PORT: 9999
@@ -503,8 +540,8 @@ services:
     image: docker.io/postgrest/postgrest:v14.12
     restart: unless-stopped
     depends_on:
-      db:
-        condition: service_healthy
+      db-bootstrap:
+        condition: service_completed_successfully
     environment:
       PGRST_DB_URI: postgres://authenticator:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
       PGRST_DB_SCHEMAS: ${PGRST_DB_SCHEMAS}
@@ -527,8 +564,8 @@ services:
     image: docker.io/supabase/realtime:v2.102.3
     restart: unless-stopped
     depends_on:
-      db:
-        condition: service_healthy
+      db-bootstrap:
+        condition: service_completed_successfully
     environment:
       PORT: 4000
       DB_HOST: ${POSTGRES_HOST}
@@ -553,8 +590,8 @@ services:
     image: docker.io/supabase/storage-api:v1.60.4
     restart: unless-stopped
     depends_on:
-      db:
-        condition: service_healthy
+      db-bootstrap:
+        condition: service_completed_successfully
       rest:
         condition: service_started
       imgproxy:
@@ -597,8 +634,8 @@ services:
     image: docker.io/supabase/postgres-meta:v0.96.6
     restart: unless-stopped
     depends_on:
-      db:
-        condition: service_healthy
+      db-bootstrap:
+        condition: service_completed_successfully
     environment:
       PG_META_PORT: 8080
       PG_META_DB_HOST: ${POSTGRES_HOST}
@@ -612,8 +649,10 @@ services:
     image: docker.io/supabase/edge-runtime:v1.74.0
     restart: unless-stopped
     depends_on:
-      db:
-        condition: service_healthy
+      db-bootstrap:
+        condition: service_completed_successfully
+      functions-bootstrap:
+        condition: service_completed_successfully
     environment:
       JWT_SECRET: ${JWT_SECRET}
       SUPABASE_URL: http://kong:8000
@@ -622,10 +661,8 @@ services:
       SUPABASE_SERVICE_ROLE_KEY: ${SERVICE_ROLE_KEY}
       SUPABASE_DB_URL: postgresql://postgres:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
       VERIFY_JWT: ${FUNCTIONS_VERIFY_JWT}
-    configs:
-      - source: functions_main
-        target: /home/deno/functions/main/index.ts
     volumes:
+      - supabase_functions_data:/home/deno/functions
       - supabase_deno_cache:/root/.cache/deno
     command: ["start", "--main-service", "/home/deno/functions/main"]
 
@@ -648,17 +685,6 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       JWT_SECRET: ${JWT_SECRET}
       JWT_EXP: ${JWT_EXPIRY}
-    # `init-scripts` runs as superuser before `migrations`; the numeric prefixes
-    # set the order within each directory.
-    configs:
-      - source: db_webhooks_sql
-        target: /docker-entrypoint-initdb.d/init-scripts/98-webhooks.sql
-      - source: db_roles_sql
-        target: /docker-entrypoint-initdb.d/init-scripts/99-roles.sql
-      - source: db_jwt_sql
-        target: /docker-entrypoint-initdb.d/init-scripts/99-jwt.sql
-      - source: db_realtime_sql
-        target: /docker-entrypoint-initdb.d/migrations/99-realtime.sql
     volumes:
       - supabase_db_data:/var/lib/postgresql/data
       # Keeps the generated pgsodium root key across restarts.
@@ -679,7 +705,9 @@ services:
       ]
 
 volumes:
+  supabase_kong_config:
   supabase_db_data:
   supabase_db_config:
   supabase_storage_data:
   supabase_deno_cache:
+  supabase_functions_data:
