@@ -76,9 +76,10 @@
 		-->
 		{@const visible = results ?? templates}
 
-		<div class="flex flex-col gap-1">
-			<h1 class="text-2xl font-semibold tracking-tight">Template catalog</h1>
-			<p class="text-sm text-muted-foreground">
+		<div class="max-w-2xl flex flex-col gap-2">
+			<p class="font-mono text-[0.6875rem] font-medium uppercase tracking-[0.16em] text-[#a9381e] dark:text-primary">Litepod catalog</p>
+			<h1 class="text-3xl font-medium tracking-[-0.055em] sm:text-4xl">Template catalog</h1>
+			<p class="max-w-[65ch] text-sm leading-relaxed text-muted-foreground">
 				{templates.length}
 				{templates.length === 1 ? 'template' : 'templates'} — one folder per app, each with a compose
 				file, an env file and an icon.
@@ -134,7 +135,7 @@
 		{:else}
 			<section
 				aria-label="Templates"
-				class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+				class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3"
 			>
 				{#each visible as template (template.id)}
 					<TemplateCard {template} />

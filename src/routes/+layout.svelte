@@ -55,8 +55,8 @@
 	</div>
 
 	<div class="relative z-10">
-		<header class="border-b border-border/80 bg-background/75 backdrop-blur-md">
-			<div class="mx-auto flex h-14 w-full max-w-7xl items-center justify-between gap-4 px-4 sm:px-6">
+		<header class="mx-auto w-full max-w-7xl px-4 pt-4 sm:px-6 sm:pt-6">
+			<div class="flex min-h-14 items-center justify-between gap-4 rounded-full bg-lp-surface/90 px-3 shadow-[0_18px_45px_-32px_rgb(26_37_32_/_45%)] ring-1 ring-foreground/10 backdrop-blur-md sm:px-4">
 				<a href="/" class="flex items-center gap-2 font-semibold tracking-tight">
 					<BoxesIcon class="size-5" />
 					Templates
