@@ -3,6 +3,7 @@
 	import favicon from '$lib/assets/favicon.svg';
 	import BoxesIcon from '@lucide/svelte/icons/boxes';
 	import FileJsonIcon from '@lucide/svelte/icons/file-json';
+	import GitPullRequestIcon from '@lucide/svelte/icons/git-pull-request';
 	import ThemeToggle from '$lib/components/theme-toggle.svelte';
 	import { browser } from '$app/env';
 	import { onNavigate } from '$app/navigation';
@@ -65,6 +66,16 @@
 					<Button variant="ghost" size="sm" href="/docs">
 						<FileJsonIcon class="size-4" />
 						API docs
+					</Button>
+					<Button
+						variant="ghost"
+						size="sm"
+						href="https://github.com/litepodsh/templates"
+						target="_blank"
+						rel="noreferrer"
+					>
+						<GitPullRequestIcon class="size-4" />
+						Contribuir
 					</Button>
 					<span
 						class="font-mono text-xs text-muted-foreground"
