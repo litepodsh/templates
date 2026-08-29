@@ -56,7 +56,7 @@ services:
       PGHOST: ${POSTGRES_HOST}
       PGPORT: ${POSTGRES_PORT}
       PGDATABASE: ${POSTGRES_DB}
-      PGUSER: postgres
+      PGUSER: supabase_admin
       PGPASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       JWT_SECRET: ${JWT_SECRET}
