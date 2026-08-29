@@ -1,0 +1,22 @@
+services:
+  dicebear:
+    image: docker.io/dicebear/api:4
+    restart: unless-stopped
+    expose:
+      - "3000"
+    tmpfs:
+      - /run
+      - /tmp
+    environment:
+      LOGGER: ${DICEBEAR_LOGGER}
+      WORKERS: ${DICEBEAR_WORKERS}
+      VERSIONS: ${DICEBEAR_VERSIONS}
+      CACHE_CONTROL_AVATARS: ${DICEBEAR_CACHE_CONTROL_AVATARS}
+      CACHE_CONTROL_STYLES: ${DICEBEAR_CACHE_CONTROL_STYLES}
+      PNG: ${DICEBEAR_PNG}
+      PNG_SIZE_MIN: ${DICEBEAR_PNG_SIZE_MIN}
+      PNG_SIZE_MAX: ${DICEBEAR_PNG_SIZE_MAX}
+      PNG_SIZE_DEFAULT: ${DICEBEAR_PNG_SIZE_DEFAULT}
+      PNG_EXIF: ${DICEBEAR_PNG_EXIF}
+      DEFINITION: ${DICEBEAR_DEFINITION}
+      OPTIONS: ${DICEBEAR_OPTIONS}

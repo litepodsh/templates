@@ -1,0 +1,17 @@
+[template]
+id          = "dicebear"
+name        = "DiceBear"
+description = "Self-hosted HTTP API for generating deterministic avatar images from URLs."
+version     = "4"
+categories  = ["developer-tools", "media"]
+tags        = ["avatars", "api", "images", "svg", "placeholders"]
+icon        = "https://github.com/dicebear.png"
+website     = "https://www.dicebear.com"
+docs        = "https://www.dicebear.com/recipes/self-host-the-http-api/"
+source      = "https://github.com/dicebear/api"
+license     = "MIT"
+
+[[ports]]
+container   = 3000
+description = "Avatar HTTP API"
+primary     = true
