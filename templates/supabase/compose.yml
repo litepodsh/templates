@@ -384,7 +384,6 @@ services:
   # named volumes and bootstrap database settings after the database is ready.
   kong-bootstrap:
     image: docker.io/library/alpine:3.22
-    restart: "no"
     environment:
       KONG_CONFIG_CONTENT: *kong-config
     volumes:
@@ -394,7 +393,6 @@ services:
 
   functions-bootstrap:
     image: docker.io/library/alpine:3.22
-    restart: "no"
     environment:
       FUNCTIONS_MAIN_SOURCE: *functions-main
     volumes:
@@ -404,7 +402,6 @@ services:
 
   db-bootstrap:
     image: docker.io/supabase/postgres:17.6.1.136
-    restart: "no"
     depends_on:
       db:
         condition: service_healthy
