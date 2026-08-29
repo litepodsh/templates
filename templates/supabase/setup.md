@@ -1,121 +1,31 @@
-## Postgres 17
+## Included services
 
-The `db` service runs Postgres 17. Earlier revisions of this template shipped
-Postgres 15, and a `supabase_db_data` volume initialised by 15 will not start
-under 17. Wipe the volumes before bringing this version up:
+This minimal template includes Postgres, Kong, Auth, REST, Postgres Meta, and
+Studio. It intentionally excludes Storage, Realtime, Edge Functions, Imgproxy,
+Webhooks, analytics, and the connection pooler.
 
-```sh
-podman compose -f templates/supabase/compose.yml down -v
-```
+## Before boot
 
-## Before first boot
+Replace all placeholder secrets in `.env`, especially `POSTGRES_PASSWORD`,
+`JWT_SECRET`, `ANON_KEY`, `SERVICE_ROLE_KEY`, and `PG_META_CRYPTO_KEY`.
+The anon and service-role keys must be valid JWTs signed with `JWT_SECRET`.
 
-This stack shares its secrets across every service. Replace these in `.env`
-**before** bringing it up in anything reachable from a network:
+Set `SITE_URL`, `API_EXTERNAL_URL`, and `SUPABASE_PUBLIC_URL` to your public
+domains. Configure SMTP or set `ENABLE_EMAIL_AUTOCONFIRM=true` for testing.
 
-- `POSTGRES_PASSWORD` — Postgres superuser; also applied to `authenticator`,
-  `supabase_auth_admin`, `supabase_storage_admin` and friends by the bootstrap service
-- `JWT_SECRET` — must be **32+ random characters**; rotate after leaks
-- `SECRET_KEY_BASE` — Phoenix signing salt for Realtime; **64+ characters**
-- `PG_META_CRYPTO_KEY` — encrypts the connection strings postgres-meta stores
-- `REALTIME_DB_ENC_KEY` — encrypts Realtime's tenant records
-- `DASHBOARD_USERNAME` / `DASHBOARD_PASSWORD` — Kong admin UI
-- `ANON_KEY` / `SERVICE_ROLE_KEY` — must be JWTs signed with `JWT_SECRET`
+## Litepod
 
-Generate the keys with the Supabase CLI:
+Kong is exposed internally on port 8000. Attach the Litepod application domain
+to that service/port; Litepod's proxy handles public HTTP and HTTPS, so this
+template does not publish host ports. Studio is available internally on 3000
+for a separate dashboard route if your deployment config exposes it.
 
-```sh
-brew install supabase/tap/supabase    # or see https://github.com/supabase/cli
-supabase start --workdir .            # prints anon + service_role keys
-```
+## Recovery
 
-Without the CLI, build two HS256 JWTs by hand (`role: "anon"` and
-`role: "service_role"`) against `JWT_SECRET` and paste them into `.env`.
-
-## URLs
-
-Update to match the host you'll expose Supabase on:
-
-```toml
-SITE_URL              = "https://app.example.com"
-API_EXTERNAL_URL      = "https://api.example.com"
-SUPABASE_PUBLIC_URL   = "https://api.example.com"
-```
-
-`SITE_URL` is where GoTrue redirects after email links; `SUPABASE_PUBLIC_URL`
-is the base clients see. They can differ (e.g. dashboard on `app.`, API on
-`api.`) but must be reachable. `API_EXTERNAL_URL` doubles as the JWT issuer.
-
-## Mail (SMTP)
-
-By default the stack points at the `mailpit` service in this catalog on the
-`mailpit` network. If you didn't start it alongside Supabase, change:
-
-```toml
-SMTP_HOST = "mailpit"
-SMTP_PORT = "1025"
-```
-
-to your real relay, and set `SMTP_USER` / `SMTP_PASS` / `SMTP_ADMIN_EMAIL`
-accordingly. With no SMTP at all, set `ENABLE_EMAIL_AUTOCONFIRM=true` so
-sign-ups are marked verified without a confirmation mail.
-
-## First boot
-
-```sh
-podman compose -f templates/supabase/compose.yml \
-  --env-file templates/supabase/.env up -d
-podman compose -f templates/supabase/compose.yml logs -f db
-```
-
-`db-bootstrap`, `kong-bootstrap`, and `functions-bootstrap` must finish with
-exit code 0 before the dependent services start. `db-bootstrap` safely applies
-the role passwords, JWT settings, `_realtime` schema, and Database Webhooks
-schema on both new and existing database volumes. This avoids Compose `configs`,
-which Podman rootless does not mount reliably. Check it before opening Studio:
-
-```sh
-podman compose -f templates/supabase/compose.yml logs db-bootstrap kong-bootstrap functions-bootstrap
-```
-
-Endpoints:
-
-- **Studio**: <http://localhost:3000>
-- **REST/Auth/Realtime/Storage/Functions**: <http://localhost:8000>
-- **Postgres** (direct): `localhost:5432`, password from `POSTGRES_PASSWORD`
-
-## Edge Functions
-
-`compose.yml` ships only the `main` dispatcher, which verifies the JWT and
-forwards `/functions/v1/<name>` to `/home/deno/functions/<name>`. The dispatcher
-lives in the named `supabase_functions_data` volume so it also works rootless.
-To deploy your own functions, populate that named volume with a one-shot service
-or bake them into a derived image. Set
-`FUNCTIONS_VERIFY_JWT=false` to accept unauthenticated calls.
-
-## OAuth (optional)
-
-Set `ENABLE_GOOGLE_SIGNIN=true` (or GitHub) and fill the matching
-`*_CLIENT_ID` / `*_CLIENT_SECRET`. The callback URL GoTrue expects is
-`${SUPABASE_PUBLIC_URL}/auth/v1/callback` — register that exact value with
-the provider, including the scheme.
-
-## Not included
-
-Upstream's compose also ships Supavisor (connection pooler) and Logflare +
-Vector (Logs & Analytics). Both are opt-in there too, and this template leaves
-them out; `ENABLED_FEATURES_LOGS_ALL` is off in Studio to match. Clients connect
-straight to Postgres on `DB_PORT`.
-
-## Reset
-
-All state lives in named volumes:
+`db-bootstrap` assigns the internal Supabase role passwords and JWT settings
+after Postgres becomes healthy. It is safe to rerun against an existing volume.
+If the database is disposable, reset all state with:
 
 ```sh
 podman compose -f templates/supabase/compose.yml down -v
 ```
-
-For a failed deployment created by an earlier version of this template, first
-redeploy this version without deleting volumes: `db-bootstrap` repairs the
-missing internal role passwords. Use the reset command only when its database
-data can be discarded.

@@ -5,18 +5,14 @@ services:
   kong:
     image: docker.io/kong/kong:latest
     restart: unless-stopped
-    expose:
-      - "8000"
-      - "8001"
-      - "8002"
     # Kong Manager (:8002) calls the Admin API (:8001) FROM YOUR BROWSER. Both
     # must be reachable at the URLs set in .env — either publish them here, or
     # route those hostnames through a reverse proxy to this service. The proxy
     # (:8000) is where your own APIs get served.
-    # ports:
-    #   - "${KONG_PROXY_PORT}:8000"
-    #   - "${KONG_ADMIN_PORT}:8001"
-    #   - "${KONG_MANAGER_PORT}:8002"
+    ports:
+      - "${KONG_PROXY_PORT}:8000"
+      - "${KONG_ADMIN_PORT}:8001"
+      - "${KONG_MANAGER_PORT}:8002"
     environment:
       KONG_DATABASE: postgres
       KONG_PG_HOST: db

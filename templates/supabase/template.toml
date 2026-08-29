@@ -1,10 +1,10 @@
 [template]
 id          = "supabase"
 name        = "Supabase"
-description = "Self-hosted Firebase alternative: Postgres, Auth, REST, Realtime, Storage, Edge Functions, and a Studio dashboard behind a single Kong gateway."
-version     = "2.0.0"
+description = "Minimal self-hosted Supabase: Postgres, Auth, REST, Studio, and Kong behind a single internal gateway."
+version     = "3.0.0"
 categories  = ["backend", "database"]
-tags        = ["supabase", "baas", "postgres", "auth", "realtime", "storage"]
+tags        = ["supabase", "baas", "postgres", "auth", "rest"]
 icon        = "https://github.com/supabase.png"
 website     = "https://supabase.com"
 docs        = "https://supabase.com/docs"
@@ -25,7 +25,3 @@ primary     = true
 [[ports]]
 container   = 3000
 description = "Studio dashboard"
-
-[[ports]]
-container   = 5432
-description = "Postgres (direct)"
