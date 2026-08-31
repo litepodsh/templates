@@ -19,8 +19,8 @@ services:
   # loki:
   #   image: docker.io/grafana/loki:latest
   #   restart: unless-stopped
-  #   ports:
-  #     - "${LOKI_PORT}:3100"
+  #   expose:
+  #     - "3100"
   #   command: -config.file=/etc/loki/local-config.yaml
   #   volumes:
   #     - loki_data:/tmp/loki
@@ -36,8 +36,8 @@ services:
   # prometheus:
   #   image: docker.io/prom/prometheus:latest
   #   restart: unless-stopped
-  #   ports:
-  #     - "${PROMETHEUS_PORT}:9090"
+  #   expose:
+  #     - "9090"
   #   command:
   #     - "--config.file=/etc/prometheus/prometheus.yml"
   #     - "--storage.tsdb.path=/prometheus"
