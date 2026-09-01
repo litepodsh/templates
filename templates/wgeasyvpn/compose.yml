@@ -18,6 +18,7 @@ services:
       - wg_easy_data:/etc/wireguard
     cap_add:
       - NET_ADMIN
+      - NET_RAW
       - SYS_MODULE
     sysctls:
       net.ipv4.ip_forward: ${WG_EASY_IPV4_FORWARDING}
