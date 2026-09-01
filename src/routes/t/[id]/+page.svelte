@@ -13,7 +13,6 @@
 	import PageContainer from '$lib/components/page-container.svelte';
 	import ReadOnlyCodeEditor from '$lib/components/read-only-code-editor.svelte';
 	import SetupCodeBlock from '$lib/components/setup-code-block.svelte';
-	import SetupTabs from '$lib/components/setup-tabs.svelte';
 	import * as Card from '$lib/components/ui/card/index.js';
 	import * as Table from '$lib/components/ui/table/index.js';
 	import { Badge } from '$lib/components/ui/badge/index.js';
@@ -28,35 +27,9 @@
 	// route param rather than from the awaited template.
 	const title = $derived(`${page.params.id} — Templates`);
 
-	type SetupTab = { value: string; label: string; content: string };
 	type SetupChunk =
 		| { kind: 'html'; content: string }
-		| { kind: 'code'; code: string; language: string }
-		| { kind: 'tabs'; tabs: SetupTab[] };
-
-	function setupChunks(markdown: string): SetupChunk[] {
-		const chunks: SetupChunk[] = [];
-		const tabs = /<Tabs\b[^>]*>([\s\S]*?)<\/Tabs>/g;
-		let cursor = 0;
-		let match: RegExpExecArray | null;
-
-		while ((match = tabs.exec(markdown)) !== null) {
-			if (match.index > cursor) {
-				chunks.push(...splitCodeBlocks(marked.parse(markdown.slice(cursor, match.index), { gfm: true, async: false })));
-			}
-
-			const values = [...match[1].matchAll(/<Tab\b[^>]*\bvalue=["']([^"']+)["'][^>]*>([\s\S]*?)<\/Tab>/g)].map(
-				([, value, content]) => ({ value, label: value, content: content.trim() }),
-			);
-			if (values.length > 0) chunks.push({ kind: 'tabs', tabs: values });
-			cursor = match.index + match[0].length;
-		}
-
-		if (cursor < markdown.length) {
-			chunks.push(...splitCodeBlocks(marked.parse(markdown.slice(cursor), { gfm: true, async: false })));
-		}
-		return chunks;
-	}
+		| { kind: 'code'; code: string; language: string };
 
 	/**
 	 * Splits `marked`'s output so each `<pre><code>` block becomes its own
@@ -149,7 +122,9 @@
 	{@const template = page.data.template as TemplateDetail}
 	{@const files = panes(template)}
 	{@const active = files.find((pane) => pane.value === activeFile) ?? files[0]}
-	{@const renderedSetup = template.setup ? setupChunks(template.setup.content) : []}
+	{@const setupChunks = template.setup
+		? splitCodeBlocks(marked.parse(template.setup.content, { gfm: true, async: false }))
+		: []}
 
 		<header class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
 			<div class="flex items-start gap-4">
@@ -205,7 +180,7 @@
 			</div>
 		</header>
 
-		{#if renderedSetup.length > 0}
+		{#if setupChunks.length > 0}
 			<Card.Root>
 				<Card.Header>
 					<Card.Title>Setup</Card.Title>
@@ -221,13 +196,11 @@
 						{@html}. The trust boundary matches `description`.
 					-->
 					<div class="setup-prose flex flex-col gap-3">
-						{#each renderedSetup as chunk, i (i)}
+						{#each setupChunks as chunk, i (i)}
 							{#if chunk.kind === 'html'}
 								{@html chunk.content}
-							{:else if chunk.kind === 'code'}
-								<SetupCodeBlock code={chunk.code} language={chunk.language} />
 							{:else}
-								<SetupTabs tabs={chunk.tabs} />
+								<SetupCodeBlock code={chunk.code} language={chunk.language} />
 							{/if}
 						{/each}
 					</div>
