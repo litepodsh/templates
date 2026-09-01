@@ -4,33 +4,24 @@ services:
     restart: unless-stopped
     ports:
       - "${WG_EASY_WIREGUARD_PORT}:51820/udp"
-      - "${WG_EASY_UI_PORT}:51821/tcp"
+    expose:
+      - "51821"
     environment:
-      PORT: ${WG_EASY_UI_CONTAINER_PORT}
-      HOST: ${WG_EASY_UI_BIND_ADDRESS}
       INSECURE: ${WG_EASY_INSECURE}
-      DISABLE_IPV6: ${WG_EASY_DISABLE_IPV6}
       INIT_ENABLED: ${WG_EASY_INIT_ENABLED}
       INIT_USERNAME: ${WG_EASY_INIT_USERNAME}
       INIT_PASSWORD: ${WG_EASY_INIT_PASSWORD}
       INIT_HOST: ${WG_EASY_INIT_HOST}
       INIT_PORT: ${WG_EASY_INIT_PORT}
       INIT_DNS: ${WG_EASY_INIT_DNS}
-      INIT_IPV4_CIDR: ${WG_EASY_INIT_IPV4_CIDR}
-      INIT_IPV6_CIDR: ${WG_EASY_INIT_IPV6_CIDR}
-      INIT_ALLOWED_IPS: ${WG_EASY_INIT_ALLOWED_IPS}
     volumes:
       - wg_easy_data:/etc/wireguard
     cap_add:
       - NET_ADMIN
-      - NET_RAW
       - SYS_MODULE
     sysctls:
       net.ipv4.ip_forward: ${WG_EASY_IPV4_FORWARDING}
       net.ipv4.conf.all.src_valid_mark: ${WG_EASY_SRC_VALID_MARK}
-      net.ipv6.conf.all.disable_ipv6: ${WG_EASY_IPV6_DISABLED}
-      net.ipv6.conf.all.forwarding: ${WG_EASY_IPV6_FORWARDING}
-      net.ipv6.conf.default.forwarding: ${WG_EASY_IPV6_DEFAULT_FORWARDING}
 
 volumes:
   wg_easy_data:
