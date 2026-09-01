@@ -3,17 +3,17 @@ services:
     image: docker.umami.is/umami-software/umami:postgresql-latest
     restart: unless-stopped
     init: true
-    ports:
-      - "${UMAMI_PORT}:3000"
+    expose:
+      - "3000"
     environment:
-      DATABASE_URL: postgresql://${UMAMI_DB_USER}:${UMAMI_DB_PASSWORD}@db:5432/${UMAMI_DB_NAME}
+      DATABASE_URL: postgresql://${UMAMI_DB_USER}:${UMAMI_DB_PASSWORD}@umami-db:5432/${UMAMI_DB_NAME}
       APP_SECRET: ${UMAMI_APP_SECRET}
       FORCE_SSL: ${UMAMI_FORCE_SSL}
       DEFAULT_LOCALE: ${UMAMI_DEFAULT_LOCALE}
     depends_on:
-      db:
+      umami-db:
         condition: service_healthy
-  db:
+  umami-db:
     image: docker.io/library/postgres:17
     restart: unless-stopped
     environment:
