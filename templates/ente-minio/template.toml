@@ -1,10 +1,10 @@
 [template]
-id          = "ente"
-name        = "Ente"
-description = "End-to-end encrypted photo storage and backup using your external S3-compatible object store."
+id          = "ente-minio"
+name        = "Ente + MinIO"
+description = "End-to-end encrypted photo storage and backup with an included MinIO S3-compatible object store."
 version     = "latest"
 categories  = ["photos", "storage"]
-tags        = ["photos", "backup", "encryption", "e2ee", "gallery", "s3"]
+tags        = ["photos", "backup", "encryption", "e2ee", "gallery", "minio", "s3"]
 icon        = "https://github.com/ente-io.png"
 website     = "https://ente.io"
 docs        = "https://ente.io/help/self-hosting/"
@@ -26,3 +26,7 @@ description = "Public albums web app"
 [[ports]]
 container   = 8080
 description = "Museum API server"
+
+[[ports]]
+container   = 3201
+description = "MinIO console (object storage UI)"
