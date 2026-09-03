@@ -1,0 +1,28 @@
+[template]
+id          = "tempo"
+name        = "Grafana Tempo"
+description = "Distributed tracing backend — OTLP ingest, TraceQL search and TraceQL metrics (rate, quantile_over_time) straight over the traces, no Prometheus and no Kafka required."
+version     = "3.0.3"
+categories  = ["monitoring", "devops"]
+tags        = ["tracing", "traces", "traceql", "otlp", "opentelemetry", "observability", "metrics"]
+icon        = "https://github.com/grafana.png"
+website     = "https://grafana.com/oss/tempo/"
+docs        = "https://grafana.com/docs/tempo/latest/"
+source      = "https://github.com/grafana/tempo"
+license     = "AGPL-3.0-only"
+
+[files]
+setup = "setup.md"
+
+[[ports]]
+container   = 3200
+description = "HTTP API (queries, readiness)"
+primary     = true
+
+[[ports]]
+container   = 4317
+description = "OTLP gRPC receiver"
+
+[[ports]]
+container   = 4318
+description = "OTLP HTTP receiver"

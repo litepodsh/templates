@@ -1,0 +1,71 @@
+# Grafana + Loki (logs) + Prometheus (metrics) on one Compose network.
+#
+# Loki writes to the `loki_data` volume mounted at /loki — that is where the
+# image's default config (/etc/loki/local-config.yaml) puts chunks and rules,
+# and /loki is the one path the image pre-creates owned by uid 10001, so a fresh
+# named volume inherits that ownership. Mounting the volume anywhere else (e.g.
+# /tmp/loki) gives Loki a root-owned directory it can't write to.
+#
+# Prometheus' config lives in the `prometheus_config` named volume mounted at
+# /etc/prometheus: on first start the empty volume is seeded with the image's
+# default prometheus.yml, after which it is a real editable file, reloadable with
+# `POST /-/reload` (--web.enable-lifecycle is set). Rule files can go in
+# /etc/prometheus/rules/. A `command:` replaces the image's default args
+# entirely, so --config.file and --storage.tsdb.path must be repeated or
+# Prometheus crash-loops looking for a relative prometheus.yml.
+services:
+  grafana:
+    image: docker.io/grafana/grafana:latest
+    restart: unless-stopped
+    expose:
+      - "3000"
+    # Uncomment to publish the UI directly on the host instead of only exposing it to the Compose network.
+    # ports:
+    #   - "${GRAFANA_PORT}:3000"
+    environment:
+      GF_SERVER_ROOT_URL: ${GRAFANA_ROOT_URL}
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD}
+      GF_USERS_ALLOW_SIGN_UP: ${GRAFANA_ALLOW_SIGN_UP}
+    volumes:
+      - grafana_data:/var/lib/grafana
+
+  loki:
+    image: docker.io/grafana/loki:latest
+    restart: unless-stopped
+    expose:
+      - "3100"
+    # Uncomment to publish the Loki API directly on the host instead of only exposing it to the Compose network.
+    # ports:
+    #   - "${LOKI_PORT}:3100"
+    volumes:
+      - loki_data:/loki
+
+  prometheus:
+    image: docker.io/prom/prometheus:latest
+    restart: unless-stopped
+    expose:
+      - "9090"
+    # Uncomment to publish the UI/API directly on the host instead of only exposing it to the Compose network.
+    # ports:
+    #   - "${PROMETHEUS_PORT}:9090"
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--storage.tsdb.retention.time=${PROMETHEUS_RETENTION_TIME}"
+      - "--web.enable-lifecycle"
+    volumes:
+      - prometheus_config:/etc/prometheus
+      - prometheus_data:/prometheus
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:9090/-/healthy"]
+      interval: ${PROMETHEUS_HEALTHCHECK_INTERVAL}
+      timeout: ${PROMETHEUS_HEALTHCHECK_TIMEOUT}
+      retries: ${PROMETHEUS_HEALTHCHECK_RETRIES}
+      start_period: ${PROMETHEUS_HEALTHCHECK_START_PERIOD}
+
+volumes:
+  grafana_data:
+  loki_data:
+  prometheus_config:
+  prometheus_data:

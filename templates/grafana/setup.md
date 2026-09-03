@@ -1,7 +1,27 @@
-# Optional Loki and Prometheus
+# Grafana on its own
 
-Grafana runs on its own by default. The Compose file includes **commented** Loki and Prometheus services; uncomment each service and its matching named volumes to enable it.
+This template is Grafana and nothing else — it ships with no data source, so the first
+thing to do after logging in is **Connections → Data sources → Add data source**.
 
-After enabling Loki, add `http://loki:3100` as a Loki data source in Grafana. After enabling Prometheus, add `http://prometheus:9090` as a Prometheus data source. `prometheus.yml` is a real file in the `prometheus_config` volume mounted at `/etc/prometheus`, seeded on first start with the image's self-scrape default; edit it (LitePod's volume file editor, or `podman exec <container> cat /etc/prometheus/prometheus.yml`) to add scrape jobs and apply without a restart via `wget -q --post-data='' http://prometheus:9090/-/reload` (`--web.enable-lifecycle` is set). For a standalone metrics store use the dedicated `prometheus` template.
+Deploy a store alongside it and address it by Compose service name on the shared network:
 
-Replace `GRAFANA_ADMIN_PASSWORD` before deployment. The tracked `.env` contains a placeholder only.
+| Template                   | Data source type | URL                      |
+| -------------------------- | ---------------- | ------------------------ |
+| `prometheus`               | Prometheus       | `http://prometheus:9090` |
+| `tempo`                    | Tempo            | `http://tempo:3200`      |
+| `grafana-loki-prometheus`  | Loki             | `http://loki:3100`       |
+
+Never `localhost` — inside a container that is the container itself.
+
+For Grafana with a log store and a metrics store already wired up, use the
+`grafana-loki-prometheus` template instead.
+
+# Rootless
+
+Runs rootless as-is: the only writable path is the `grafana_data` named volume mounted at
+`/var/lib/grafana`, which exists in the image owned by uid 472, so the fresh volume
+inherits that ownership on first start. The published port (3000) is above 1024. Replacing
+the volume with a bind mount breaks this.
+
+Replace `GRAFANA_ADMIN_PASSWORD` before deployment. The tracked `.env` contains a
+placeholder only.

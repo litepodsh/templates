@@ -1,0 +1,28 @@
+[template]
+id          = "grafana-loki-prometheus"
+name        = "Grafana + Loki + Prometheus"
+description = "Logs and metrics stack: Grafana dashboards with a Loki log store and a Prometheus metrics store, wired on one Compose network."
+version     = "latest"
+categories  = ["monitoring", "developer-tools"]
+tags        = ["dashboards", "metrics", "logs", "observability", "loki", "prometheus", "promql"]
+icon        = "https://github.com/grafana.png"
+website     = "https://grafana.com"
+docs        = "https://grafana.com/docs/grafana/latest/setup-grafana/installation/docker/"
+source      = "https://github.com/grafana/grafana"
+license     = "AGPL-3.0-only"
+
+[files]
+setup = "setup.md"
+
+[[ports]]
+container   = 3000
+description = "Grafana web UI"
+primary     = true
+
+[[ports]]
+container   = 3100
+description = "Loki API"
+
+[[ports]]
+container   = 9090
+description = "Prometheus web UI & API"

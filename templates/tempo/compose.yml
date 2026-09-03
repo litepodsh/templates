@@ -1,0 +1,101 @@
+# Grafana Tempo 3.0, monolithic (`-target=all`): distributor, live-store,
+# block-builder, querier, query-frontend and compaction in one process. No Kafka
+# — that is microservices-only in 3.0 — and no external database.
+#
+# The image is distroless and ships NO config file, so tempo.yaml is inlined
+# below as a compose `config` (bind mounts don't work rootless; the garage
+# template uses the same trick). Compose interpolates ${...} in config content
+# from .env; there are no literal `$` in this file so none need doubling.
+#
+# Rootless: /var/tempo is pre-created in the image owned by uid 10001, so the
+# `tempo_data` named volume inherits that ownership on first start. Don't move
+# the mount point and don't swap it for a bind mount — Tempo would get a
+# root-owned directory it can't write to.
+x-tempo-config: &tempo-config |
+  stream_over_http_enabled: true
+
+  server:
+    http_listen_port: 3200
+    log_level: ${TEMPO_LOG_LEVEL}
+
+  distributor:
+    receivers:
+      otlp:
+        protocols:
+          grpc:
+            endpoint: "0.0.0.0:4317"
+          http:
+            endpoint: "0.0.0.0:4318"
+
+  query_frontend:
+    # MCP server for LLM-driven trace exploration (Tempo 2.10+).
+    mcp_server:
+      enabled: ${TEMPO_MCP_SERVER_ENABLED}
+    # TraceQL metrics, tuned for a single on-prem node: fewer, bigger jobs.
+    metrics:
+      concurrent_jobs: 8
+      target_bytes_per_job: 1.25e+09
+      max_duration: ${TEMPO_METRICS_MAX_DURATION}
+
+  storage:
+    trace:
+      backend: local
+      wal:
+        path: /var/tempo/wal
+      local:
+        path: /var/tempo/blocks
+
+  overrides:
+    defaults:
+      compaction:
+        block_retention: ${TEMPO_BLOCK_RETENTION}
+      # Span metrics and service graphs are generated metrics, so they need
+      # somewhere to be written. Uncomment together with the metrics_generator
+      # block below after deploying the `prometheus` template on this network
+      # with --web.enable-remote-write-receiver.
+      # metrics_generator:
+      #   processors: ["span-metrics", "service-graphs"]
+      #   generate_native_histograms: both
+
+  # metrics_generator:
+  #   registry:
+  #     external_labels:
+  #       source: tempo
+  #   storage:
+  #     path: /var/tempo/generator/wal
+  #     remote_write:
+  #       - url: http://prometheus:9090/api/v1/write
+  #         send_exemplars: true
+
+  usage_report:
+    reporting_enabled: false
+
+configs:
+  tempo_config:
+    content: *tempo-config
+
+services:
+  tempo:
+    image: docker.io/grafana/tempo:3.0.3
+    restart: unless-stopped
+    command: ["-target=all", "-config.file=/etc/tempo.yaml"]
+    expose:
+      - "3200"
+      - "4317"
+      - "4318"
+    # Uncomment to publish the query API and the OTLP receivers directly on the host
+    # instead of only exposing them to the Compose network.
+    # ports:
+    #   - "${TEMPO_PORT}:3200"
+    #   - "${TEMPO_OTLP_GRPC_PORT}:4317"
+    #   - "${TEMPO_OTLP_HTTP_PORT}:4318"
+    configs:
+      - source: tempo_config
+        target: /etc/tempo.yaml
+    volumes:
+      - tempo_data:/var/tempo
+    # No healthcheck: the image is distroless — no shell, no wget, no curl.
+    # Check readiness from another container: http://tempo:3200/ready
+
+volumes:
+  tempo_data:

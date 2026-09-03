@@ -15,46 +15,5 @@ services:
     volumes:
       - grafana_data:/var/lib/grafana
 
-  # Optional Loki log store. Uncomment this service and its volume below to enable it.
-  # loki:
-  #   image: docker.io/grafana/loki:latest
-  #   restart: unless-stopped
-  #   expose:
-  #     - "3100"
-  #   command: -config.file=/etc/loki/local-config.yaml
-  #   volumes:
-  #     - loki_data:/tmp/loki
-
-  # Optional Prometheus metrics store. Uncomment this service and its volumes below to enable it.
-  # The config lives in the `prometheus_config` named volume mounted at /etc/prometheus:
-  # on first start the empty volume is seeded with the image's default prometheus.yml,
-  # after which it is a real editable file, reloadable with `POST /-/reload`
-  # (--web.enable-lifecycle is set). Rule files can go in /etc/prometheus/rules/.
-  # A `command:` replaces the image's default args entirely, so --config.file and
-  # --storage.tsdb.path must be repeated or Prometheus crash-loops looking for a
-  # relative prometheus.yml. This mirrors the dedicated `prometheus` template.
-  # prometheus:
-  #   image: docker.io/prom/prometheus:latest
-  #   restart: unless-stopped
-  #   expose:
-  #     - "9090"
-  #   command:
-  #     - "--config.file=/etc/prometheus/prometheus.yml"
-  #     - "--storage.tsdb.path=/prometheus"
-  #     - "--storage.tsdb.retention.time=${PROMETHEUS_RETENTION_TIME}"
-  #     - "--web.enable-lifecycle"
-  #   volumes:
-  #     - prometheus_config:/etc/prometheus
-  #     - prometheus_data:/prometheus
-  #   healthcheck:
-  #     test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:9090/-/healthy"]
-  #     interval: ${PROMETHEUS_HEALTHCHECK_INTERVAL}
-  #     timeout: ${PROMETHEUS_HEALTHCHECK_TIMEOUT}
-  #     retries: ${PROMETHEUS_HEALTHCHECK_RETRIES}
-  #     start_period: ${PROMETHEUS_HEALTHCHECK_START_PERIOD}
-
 volumes:
   grafana_data:
-  # loki_data:
-  # prometheus_config:
-  # prometheus_data:
