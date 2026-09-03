@@ -4,11 +4,11 @@ The heaviest template in the catalog — five containers:
 
 | Service | Role |
 | ------- | ---- |
-| `museum` | the Ente API server, port 8080 |
-| `web` | Photos web app (`:3000`) and public Albums app (`:3002`) |
-| `db` | PostgreSQL 15 — account and file metadata |
-| `minio` | S3-compatible object storage for the encrypted blobs; web console on `:3201` |
-| `minio-provision` | one-shot; creates the `b2-eu-cen` bucket, then exits |
+| `ente-museum` | the Ente API server, port 8080 |
+| `ente-web` | Photos web app (`:3000`) and public Albums app (`:3002`) |
+| `ente-db` | PostgreSQL 15 — account and file metadata |
+| `ente-minio` | S3-compatible object storage for the encrypted blobs; web console on `:3201` |
+| `ente-minio-provision` | one-shot; creates the `b2-eu-cen` bucket, then exits |
 
 Ente self-hosting only supports S3-style object storage — there is no local-disk
 mode — so MinIO is part of the stack. Its console (`:3201`, log in with
@@ -18,27 +18,38 @@ objects.
 MinIO is **pinned to `RELEASE.2025-04-22T22-12-26Z`** — the last Community
 Edition build with a full management console. Later releases strip the console
 down to a bare object browser. The pin means no security updates past that date;
-bump the `minio` / `minio-provision` image tags if you don't need the admin UI.
+bump the `ente-minio` / `ente-minio-provision` image tags if you don't need the admin UI.
 
-## 1. Generate the crypto secrets
+## 1. Crypto secrets
 
-`.env` ships these **empty** — museum will not start until they are set:
+Litepod replaces the `{{base64_32}}`, `{{base64_64}}` and
+`{{base64url_32}}` markers in `.env` with cryptographically random values when
+the template is deployed. Back up the resulting values and do not regenerate
+them during a redeploy. Losing them makes every existing account permanently
+unrecoverable.
 
-```sh
-echo "ENTE_KEY_ENCRYPTION=$(openssl rand -base64 32)"
-echo "ENTE_KEY_HASH=$(openssl rand -base64 64)"
-echo "ENTE_JWT_SECRET=$(openssl rand -base64 32)"
+## 2. Domains and public origins
+
+Create these domain routes in Litepod:
+
+| Purpose | Route target | Example |
+| ------- | ------------ | ------- |
+| Photos user interface | `ente-web:3000` | `https://photos.example.com` |
+| Ente API | `ente-museum:8080` | `https://api.photos.example.com` |
+| Public albums | `ente-web:3002` | `https://albums.photos.example.com` |
+
+The Photos user interface has no separate origin variable; its domain is the
+route that targets `ente-web:3000`. Set `ENTE_API_ORIGIN` to the complete public
+HTTPS URL routed to `ente-museum:8080`, and set `ENTE_ALBUMS_ORIGIN` to the
+complete public HTTPS URL routed to `ente-web:3002`. Do not add a trailing
+slash.
+
+For example:
+
+```dotenv
+ENTE_API_ORIGIN=https://api.photos.example.com
+ENTE_ALBUMS_ORIGIN=https://albums.photos.example.com
 ```
-
-Paste the values into `.env`. Back them up — losing them makes every existing
-account permanently unrecoverable.
-
-## 2. Origins
-
-- `ENTE_API_ORIGIN` — the museum URL as the **browser** will reach it. Publish
-  port 8080 (uncomment in `compose.yml`) or route a hostname to `museum:8080`.
-- `ENTE_ALBUMS_ORIGIN` — public shared-album URL; must match how the albums app
-  (`:3002`) is served.
 
 The mobile and desktop apps also need the API endpoint: in the app, tap the
 onboarding screen title 7 times and enter `ENTE_API_ORIGIN`.
@@ -49,7 +60,7 @@ Without SMTP configured, the sign-up **verification code is written to the
 museum log**:
 
 ```sh
-podman logs ente_museum_1 2>&1 | grep -i 'verification code'
+podman compose logs ente-museum 2>&1 | grep -i 'verification code'
 ```
 
 Set the `ENTE_SMTP_*` values in `.env` to have codes emailed instead.
@@ -64,7 +75,7 @@ included MinIO service:
 | -------- | ------- | ------------------- |
 | `ENTE_S3_ACCESS_KEY` | Access key shared by museum and MinIO's root user | `ente` |
 | `ENTE_S3_SECRET_KEY` | Secret shared by museum and MinIO's root user | Generated password placeholder |
-| `ENTE_S3_ENDPOINT` | S3 endpoint reachable from the museum container | `minio:3200` |
+| `ENTE_S3_ENDPOINT` | S3 endpoint reachable from the museum container | `ente-minio:3200` |
 | `ENTE_S3_REGION` | Region passed to the S3 client | `eu-central-2` |
 | `ENTE_S3_BUCKET` | Physical bucket used for encrypted objects | `b2-eu-cen` |
 | `ENTE_S3_ARE_LOCAL_BUCKETS` | Enables Ente's local-storage compatibility behavior, including HTTP | `true` |
@@ -72,11 +83,11 @@ included MinIO service:
 
 Compose passes the same access key and secret to museum, MinIO and the
 provisioning job, so their credentials cannot drift apart. The
-`minio-provision` service uses `ENTE_S3_BUCKET` to create the bucket
+`ente-minio-provision` service uses `ENTE_S3_BUCKET` to create the bucket
 automatically and make it private.
 
 Ente's internal storage slot is still named `b2-eu-cen` for historical
 compatibility; `ENTE_S3_BUCKET` controls the real bucket name. If uploads fail
 with storage errors, verify `ENTE_S3_B2_EU_CEN_*` reached the container
-(`podman exec ente_museum_1 env | grep ENTE_S3`) and that the `minio-provision`
+(`podman compose exec ente-museum env | grep ENTE_S3`) and that the `ente-minio-provision`
 job completed.

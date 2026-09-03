@@ -1,15 +1,15 @@
 # Ente self-hosted stack using external S3-compatible object storage.
 # Museum is configured entirely through ENTE_* environment overrides.
 services:
-  museum:
-    image: ghcr.io/ente-io/server:latest
+  ente-museum:
+    image: ghcr.io/ente/server:latest
     restart: unless-stopped
     expose:
       - "8080"
     # ports:
     #   - "${ENTE_API_PORT}:8080"
     environment:
-      ENTE_DB_HOST: db
+      ENTE_DB_HOST: ente-db
       ENTE_DB_PORT: "5432"
       ENTE_DB_NAME: ${ENTE_DB_NAME}
       ENTE_DB_USER: ${ENTE_DB_USER}
@@ -31,11 +31,13 @@ services:
       ENTE_SMTP_PASSWORD: ${ENTE_SMTP_PASSWORD}
       ENTE_SMTP_EMAIL: ${ENTE_SMTP_EMAIL}
     depends_on:
-      db:
+      ente-db:
         condition: service_healthy
+    networks:
+      - ente-internal
 
-  web:
-    image: ghcr.io/ente-io/web:latest
+  ente-web:
+    image: ghcr.io/ente/web:latest
     restart: unless-stopped
     expose:
       - "3000"
@@ -47,10 +49,12 @@ services:
       ENTE_API_ORIGIN: ${ENTE_API_ORIGIN}
       ENTE_ALBUMS_ORIGIN: ${ENTE_ALBUMS_ORIGIN}
     depends_on:
-      museum:
+      ente-museum:
         condition: service_started
+    networks:
+      - ente-internal
 
-  db:
+  ente-db:
     image: docker.io/library/postgres:15
     restart: unless-stopped
     environment:
@@ -64,6 +68,11 @@ services:
       interval: ${ENTE_DB_HEALTHCHECK_INTERVAL}
       timeout: ${ENTE_DB_HEALTHCHECK_TIMEOUT}
       retries: ${ENTE_DB_HEALTHCHECK_RETRIES}
+    networks:
+      - ente-internal
+
+networks:
+  ente-internal:
 
 volumes:
   ente_db_data:
