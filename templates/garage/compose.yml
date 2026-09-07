@@ -57,7 +57,7 @@ services:
     #   - "${GARAGE_S3_PORT}:3900"
     #   - "${GARAGE_ADMIN_PORT}:3903"
     volumes:
-      - garage_config:/etc/garage.toml:ro
+      - garage_config:/etc:ro
       - garage_meta:/var/lib/garage/meta
       - garage_data:/var/lib/garage/data
 

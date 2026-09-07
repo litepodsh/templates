@@ -96,7 +96,7 @@ services:
     #   - "${TEMPO_OTLP_GRPC_PORT}:4317"
     #   - "${TEMPO_OTLP_HTTP_PORT}:4318"
     volumes:
-      - tempo_config:/etc/tempo.yaml:ro
+      - tempo_config:/etc:ro
       - tempo_data:/var/tempo
     # No healthcheck: the image is distroless — no shell, no wget, no curl.
     # Check readiness from another container: http://tempo:3200/ready
