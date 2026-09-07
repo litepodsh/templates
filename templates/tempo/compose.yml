@@ -2,10 +2,12 @@
 # block-builder, querier, query-frontend and compaction in one process. No Kafka
 # — that is microservices-only in 3.0 — and no external database.
 #
-# The image is distroless and ships NO config file, so tempo.yaml is inlined
-# below as a compose `config` (bind mounts don't work rootless; the garage
-# template uses the same trick). Compose interpolates ${...} in config content
-# from .env; there are no literal `$` in this file so none need doubling.
+# The image is distroless and ships NO config file, so tempo.yaml is materialised
+# at start by the `tempo-config` one-shot init container (see supabase/compose.yml
+# for the same trick). Inline `content:` configs are not portable across Compose
+# runtimes; a named volume seeded by an init service works rootless and survives
+# `podman compose down`. Compose interpolates ${...} in config content from .env;
+# there are no literal `$` in this file so none need doubling.
 #
 # Rootless: /var/tempo is pre-created in the image owned by uid 10001, so the
 # `tempo_data` named volume inherits that ownership on first start. Don't move
@@ -70,15 +72,19 @@ x-tempo-config: &tempo-config |
   usage_report:
     reporting_enabled: false
 
-configs:
-  tempo_config:
-    content: *tempo-config
-
 services:
+  tempo-config:
+    image: docker.io/library/alpine:3.22
+    environment: { TEMPO_CONFIG_CONTENT: *tempo-config }
+    volumes: [tempo_config:/config]
+    command: ["/bin/sh", "-ec", "printenv TEMPO_CONFIG_CONTENT > /config/tempo.yaml"]
+
   tempo:
     image: docker.io/grafana/tempo:3.0.3
     restart: unless-stopped
     command: ["-target=all", "-config.file=/etc/tempo.yaml"]
+    depends_on:
+      tempo-config: { condition: service_completed_successfully }
     expose:
       - "3200"
       - "4317"
@@ -89,13 +95,12 @@ services:
     #   - "${TEMPO_PORT}:3200"
     #   - "${TEMPO_OTLP_GRPC_PORT}:4317"
     #   - "${TEMPO_OTLP_HTTP_PORT}:4318"
-    configs:
-      - source: tempo_config
-        target: /etc/tempo.yaml
     volumes:
+      - tempo_config:/etc/tempo.yaml:ro
       - tempo_data:/var/tempo
     # No healthcheck: the image is distroless — no shell, no wget, no curl.
     # Check readiness from another container: http://tempo:3200/ready
 
 volumes:
+  tempo_config: {}
   tempo_data:

@@ -70,10 +70,13 @@ blocks are kept before compaction drops them.
 
 # Rootless
 
-Runs rootless as-is. The config is injected as a compose `config` rather than a bind mount,
-and the single writable path — `/var/tempo` — is pre-created in the image owned by uid
-10001, so the fresh named volume inherits that ownership. Published ports are all above
-1024.
+Runs rootless as-is. `tempo.yaml` is materialised into a shared named volume by the
+`tempo-config` one-shot init container at start (see `compose.yml` — same pattern as
+supabase's `kong-bootstrap`). Bind mounts are not used because they don't survive
+`podman compose down` and don't work rootless without host paths the user has to
+create. The single writable data path — `/var/tempo` — is pre-created in the image
+owned by uid 10001, so the fresh `tempo_data` named volume inherits that ownership.
+Published ports are all above 1024.
 
 # Why the version is pinned
 

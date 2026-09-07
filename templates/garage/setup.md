@@ -8,9 +8,11 @@ Replace the generated secrets in `.env`:
   metrics APIs.
 - `GARAGE_WEBUI_AUTH_USER_PASS` — `user:password` for the web UI login.
 
-The config file is inlined in `compose.yml` as a compose `config` and shared by
-both containers, so there is no `garage.toml` on disk to edit — change values
-through `.env`.
+The config file is materialised at start by the `garage-config` one-shot init
+container (same pattern as supabase's `kong-bootstrap`) and mounted into the
+`garage` container. There is no `garage.toml` on disk to edit — change values
+through `.env`. (`garage-webui` only talks to the admin API, so it does not need
+the file mounted.)
 
 # After first deploy: create the cluster layout
 
