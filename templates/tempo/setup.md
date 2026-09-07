@@ -29,6 +29,26 @@ Search with TraceQL:
 {span.http.status_code >= 500}
 ```
 
+# Public hostname (optional)
+
+By default litepod assigns an auto-generated `*.sslip.io` hostname that points at the
+query API and the built-in UI on port `3200`. To use a real domain instead:
+
+1. **litepod UI** → Applications → tempo → **Domains** → add a row:
+   - host: `tempo.mydomain.com`
+   - port: `3200`
+   - https: **on**
+   - is_primary: **on** (demotes the auto-sslip.io row; delete it if you want)
+2. **DNS**: add an `A` (or `AAAA`) record for `tempo.mydomain.com` pointing at the
+   litepod server's public IP.
+3. Hit `https://tempo.mydomain.com` — Caddy provisions a Let's Encrypt cert on the
+   first request.
+
+The OTLP receivers (`4317`/`4318`) stay internal. Apps on the same Compose network
+push to `tempo:4318` (HTTP) or `tempo:4317` (gRPC); do not route OTLP through Caddy
+— gRPC over a public TLS-terminating proxy is fragile, and the receivers don't need
+to be reachable from the public internet.
+
 # TraceQL metrics
 
 Tempo 3.0 answers metrics queries from the traces themselves — the live-store serves recent
