@@ -67,7 +67,7 @@
 	<title>Templates — litepod.sh</title>
 </svelte:head>
 
-<PageContainer>
+<PageContainer maxW="w-full">
 	{@const templates = page.data.templates as TemplateSummary[]}
 		{@const categoryOptions = categoriesOf(templates)}
 		<!--
@@ -135,7 +135,7 @@
 		{:else}
 			<section
 				aria-label="Templates"
-				class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3"
+				class="grid gap-5 grid-cols-[repeat(auto-fill,minmax(17rem,1fr))]"
 			>
 				{#each visible as template (template.id)}
 					<TemplateCard {template} />
