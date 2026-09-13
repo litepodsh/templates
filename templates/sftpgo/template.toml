@@ -1,0 +1,21 @@
+[template]
+id          = "sftpgo"
+name        = "SFTPGo"
+description = "Actively maintained SFTP server with a web admin, user management, and local file storage."
+version     = "2.7.5"
+categories  = ["storage", "developer-tools"]
+tags        = ["sftp", "ssh", "file-transfer", "web-admin"]
+icon        = "https://github.com/drakkan.png"
+website     = "https://sftpgo.com"
+docs        = "https://docs.sftpgo.com"
+source      = "https://github.com/drakkan/sftpgo"
+license     = "AGPL-3.0"
+
+[[ports]]
+container   = 2022
+description = "SFTP"
+primary     = true
+
+[[ports]]
+container   = 8080
+description = "Web admin"

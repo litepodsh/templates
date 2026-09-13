@@ -1,0 +1,22 @@
+services:
+  sftpgo:
+    image: docker.io/drakkan/sftpgo:v2.7.5
+    restart: unless-stopped
+    expose:
+      - "2022"
+      - "8080"
+    # Uncomment to publish SFTP and the web admin directly on the host.
+    # ports:
+    #   - "${SFTPGO_SFTP_PORT}:2022"
+    #   - "${SFTPGO_WEB_PORT}:8080"
+    environment:
+      SFTPGO_DATA_PROVIDER__CREATE_DEFAULT_ADMIN: ${SFTPGO_CREATE_DEFAULT_ADMIN}
+      SFTPGO_DEFAULT_ADMIN_USERNAME: ${SFTPGO_ADMIN_USERNAME}
+      SFTPGO_DEFAULT_ADMIN_PASSWORD: ${SFTPGO_ADMIN_PASSWORD}
+    volumes:
+      - sftpgo_data:/srv/sftpgo
+      - sftpgo_home:/var/lib/sftpgo
+
+volumes:
+  sftpgo_data:
+  sftpgo_home:
