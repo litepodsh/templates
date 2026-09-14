@@ -78,7 +78,8 @@ services:
   ente-minio:
     # Pinned to the last Community Edition release with the full admin console;
     # newer tags ship only a bare object browser. No security fixes past this date.
-    image: docker.io/minio/minio:RELEASE.2025-04-22T22-12-26Z
+    # Docker Hub removed minio/minio in 2025; images now live on quay.io.
+    image: quay.io/minio/minio:RELEASE.2025-04-22T22-12-26Z
     restart: unless-stopped
     command: server /data --address ":3200" --console-address ":3201"
     expose:
@@ -96,7 +97,7 @@ services:
       - ente-internal
 
   ente-minio-provision:
-    image: docker.io/minio/mc:RELEASE.2025-04-16T18-13-26Z
+    image: quay.io/minio/mc:RELEASE.2025-04-16T18-13-26Z
     restart: on-failure
     entrypoint:
       - /bin/sh
