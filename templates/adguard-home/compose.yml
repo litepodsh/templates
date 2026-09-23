@@ -1,0 +1,21 @@
+services:
+  adguardhome:
+    image: docker.io/adguard/adguardhome:latest
+    restart: unless-stopped
+    ports:
+      - "53:53/tcp" # DNS
+      - "53:53/udp" # DNS
+      - "67:67/udp" # DHCP server
+      - "68:68/udp" # DHCP client
+      - "853:853/tcp" # DNS-over-TLS
+      - "853:853/udp" # DNS-over-QUIC
+    expose:
+      - "3000" # Web setup and dashboard; route through Litepod
+      - "6060" # pprof debug endpoint
+    volumes:
+      - adguardhome_work:/opt/adguardhome/work
+      - adguardhome_conf:/opt/adguardhome/conf
+
+volumes:
+  adguardhome_work:
+  adguardhome_conf:

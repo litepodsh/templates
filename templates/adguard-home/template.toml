@@ -1,0 +1,36 @@
+[template]
+id          = "adguard-home"
+name        = "AdGuard Home"
+description = "Network-wide DNS server with ad and tracker blocking, encrypted DNS, and optional DHCP."
+version     = "latest"
+categories  = ["networking", "security"]
+tags        = ["dns", "ad-blocking", "privacy", "dhcp", "dns-over-tls", "dns-over-quic"]
+icon        = "https://github.com/AdguardTeam.png"
+website     = "https://adguard.com/adguard-home/overview.html"
+docs        = "https://github.com/AdguardTeam/AdGuardHome/wiki"
+source      = "https://github.com/AdguardTeam/AdGuardHome"
+license     = "GPL-3.0-or-later"
+
+[files]
+setup = "setup.md"
+
+[[ports]]
+container   = 3000
+description = "Web setup and dashboard"
+primary     = true
+
+[[ports]]
+container   = 53
+description = "DNS (TCP and UDP)"
+
+[[ports]]
+container   = 67
+description = "DHCP server (UDP)"
+
+[[ports]]
+container   = 68
+description = "DHCP client (UDP)"
+
+[[ports]]
+container   = 853
+description = "DNS-over-TLS and DNS-over-QUIC (TCP and UDP)"
