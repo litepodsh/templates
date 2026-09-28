@@ -1,0 +1,21 @@
+[template]
+id          = "nats"
+name        = "NATS"
+description = "High-performance messaging server with JetStream persistence, key-value, and object storage."
+version     = "2.15.0"
+categories  = ["developer-tools", "networking"]
+tags        = ["messaging", "pubsub", "jetstream", "queue", "streaming", "key-value"]
+icon        = "https://github.com/nats-io.png"
+website     = "https://nats.io"
+docs        = "https://docs.nats.io"
+source      = "https://github.com/nats-io/nats-server"
+license     = "Apache-2.0"
+
+[[ports]]
+container   = 4222
+description = "Client connections (NATS protocol, TCP)"
+primary     = true
+
+[[ports]]
+container   = 8222
+description = "HTTP monitoring"
