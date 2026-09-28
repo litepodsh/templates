@@ -1,0 +1,14 @@
+services:
+  changedetection:
+    image: docker.io/dgtlmoon/changedetection.io:${CHANGEDETECTION_VERSION}
+    restart: unless-stopped
+    environment:
+      PORT: ${CHANGEDETECTION_PORT}
+      TZ: ${TZ}
+    expose:
+      - "${CHANGEDETECTION_PORT}"
+    volumes:
+      - changedetection_data:/datastore
+
+volumes:
+  changedetection_data:

@@ -1,0 +1,16 @@
+[template]
+id          = "changedetection-io"
+name        = "changedetection.io"
+description = "Self-hosted website change detection and alerting."
+version     = "latest"
+categories  = ["monitoring", "developer-tools"]
+tags        = ["website-monitoring", "alerts", "change-detection"]
+website     = "https://changedetection.io"
+docs        = "https://github.com/dgtlmoon/changedetection.io/wiki"
+source      = "https://github.com/dgtlmoon/changedetection.io"
+license     = "Apache-2.0"
+
+[[ports]]
+container   = 5000
+description = "Web UI"
+primary     = true
