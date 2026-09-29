@@ -8,6 +8,7 @@ tags        = ["website-monitoring", "alerts", "change-detection"]
 website     = "https://changedetection.io"
 docs        = "https://github.com/dgtlmoon/changedetection.io/wiki"
 source      = "https://github.com/dgtlmoon/changedetection.io"
+icon        = "https://raw.githubusercontent.com/dgtlmoon/changedetection.io/master/changedetectionio/static/favicons/android-chrome-256x256.png"
 license     = "Apache-2.0"
 
 [[ports]]
