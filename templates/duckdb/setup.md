@@ -39,12 +39,11 @@ just works.
 Quack exposes the full SQL surface of the server session — read *and* write.
 Default authentication is token-based (the `DUCKDB_AUTH_TOKEN` above) and
 default authorization allows everything, so keep it behind a reverse proxy or
-VPN. The token is baked into `/data/init.sql` at first boot; after rotating
-`DUCKDB_AUTH_TOKEN` in `.env`, recreate the volume:
+VPN. The token is passed to `quack_serve` on every boot; after rotating
+`DUCKDB_AUTH_TOKEN` in `.env`, recreate the service (data is kept):
 
 ```sh
-podman compose -f templates/duckdb/compose.yml --env-file templates/duckdb/.env down -v
-podman compose -f templates/duckdb/compose.yml --env-file templates/duckdb/.env up -d
+podman compose -f templates/duckdb/compose.yml --env-file templates/duckdb/.env up -d --force-recreate
 ```
 
 For stricter setups, Quack lets you replace the authentication and

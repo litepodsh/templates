@@ -2,9 +2,8 @@
 #
 # The official duckdb/duckdb image is the CLI on a shell-less distroless base.
 # To keep the Quack server alive, the CLI is left interactive with stdin open
-# (`stdin_open: true`) and the bootstrap SQL is fed through `-init`. The init
-# service only writes that bootstrap file into the shared volume on first
-# boot; `depends_on: condition: service_completed_successfully` orders them.
+# (`stdin_open: true`) and the bootstrap SQL is passed through `-cmd`, so it
+# runs on every boot with the current token and needs no init service.
 #
 # Quack is still in beta and the protocol, function names and defaults are
 # subject to change. Pin the image to a specific DuckDB release and bump it
@@ -12,9 +11,9 @@
 services:
   duckdb:
     image: docker.io/duckdb/duckdb:1.5.6
-    # Open the persistent database and run the bootstrap script, then keep the
+    # Open the persistent database and start the Quack server, then keep the
     # CLI alive by leaving stdin open (stdin_open below).
-    command: ["/duckdb", "/data/main.duckdb", "-init", "/data/init.sql"]
+    command: ["/duckdb", "/data/main.duckdb", "-cmd", "INSTALL quack; LOAD quack; CALL quack_serve('quack:0.0.0.0:9494', allow_other_hostname => true, token => '${DUCKDB_AUTH_TOKEN}');"]
     restart: unless-stopped
     stdin_open: true
     expose:
@@ -27,29 +26,16 @@ services:
     #   - "${DUCKDB_PORT}:9494"
     environment:
       # Keep the home directory on the data volume so the installed `quack`
-      # extension survives restarts and the CLI finds the init script after
-      # the init service has written it.
+      # extension survives restarts.
       HOME: /data
     volumes:
       - duckdb_data:/data
-    depends_on:
-      duckdb-init:
-        condition: service_completed_successfully
     healthcheck:
       test: ["CMD", "/duckdb", ":memory:", "-c", "INSTALL quack; LOAD quack; FROM quack_query('quack:localhost:9494', 'SELECT 1', token => '${DUCKDB_AUTH_TOKEN}');"]
       interval: ${DUCKDB_HEALTHCHECK_INTERVAL}
       timeout: ${DUCKDB_HEALTHCHECK_TIMEOUT}
       retries: ${DUCKDB_HEALTHCHECK_RETRIES}
       start_period: ${DUCKDB_HEALTHCHECK_START_PERIOD}
-
-  # Seeds /data/init.sql, which the server runs on every boot. Idempotent: the
-  # file lives in the volume, so this service only matters on a fresh volume.
-  # If you rotate the token, regenerate the volume (podman compose down -v).
-  duckdb-init:
-    image: docker.io/library/busybox:latest
-    command: ["/bin/sh", "-c", "cat > /data/init.sql <<'EOF'\nINSTALL quack;\nLOAD quack;\nCALL quack_serve('quack:0.0.0.0:9494', allow_other_hostname => true, token => '${DUCKDB_AUTH_TOKEN}');\nEOF\n"]
-    volumes:
-      - duckdb_data:/data
 
 volumes:
   duckdb_data:
