@@ -1,0 +1,29 @@
+services:
+  hermes:
+    image: docker.io/nousresearch/hermes-agent:${HERMES_VERSION}
+    restart: unless-stopped
+    # Inside the image, `gateway run` is supervised by s6-overlay, which also
+    # runs the dashboard when HERMES_DASHBOARD=1.
+    command: gateway run
+    ports:
+      - "${HERMES_DASHBOARD_PORT}:9119"
+      - "${HERMES_API_PORT}:8642"
+    environment:
+      HERMES_DASHBOARD: ${HERMES_DASHBOARD}
+      HERMES_DASHBOARD_BASIC_AUTH_USERNAME: ${HERMES_DASHBOARD_BASIC_AUTH_USERNAME}
+      HERMES_DASHBOARD_BASIC_AUTH_PASSWORD: ${HERMES_DASHBOARD_BASIC_AUTH_PASSWORD}
+      HERMES_DASHBOARD_BASIC_AUTH_SECRET: ${HERMES_DASHBOARD_BASIC_AUTH_SECRET}
+      API_SERVER_ENABLED: ${API_SERVER_ENABLED}
+      API_SERVER_HOST: ${API_SERVER_HOST}
+      API_SERVER_KEY: ${API_SERVER_KEY}
+    volumes:
+      # Config, provider API keys, sessions, skills and memories.
+      - hermes_data:/opt/data
+    deploy:
+      resources:
+        limits:
+          memory: ${HERMES_MEMORY_LIMIT}
+          cpus: "${HERMES_CPU_LIMIT}"
+
+volumes:
+  hermes_data:

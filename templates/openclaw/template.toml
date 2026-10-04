@@ -1,0 +1,17 @@
+[template]
+id          = "openclaw"
+name        = "OpenClaw"
+description = "Self-hosted personal AI agent gateway for WhatsApp, Telegram, Discord and Slack, with a browser sidecar for web tasks."
+version     = "2026.9.8"
+categories  = ["ai", "automation"]
+tags        = ["agent", "llm", "chatbot", "whatsapp", "telegram", "discord", "browser"]
+icon        = "logo.svg"
+website     = "https://openclaw.ai"
+docs        = "https://docs.openclaw.ai"
+source      = "https://github.com/openclaw/openclaw"
+license     = "MIT"
+
+[[ports]]
+container   = 8080
+description = "Control UI (basic auth) & browser desktop at /browser/"
+primary     = true

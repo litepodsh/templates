@@ -1,0 +1,24 @@
+[template]
+id          = "clickhouse"
+name        = "ClickHouse"
+description = "Column-oriented OLAP database for real-time analytics — SQL over billions of rows. Single-node configuration."
+version     = "26.8"
+categories  = ["database", "analytics"]
+tags        = ["olap", "sql", "columnar", "analytics", "time-series"]
+icon        = "https://github.com/ClickHouse.png"
+website     = "https://clickhouse.com"
+docs        = "https://clickhouse.com/docs/install/docker"
+source      = "https://github.com/ClickHouse/ClickHouse"
+license     = "Apache-2.0"
+
+[files]
+setup = "setup.md"
+
+[[ports]]
+container   = 8123
+description = "HTTP interface & Play SQL UI (/play)"
+primary     = true
+
+[[ports]]
+container   = 9000
+description = "Native TCP protocol (clickhouse-client, drivers)"

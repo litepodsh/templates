@@ -1,0 +1,21 @@
+[template]
+id          = "hermes"
+name        = "Hermes Agent"
+description = "Open agent runtime from Nous Research with an OpenAI-compatible gateway API and a supervised web dashboard."
+version     = "v2026.9.24"
+categories  = ["ai", "developer-tools"]
+tags        = ["agent", "llm", "openai-compatible", "chatbot"]
+icon        = "logo.png"
+website     = "https://hermes-agent.nousresearch.com"
+docs        = "https://hermes-agent.nousresearch.com/docs/user-guide/docker"
+source      = "https://github.com/NousResearch/hermes-agent"
+license     = "MIT"
+
+[[ports]]
+container   = 9119
+description = "Web dashboard"
+primary     = true
+
+[[ports]]
+container   = 8642
+description = "OpenAI-compatible gateway API"

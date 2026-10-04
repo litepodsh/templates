@@ -1,0 +1,84 @@
+services:
+  openclaw:
+    # coollabsio build: openclaw + nginx front proxy (basic auth on :8080)
+    # that configures openclaw.json from env vars on every start.
+    image: docker.io/coollabsio/openclaw:${OPENCLAW_VERSION}
+    restart: unless-stopped
+    ports:
+      - "${OPENCLAW_PORT}:8080"
+    environment:
+      PORT: 8080
+      AUTH_USERNAME: ${AUTH_USERNAME}
+      AUTH_PASSWORD: ${AUTH_PASSWORD}
+      OPENCLAW_GATEWAY_TOKEN: ${OPENCLAW_GATEWAY_TOKEN}
+      OPENCLAW_GATEWAY_PORT: 18789
+      # `loopback` keeps the gateway behind nginx's basic auth; `lan` bypasses it.
+      OPENCLAW_GATEWAY_BIND: ${OPENCLAW_GATEWAY_BIND}
+      # The bundled nginx proxies from 127.0.0.1; without this the gateway
+      # rejects proxied requests with `proxy_attribution_required` (403).
+      "OPENCLAW__gateway__trustedProxies[]": 127.0.0.1
+      OPENCLAW_ALLOWED_ORIGINS: ${OPENCLAW_ALLOWED_ORIGINS}
+      OPENCLAW_STATE_DIR: /data/.openclaw
+      OPENCLAW_WORKSPACE_DIR: /data/workspace
+      OPENCLAW_PRIMARY_MODEL: ${OPENCLAW_PRIMARY_MODEL}
+      # Providers: set at least one. Empty values are ignored.
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY}
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
+      XAI_API_KEY: ${XAI_API_KEY}
+      GROQ_API_KEY: ${GROQ_API_KEY}
+      MISTRAL_API_KEY: ${MISTRAL_API_KEY}
+      MOONSHOT_API_KEY: ${MOONSHOT_API_KEY}
+      OPENCODE_API_KEY: ${OPENCODE_API_KEY}
+      COPILOT_GITHUB_TOKEN: ${COPILOT_GITHUB_TOKEN}
+      OLLAMA_BASE_URL: ${OLLAMA_BASE_URL}
+      DEEPGRAM_API_KEY: ${DEEPGRAM_API_KEY}
+      # Channels
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN}
+      DISCORD_BOT_TOKEN: ${DISCORD_BOT_TOKEN}
+      SLACK_BOT_TOKEN: ${SLACK_BOT_TOKEN}
+      SLACK_APP_TOKEN: ${SLACK_APP_TOKEN}
+      WHATSAPP_ENABLED: ${WHATSAPP_ENABLED}
+      # Webhooks
+      HOOKS_ENABLED: ${HOOKS_ENABLED}
+      HOOKS_TOKEN: ${HOOKS_TOKEN}
+      HOOKS_PATH: ${HOOKS_PATH}
+      # Browser sidecar
+      BROWSER_CDP_URL: http://browser:9223
+      BROWSER_DEFAULT_PROFILE: openclaw
+      BROWSER_EVALUATE_ENABLED: ${BROWSER_EVALUATE_ENABLED}
+      BROWSER_SNAPSHOT_MODE: ${BROWSER_SNAPSHOT_MODE}
+      OPENCLAW_DOCKER_APT_PACKAGES: ${OPENCLAW_DOCKER_APT_PACKAGES}
+    volumes:
+      - openclaw_data:/data
+    depends_on:
+      browser:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://127.0.0.1:8080/healthz"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+
+  browser:
+    # Chromium desktop; reachable only through openclaw at /browser/.
+    image: docker.io/coollabsio/openclaw-browser:${OPENCLAW_BROWSER_VERSION}
+    restart: unless-stopped
+    environment:
+      PUID: 1000
+      PGID: 1000
+      TZ: ${TZ}
+      CHROME_CLI: --remote-debugging-port=9222
+    volumes:
+      - openclaw_browser:/config
+    shm_size: 2g
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c ':> /dev/tcp/127.0.0.1/9222' || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  openclaw_data:
+  openclaw_browser:
