@@ -11,6 +11,9 @@ source      = "https://github.com/dgtlmoon/changedetection.io"
 icon        = "https://raw.githubusercontent.com/dgtlmoon/changedetection.io/master/changedetectionio/static/favicons/android-chrome-256x256.png"
 license     = "Apache-2.0"
 
+[files]
+setup = "setup.md"
+
 [[ports]]
 container   = 5000
 description = "Web UI"
