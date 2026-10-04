@@ -3,6 +3,7 @@
 	import PackageSearchIcon from '@lucide/svelte/icons/package-search';
 	import SearchIcon from '@lucide/svelte/icons/search';
 	import TriangleAlertIcon from '@lucide/svelte/icons/triangle-alert';
+	import { replaceState } from '$app/navigation';
 	import { page } from '$app/state';
 	import { CategoriesFilter } from '$lib/components/custom/categories-filter/index.js';
 	import PageContainer from '$lib/components/page-container.svelte';
@@ -15,11 +16,14 @@
 
 	const DEBOUNCE_MS = 200;
 
-	let search = $state('');
-	let categories = $state<string[]>([]);
+	// Seeded from the URL so a search survives reloads and can be shared.
+	let search = $state(page.url.searchParams.get('q') ?? '');
+	let categories = $state<string[]>(page.url.searchParams.getAll('category'));
 
 	/** null = no active query, show the full catalog from the boundary. */
-	let results = $state<TemplateSummary[] | null>(null);
+	let results = $state<TemplateSummary[] | null>(page.data.results ?? null);
+	// The server already filtered for the initial URL; don't refetch it on hydrate.
+	let skipInitialSearch = page.data.results != null;
 	let searching = $state(false);
 	let searchError = $state('');
 
@@ -43,6 +47,11 @@
 			return;
 		}
 
+		if (skipInitialSearch) {
+			skipInitialSearch = false;
+			return;
+		}
+
 		searching = true;
 		const id = ++requestId;
 		const timer = setTimeout(async () => {
@@ -60,6 +69,19 @@
 		}, DEBOUNCE_MS);
 
 		return () => clearTimeout(timer);
+	});
+
+	// Mirror the search into the URL. Shallow `replaceState` doesn't rerun
+	// `load` or push a history entry per keystroke.
+	$effect(() => {
+		const q = search.trim();
+		const selected = categories;
+		const url = new URL(page.url.href);
+		url.searchParams.delete('q');
+		url.searchParams.delete('category');
+		if (q) url.searchParams.set('q', q);
+		for (const category of selected) url.searchParams.append('category', category);
+		if (url.search !== location.search) replaceState(url, page.state);
 	});
 </script>
 
