@@ -1,0 +1,42 @@
+# Image is fully qualified: Podman has no implicit docker.io fallback unless
+# unqualified-search-registries is configured.
+services:
+  unleash:
+    image: docker.io/unleashorg/unleash-server:latest
+    restart: unless-stopped
+    ports:
+      - "${UNLEASH_HTTP_PORT}:4242"
+    environment:
+      DATABASE_URL: postgres://${UNLEASH_DB_USER}:${UNLEASH_DB_PASSWORD}@db:5432/${UNLEASH_DB_NAME}
+      DATABASE_SSL: "false"
+      LOG_LEVEL: ${UNLEASH_LOG_LEVEL}
+      AUTH_TYPE: ${UNLEASH_AUTH_TYPE}
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:4242/health || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  db:
+    image: docker.io/library/postgres:15
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${UNLEASH_DB_NAME}
+      POSTGRES_USER: ${UNLEASH_DB_USER}
+      POSTGRES_PASSWORD: ${UNLEASH_DB_PASSWORD}
+    # Named volume rather than a bind mount so it works rootless.
+    volumes:
+      - unleash_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${UNLEASH_DB_USER} -d ${UNLEASH_DB_NAME}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+volumes:
+  unleash_postgres_data:

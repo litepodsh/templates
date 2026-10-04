@@ -1,0 +1,20 @@
+[template]
+id          = "duckdb"
+name        = "DuckDB"
+description = "In-process analytical SQL database, self-hosted as a Quack (client–server) instance with a persistent database file."
+version     = "1.5.6"
+categories  = ["database", "analytics"]
+tags        = ["sql", "analytics", "olap", "parquet", "quack"]
+icon        = "https://github.com/duckdb.png"
+website     = "https://duckdb.org"
+docs        = "https://duckdb.org/docs/current/quack/overview"
+source      = "https://github.com/duckdb/duckdb"
+license     = "MIT"
+
+[files]
+setup = "setup.md"
+
+[[ports]]
+container   = 9494
+description = "Quack remote protocol (HTTP)"
+primary     = true

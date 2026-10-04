@@ -1,0 +1,17 @@
+[template]
+id          = "unleash"
+name        = "Unleash"
+description = "Self-hosted feature flag service with release toggles, experiments and kill switches, backed by PostgreSQL."
+version     = "latest"
+categories  = ["developer-tools", "devops"]
+tags        = ["feature-flags", "flags", "experiments", "postgresql"]
+icon        = "https://github.com/Unleash.png"
+website     = "https://www.getunleash.io"
+docs        = "https://docs.getunleash.io/deploy/getting-started"
+source      = "https://github.com/Unleash/unleash"
+license     = "Apache-2.0"
+
+[[ports]]
+container   = 4242
+description = "Admin UI & REST API"
+primary     = true

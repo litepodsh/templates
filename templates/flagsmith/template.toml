@@ -1,0 +1,17 @@
+[template]
+id          = "flagsmith"
+name        = "Flagsmith"
+description = "Feature flag and remote config platform with segment targeting and A/B testing, backed by PostgreSQL."
+version     = "latest"
+categories  = ["developer-tools", "devops"]
+tags        = ["feature-flags", "remote-config", "flags", "postgresql"]
+icon        = "https://github.com/Flagsmith.png"
+website     = "https://www.flagsmith.com"
+docs        = "https://docs.flagsmith.com/deployment-self-hosting/hosting-guides/docker"
+source      = "https://github.com/Flagsmith/flagsmith"
+license     = "BSD-3-Clause"
+
+[[ports]]
+container   = 8000
+description = "Dashboard & REST API"
+primary     = true

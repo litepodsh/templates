@@ -1,0 +1,21 @@
+[template]
+id          = "growthbook"
+name        = "GrowthBook"
+description = "Feature flags and A/B experimentation platform with built-in statistical analysis and visual editor."
+version     = "latest"
+categories  = ["developer-tools", "devops"]
+tags        = ["feature-flags", "experiments", "ab-testing", "mongodb"]
+icon        = "https://github.com/growthbook.png"
+website     = "https://www.growthbook.io"
+docs        = "https://docs.growthbook.io/self-host"
+source      = "https://github.com/growthbook/growthbook"
+license     = "MIT"
+
+[[ports]]
+container   = 3000
+description = "Web UI"
+primary     = true
+
+[[ports]]
+container   = 3100
+description = "REST API / SDK endpoint"
