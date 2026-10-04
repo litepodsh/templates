@@ -1,0 +1,20 @@
+[template]
+id          = "keycloak"
+name        = "Keycloak"
+description = "Open-source identity and access management — SSO, OIDC, SAML, user federation and social login. Dev mode with Postgres."
+version     = "26.8"
+categories  = ["security"]
+tags        = ["sso", "oidc", "saml", "oauth2", "iam", "identity"]
+icon        = "https://github.com/keycloak.png"
+website     = "https://www.keycloak.org"
+docs        = "https://www.keycloak.org/server/containers"
+source      = "https://github.com/keycloak/keycloak"
+license     = "Apache-2.0"
+
+[files]
+setup = "setup.md"
+
+[[ports]]
+container   = 8080
+description = "Web UI & admin console (/admin)"
+primary     = true

@@ -1,0 +1,24 @@
+[template]
+id          = "logto"
+name        = "Logto"
+description = "Open-source auth infrastructure for apps — OIDC, OAuth 2.0, SAML, social sign-in, MFA and multi-tenancy, with a hosted sign-in UI."
+version     = "1.44.0"
+categories  = ["security"]
+tags        = ["sso", "oidc", "oauth2", "saml", "iam", "identity", "auth"]
+icon        = "https://github.com/logto-io.png"
+website     = "https://logto.io"
+docs        = "https://docs.logto.io/logto-oss/get-started-with-oss"
+source      = "https://github.com/logto-io/logto"
+license     = "MPL-2.0"
+
+[files]
+setup = "setup.md"
+
+[[ports]]
+container   = 3001
+description = "OIDC endpoint & sign-in UI"
+primary     = true
+
+[[ports]]
+container   = 3002
+description = "Admin console"

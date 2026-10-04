@@ -1,0 +1,24 @@
+[template]
+id          = "authentik"
+name        = "authentik"
+description = "Open-source identity provider — SSO with OIDC, SAML, LDAP and proxy auth, flows, MFA and user management."
+version     = "2026.8.3"
+categories  = ["security"]
+tags        = ["sso", "oidc", "saml", "ldap", "iam", "identity", "mfa"]
+icon        = "https://github.com/goauthentik.png"
+website     = "https://goauthentik.io"
+docs        = "https://docs.goauthentik.io/install-config/install/docker-compose"
+source      = "https://github.com/goauthentik/authentik"
+license     = "MIT"
+
+[files]
+setup = "setup.md"
+
+[[ports]]
+container   = 9000
+description = "Web UI & admin interface (HTTP)"
+primary     = true
+
+[[ports]]
+container   = 9443
+description = "Web UI (HTTPS, self-signed)"

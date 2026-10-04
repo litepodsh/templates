@@ -1,0 +1,62 @@
+# authentik server + worker + Postgres. Since 2025.10 authentik no longer
+# needs Redis. The worker's Docker socket mount from the upstream file is
+# omitted: it's only used for managed outposts, and bind mounts break rootless.
+services:
+  server:
+    image: ghcr.io/goauthentik/server:${AUTHENTIK_VERSION}
+    command: server
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "${AUTHENTIK_HTTP_PORT}:9000"
+      - "${AUTHENTIK_HTTPS_PORT}:9443"
+    environment: &authentik-env
+      AUTHENTIK_SECRET_KEY: ${AUTHENTIK_SECRET_KEY}
+      AUTHENTIK_POSTGRESQL__HOST: db
+      AUTHENTIK_POSTGRESQL__NAME: ${AUTHENTIK_DB_NAME}
+      AUTHENTIK_POSTGRESQL__USER: ${AUTHENTIK_DB_USER}
+      AUTHENTIK_POSTGRESQL__PASSWORD: ${AUTHENTIK_DB_PASSWORD}
+      # Creates akadmin on first boot only.
+      AUTHENTIK_BOOTSTRAP_EMAIL: ${AUTHENTIK_BOOTSTRAP_EMAIL}
+      AUTHENTIK_BOOTSTRAP_PASSWORD: ${AUTHENTIK_BOOTSTRAP_PASSWORD}
+    restart: unless-stopped
+    shm_size: 512mb
+    volumes:
+      - authentik_data:/data
+      - authentik_templates:/templates
+
+  worker:
+    image: ghcr.io/goauthentik/server:${AUTHENTIK_VERSION}
+    command: worker
+    depends_on:
+      db:
+        condition: service_healthy
+    environment: *authentik-env
+    restart: unless-stopped
+    shm_size: 512mb
+    volumes:
+      - authentik_data:/data
+      - authentik_certs:/certs
+      - authentik_templates:/templates
+
+  db:
+    image: docker.io/library/postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${AUTHENTIK_DB_NAME}
+      POSTGRES_USER: ${AUTHENTIK_DB_USER}
+      POSTGRES_PASSWORD: ${AUTHENTIK_DB_PASSWORD}
+    restart: unless-stopped
+    volumes:
+      - authentik_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${AUTHENTIK_DB_USER} -d ${AUTHENTIK_DB_NAME}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  authentik_data:
+  authentik_certs:
+  authentik_templates:
+  authentik_db_data:

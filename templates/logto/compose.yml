@@ -1,0 +1,46 @@
+# Logto + Postgres, adapted from the Dokploy logto blueprint.
+# Port 3001 serves the OIDC endpoint / sign-in UI, 3002 the admin console.
+services:
+  logto:
+    image: ghcr.io/logto-io/logto:${LOGTO_VERSION}
+    # Seeds the database on first boot (no-op afterwards), then starts.
+    entrypoint: ["sh", "-c", "npm run cli db seed -- --swe && npm start"]
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "${LOGTO_HTTP_PORT}:3001"
+      - "${LOGTO_ADMIN_PORT}:3002"
+    environment:
+      TRUST_PROXY_HEADER: 1
+      DB_URL: postgres://${LOGTO_DB_USER}:${LOGTO_DB_PASSWORD}@db:5432/${LOGTO_DB_NAME}
+      ENDPOINT: ${LOGTO_ENDPOINT}
+      ADMIN_ENDPOINT: ${LOGTO_ADMIN_ENDPOINT}
+    restart: unless-stopped
+    volumes:
+      - logto_connectors:/etc/logto/packages/core/connectors
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:3001/api/status || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 60s
+
+  db:
+    image: docker.io/library/postgres:17-alpine
+    environment:
+      POSTGRES_DB: ${LOGTO_DB_NAME}
+      POSTGRES_USER: ${LOGTO_DB_USER}
+      POSTGRES_PASSWORD: ${LOGTO_DB_PASSWORD}
+    restart: unless-stopped
+    volumes:
+      - logto_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${LOGTO_DB_USER} -d ${LOGTO_DB_NAME}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  logto_connectors:
+  logto_db_data:
