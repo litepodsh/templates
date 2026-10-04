@@ -1,0 +1,12 @@
+services:
+  runner:
+    image: docker.io/myoung34/github-runner:latest
+    restart: unless-stopped
+    environment:
+      RUNNER_SCOPE: ${RUNNER_SCOPE}
+      REPO_URL: ${REPO_URL}
+      ORG_NAME: ${ORG_NAME}
+      ACCESS_TOKEN: ${ACCESS_TOKEN}
+      RUNNER_NAME_PREFIX: ${RUNNER_NAME_PREFIX}
+      LABELS: ${LABELS}
+      EPHEMERAL: ${EPHEMERAL}

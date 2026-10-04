@@ -1,0 +1,15 @@
+[template]
+id          = "github-runner"
+name        = "GitHub Actions Runner"
+description = "Self-hosted GitHub Actions runner that registers itself with a repository or organization."
+version     = "latest"
+categories  = ["developer-tools", "ci-cd"]
+tags        = ["github", "actions", "ci", "runner", "self-hosted"]
+icon        = "https://github.com/actions.png"
+website     = "https://docs.github.com/en/actions/hosting-your-own-runners"
+docs        = "https://github.com/myoung34/docker-github-actions-runner"
+source      = "https://github.com/myoung34/docker-github-actions-runner"
+license     = "MIT"
+
+[files]
+setup = "setup.md"
