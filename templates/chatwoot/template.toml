@@ -1,0 +1,18 @@
+[template]
+id          = "chatwoot"
+name        = "Chatwoot"
+description = "Open-source omnichannel customer support desk — live chat, email, WhatsApp, Instagram and more in one shared inbox. An alternative to Intercom and Zendesk."
+version     = "4.18.0"
+categories  = ["communication", "business"]
+tags        = ["live-chat", "helpdesk", "customer-support", "inbox", "whatsapp", "crm"]
+icon        = "https://raw.githubusercontent.com/chatwoot/chatwoot/develop/public/brand-assets/logo_thumbnail.svg"
+website     = "https://www.chatwoot.com"
+docs        = "https://www.chatwoot.com/docs/self-hosted"
+source      = "https://github.com/chatwoot/chatwoot"
+license     = "MIT"
+
+[[ports]]
+container   = 3000
+service     = "chatwoot"
+description = "Web UI"
+primary     = true
