@@ -2,7 +2,7 @@
 # Port 3001 serves the OIDC endpoint / sign-in UI, 3002 the admin console.
 services:
   logto:
-    image: ghcr.io/logto-io/logto:${LOGTO_VERSION}
+    image: ghcr.io/logto-io/logto:1.44.0
     # Seeds the database on first boot (no-op afterwards), then starts.
     entrypoint: ["sh", "-c", "npm run cli db seed -- --swe && npm start"]
     depends_on:

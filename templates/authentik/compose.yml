@@ -3,7 +3,7 @@
 # omitted: it's only used for managed outposts, and bind mounts break rootless.
 services:
   server:
-    image: ghcr.io/goauthentik/server:${AUTHENTIK_VERSION}
+    image: ghcr.io/goauthentik/server:2026.8.3
     command: server
     depends_on:
       db:
@@ -27,7 +27,7 @@ services:
       - authentik_templates:/templates
 
   worker:
-    image: ghcr.io/goauthentik/server:${AUTHENTIK_VERSION}
+    image: ghcr.io/goauthentik/server:2026.8.3
     command: worker
     depends_on:
       db:

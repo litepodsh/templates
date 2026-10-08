@@ -2,7 +2,7 @@
 # existing clickhouse_data volume.
 services:
   clickhouse:
-    image: docker.io/clickhouse/clickhouse-server:${CLICKHOUSE_VERSION}
+    image: docker.io/clickhouse/clickhouse-server:26.8.17.4
     restart: unless-stopped
     ports:
       - "${CLICKHOUSE_HTTP_PORT}:8123"

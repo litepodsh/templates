@@ -1,43 +1,44 @@
-# Rails and Sidekiq share one image, storage volume and env; the anchor keeps
-# them in sync. `chatwoot` runs `db:chatwoot_prepare` (create + migrate, idempotent)
-# before booting, and the worker waits for it to be healthy.
-x-chatwoot: &chatwoot
-  image: docker.io/chatwoot/chatwoot:${CHATWOOT_VERSION}
-  restart: unless-stopped
-  volumes:
-    - chatwoot_storage:/app/storage
-  environment:
-    FRONTEND_URL: ${CHATWOOT_FRONTEND_URL}
-    SECRET_KEY_BASE: ${CHATWOOT_SECRET_KEY_BASE}
-    FORCE_SSL: ${CHATWOOT_FORCE_SSL}
-    ENABLE_ACCOUNT_SIGNUP: ${CHATWOOT_ENABLE_ACCOUNT_SIGNUP}
-    DEFAULT_LOCALE: ${CHATWOOT_DEFAULT_LOCALE}
-    RAILS_ENV: production
-    NODE_ENV: production
-    INSTALLATION_ENV: docker
-    RAILS_LOG_TO_STDOUT: "true"
-    LOG_LEVEL: ${CHATWOOT_LOG_LEVEL}
-    RAILS_MAX_THREADS: ${CHATWOOT_RAILS_MAX_THREADS}
-    ACTIVE_STORAGE_SERVICE: local
-    POSTGRES_HOST: postgres
-    POSTGRES_PORT: "5432"
-    POSTGRES_DATABASE: ${CHATWOOT_DB_NAME}
-    POSTGRES_USERNAME: ${CHATWOOT_DB_USER}
-    POSTGRES_PASSWORD: ${CHATWOOT_DB_PASSWORD}
-    REDIS_URL: redis://redis:6379
-    REDIS_PASSWORD: ${CHATWOOT_REDIS_PASSWORD}
-    MAILER_SENDER_EMAIL: ${CHATWOOT_MAILER_SENDER_EMAIL}
-    SMTP_ADDRESS: ${CHATWOOT_SMTP_ADDRESS}
-    SMTP_PORT: ${CHATWOOT_SMTP_PORT}
-    SMTP_DOMAIN: ${CHATWOOT_SMTP_DOMAIN}
-    SMTP_USERNAME: ${CHATWOOT_SMTP_USERNAME}
-    SMTP_PASSWORD: ${CHATWOOT_SMTP_PASSWORD}
-    SMTP_AUTHENTICATION: ${CHATWOOT_SMTP_AUTHENTICATION}
-    SMTP_ENABLE_STARTTLS_AUTO: ${CHATWOOT_SMTP_ENABLE_STARTTLS_AUTO}
+# Rails and Sidekiq share one env; the `x-chatwoot-env` anchor keeps them in
+# sync. Image tags are literal (LitePod pre-pulls `image:` as written, without
+# .env interpolation) and services avoid `<<:` merge keys for the same reason.
+# `chatwoot` runs `db:chatwoot_prepare` (create + migrate, idempotent) before
+# booting, and the worker waits for it to be healthy.
+x-chatwoot-env: &chatwoot-env
+  FRONTEND_URL: ${CHATWOOT_FRONTEND_URL}
+  SECRET_KEY_BASE: ${CHATWOOT_SECRET_KEY_BASE}
+  FORCE_SSL: ${CHATWOOT_FORCE_SSL}
+  ENABLE_ACCOUNT_SIGNUP: ${CHATWOOT_ENABLE_ACCOUNT_SIGNUP}
+  DEFAULT_LOCALE: ${CHATWOOT_DEFAULT_LOCALE}
+  RAILS_ENV: production
+  NODE_ENV: production
+  INSTALLATION_ENV: docker
+  RAILS_LOG_TO_STDOUT: "true"
+  LOG_LEVEL: ${CHATWOOT_LOG_LEVEL}
+  RAILS_MAX_THREADS: ${CHATWOOT_RAILS_MAX_THREADS}
+  ACTIVE_STORAGE_SERVICE: local
+  POSTGRES_HOST: postgres
+  POSTGRES_PORT: "5432"
+  POSTGRES_DATABASE: ${CHATWOOT_DB_NAME}
+  POSTGRES_USERNAME: ${CHATWOOT_DB_USER}
+  POSTGRES_PASSWORD: ${CHATWOOT_DB_PASSWORD}
+  REDIS_URL: redis://redis:6379
+  REDIS_PASSWORD: ${CHATWOOT_REDIS_PASSWORD}
+  MAILER_SENDER_EMAIL: ${CHATWOOT_MAILER_SENDER_EMAIL}
+  SMTP_ADDRESS: ${CHATWOOT_SMTP_ADDRESS}
+  SMTP_PORT: ${CHATWOOT_SMTP_PORT}
+  SMTP_DOMAIN: ${CHATWOOT_SMTP_DOMAIN}
+  SMTP_USERNAME: ${CHATWOOT_SMTP_USERNAME}
+  SMTP_PASSWORD: ${CHATWOOT_SMTP_PASSWORD}
+  SMTP_AUTHENTICATION: ${CHATWOOT_SMTP_AUTHENTICATION}
+  SMTP_ENABLE_STARTTLS_AUTO: ${CHATWOOT_SMTP_ENABLE_STARTTLS_AUTO}
 
 services:
   chatwoot:
-    <<: *chatwoot
+    image: docker.io/chatwoot/chatwoot:v4.18.0
+    restart: unless-stopped
+    environment: *chatwoot-env
+    volumes:
+      - chatwoot_storage:/app/storage
     depends_on:
       postgres:
         condition: service_healthy
@@ -55,14 +56,18 @@ services:
       start_period: 180s
 
   chatwoot-worker:
-    <<: *chatwoot
+    image: docker.io/chatwoot/chatwoot:v4.18.0
+    restart: unless-stopped
+    environment: *chatwoot-env
+    volumes:
+      - chatwoot_storage:/app/storage
     depends_on:
       chatwoot:
         condition: service_healthy
     command: ["bundle", "exec", "sidekiq", "-C", "config/sidekiq.yml"]
 
   postgres:
-    image: docker.io/pgvector/pgvector:${CHATWOOT_PGVECTOR_VERSION}
+    image: docker.io/pgvector/pgvector:0.8.7-pg16
     restart: unless-stopped
     environment:
       POSTGRES_DB: ${CHATWOOT_DB_NAME}
@@ -77,7 +82,7 @@ services:
       retries: 5
 
   redis:
-    image: docker.io/library/redis:${CHATWOOT_REDIS_VERSION}
+    image: docker.io/library/redis:8-alpine
     restart: unless-stopped
     command: ["sh", "-c", "exec redis-server --requirepass \"$$REDIS_PASSWORD\""]
     environment:

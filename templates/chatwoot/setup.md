@@ -59,4 +59,4 @@ Open `/super_admin` and log in with the super admin account. Here you manage acc
 - Uploads are stored in the `chatwoot_storage` volume. Back it up with `chatwoot_postgres_data`.
 - Keep `CHATWOOT_FORCE_SSL=false`. LitePod's proxy terminates TLS.
 - Postgres uses `pgvector` on PG 16, as Chatwoot recommends. Do not change the major version on an existing install without a dump and restore.
-- To upgrade, change `CHATWOOT_VERSION` and redeploy. Migrations run automatically on boot. Read the [release notes](https://github.com/chatwoot/chatwoot/releases) first.
+- To upgrade, change the `chatwoot/chatwoot` tag on both `chatwoot` and `chatwoot-worker` in the compose file and redeploy. Migrations run automatically on boot. Read the [release notes](https://github.com/chatwoot/chatwoot/releases) first.
