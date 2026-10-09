@@ -5,6 +5,7 @@ description = "Self-hosted backend platform for authentication, databases, stora
 version     = "latest"
 categories  = ["developer-tools", "backend"]
 tags        = ["backend", "api", "auth", "database", "storage"]
+platforms   = ["linux/amd64", "linux/arm64"]
 icon        = "https://github.com/appwrite.png"
 website     = "https://appwrite.io"
 docs        = "https://appwrite.io/docs/advanced/self-hosting"

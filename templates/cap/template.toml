@@ -5,6 +5,7 @@ description = "Privacy-first, self-hosted CAPTCHA that uses proof-of-work and in
 version     = "latest"
 categories  = ["security"]
 tags        = ["captcha", "anti-bot", "proof-of-work", "anti-abuse", "anti-scraper"]
+platforms   = ["linux/amd64", "linux/arm64"]
 icon        = "https://raw.githubusercontent.com/tiagozip/cap/main/docs/public/logo.png"
 website     = "https://trycap.dev"
 docs        = "https://trycap.dev/guide/standalone/"

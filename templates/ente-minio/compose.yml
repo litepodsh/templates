@@ -76,10 +76,10 @@ services:
       - ente-internal
 
   ente-minio:
-    # Pinned to the last Community Edition release with the full admin console;
-    # newer tags ship only a bare object browser. No security fixes past this date.
-    # Docker Hub removed minio/minio in 2025; images now live on quay.io.
-    image: quay.io/minio/minio:RELEASE.2025-04-22T22-12-26Z
+    # MinIO stopped publishing public images (Docker Hub and quay.io) in 2025.
+    # pgsty/minio is a maintained community build of upstream MinIO that keeps
+    # the full admin console and ships multi-arch images.
+    image: docker.io/pgsty/minio:RELEASE.2026-08-04T00-00-00Z
     restart: unless-stopped
     command: server /data --address ":3200" --console-address ":3201"
     expose:
@@ -97,7 +97,7 @@ services:
       - ente-internal
 
   ente-minio-provision:
-    image: quay.io/minio/mc:RELEASE.2025-04-16T18-13-26Z
+    image: docker.io/pgsty/mc:RELEASE.2026-09-16T00-00-00Z
     restart: on-failure
     entrypoint:
       - /bin/sh

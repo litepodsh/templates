@@ -5,6 +5,7 @@ description = "Actively maintained SFTP server with a web admin, user management
 version     = "2.7.5"
 categories  = ["storage", "developer-tools"]
 tags        = ["sftp", "ssh", "file-transfer", "web-admin"]
+platforms   = ["linux/amd64", "linux/arm/v7", "linux/arm64"]
 icon        = "https://github.com/drakkan.png"
 website     = "https://sftpgo.com"
 docs        = "https://docs.sftpgo.com"

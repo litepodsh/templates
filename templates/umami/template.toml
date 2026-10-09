@@ -5,6 +5,7 @@ description = "Privacy-focused, self-hosted web analytics with PostgreSQL storag
 version     = "latest"
 categories  = ["analytics", "monitoring"]
 tags        = ["web-analytics", "privacy", "postgresql"]
+platforms   = ["linux/amd64", "linux/arm64"]
 icon        = "https://github.com/umami-software.png"
 website     = "https://umami.is"
 docs        = "https://umami.is/docs"

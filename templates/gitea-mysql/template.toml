@@ -5,6 +5,7 @@ description = "Lightweight self-hosted Git forge with MySQL, web UI and built-in
 version     = "latest"
 categories  = ["developer-tools", "collaboration"]
 tags        = ["git", "forge", "code-hosting", "mysql", "ci"]
+platforms   = ["linux/amd64", "linux/arm64"]
 icon        = "https://github.com/go-gitea.png"
 website     = "https://about.gitea.com"
 docs        = "https://docs.gitea.com/installation/install-with-docker-rootless"

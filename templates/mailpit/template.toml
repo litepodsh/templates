@@ -5,6 +5,7 @@ description = "Email & SMTP testing tool with a web UI. Captures outgoing mail f
 version     = "1.27"
 categories  = ["email", "developer-tools"]
 tags        = ["smtp", "testing", "mail"]
+platforms   = ["linux/amd64", "linux/arm64"]
 icon        = "logo.svg"
 website     = "https://mailpit.axllent.org"
 docs        = "https://mailpit.axllent.org/docs/"

@@ -38,6 +38,7 @@ const manifestSchema = z.object({
 		version: z.string().default('0.0.0'),
 		categories: z.array(z.string()).default([]),
 		tags: z.array(z.string()).default([]),
+		platforms: z.array(z.string()).default([]),
 		icon: z.string().optional(),
 		website: z.string().optional(),
 		docs: z.string().optional(),
@@ -204,6 +205,7 @@ async function loadTemplate(dir: string, id: string): Promise<LoadedTemplate | n
 			appVersion: appVersion ?? undefined,
 			categories: manifest.template.categories,
 			tags: manifest.template.tags,
+			platforms: manifest.template.platforms,
 			icon: externalIconUrl
 				? { path: externalIconUrl }
 				: iconFilename && extension

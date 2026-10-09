@@ -5,6 +5,7 @@ description = "Distributed tracing backend — OTLP ingest, TraceQL search and T
 version     = "3.0.3"
 categories  = ["monitoring", "devops"]
 tags        = ["tracing", "traces", "traceql", "otlp", "opentelemetry", "observability", "metrics"]
+platforms   = ["linux/amd64", "linux/arm64"]
 icon        = "https://github.com/grafana.png"
 website     = "https://grafana.com/oss/tempo/"
 docs        = "https://grafana.com/docs/tempo/latest/"

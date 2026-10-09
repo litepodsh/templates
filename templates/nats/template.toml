@@ -5,6 +5,7 @@ description = "High-performance messaging server with JetStream persistence, key
 version     = "2.15.0"
 categories  = ["developer-tools", "networking"]
 tags        = ["messaging", "pubsub", "jetstream", "queue", "streaming", "key-value"]
+platforms   = ["linux/amd64", "linux/arm/v7", "linux/arm64"]
 icon        = "https://github.com/nats-io.png"
 website     = "https://nats.io"
 docs        = "https://docs.nats.io"

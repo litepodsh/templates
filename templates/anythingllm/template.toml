@@ -5,6 +5,7 @@ description = "All-in-one desktop & Docker LLM app. RAG, agents, multi-model, an
 version     = "latest"
 categories  = ["ai", "developer-tools"]
 tags        = ["llm", "rag", "vector-db", "agents"]
+platforms   = ["linux/amd64", "linux/arm64"]
 icon        = "https://github.com/Mintplex-Labs.png"
 website     = "https://anythingllm.com"
 docs        = "https://docs.anythingllm.com"

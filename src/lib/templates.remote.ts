@@ -20,6 +20,7 @@ export const getTemplateById = query(z.string(), async (id) => {
 const searchInput = z.object({
 	q: z.string().default(''),
 	categories: z.array(z.string()).default([]),
+	archs: z.array(z.string()).default([]),
 	limit: z.number().int().min(1).max(100).optional(),
 });
 
@@ -27,7 +28,7 @@ const searchInput = z.object({
  * Server-side counterpart of `/api/v1/templates?q=`, sharing the same Fuse
  * config so the browser and LitePod rank results identically.
  */
-export const findTemplates = query(searchInput, async ({ q, categories, limit }) => {
+export const findTemplates = query(searchInput, async ({ q, categories, archs, limit }) => {
 	const event = getRequestEvent();
 	const client = clientAddress(event);
 	if (!isSearchRateLimitAllowlisted(event, client)) {
@@ -40,6 +41,7 @@ export const findTemplates = query(searchInput, async ({ q, categories, limit })
 	return findCachedTemplates({
 		query: q,
 		category: categories,
+		arch: archs,
 		limit,
 	});
 });

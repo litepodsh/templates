@@ -5,6 +5,7 @@ description = "Self-hosted anti-bot gateway that challenges scraper traffic befo
 version     = "latest"
 categories  = ["security", "networking"]
 tags        = ["anubis", "anti-bot", "proxy", "scraper", "web-firewall"]
+platforms   = ["linux/amd64", "linux/arm64"]
 icon        = "https://raw.githubusercontent.com/TecharoHQ/anubis/main/docs/static/img/happy.webp"
 website     = "https://anubis.techaro.lol"
 docs        = "https://anubis.techaro.lol/docs/admin/"

@@ -5,6 +5,7 @@ description = "Open-source invoicing, billing and payments platform — quotes, 
 version     = "latest"
 categories  = ["finance", "business"]
 tags        = ["invoicing", "billing", "payments", "accounting", "php"]
+platforms   = ["linux/amd64", "linux/arm64"]
 icon        = "https://github.com/invoiceninja.png"
 website     = "https://www.invoiceninja.com"
 docs        = "https://invoiceninja.github.io/docs/self-host-installation/"

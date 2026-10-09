@@ -5,6 +5,7 @@ description = "Cloudflare Tunnel connector for securely publishing private servi
 version     = "latest"
 categories  = ["networking", "security"]
 tags        = ["cloudflare", "tunnel", "reverse-proxy", "zero-trust"]
+platforms   = ["linux/amd64", "linux/arm64"]
 icon        = "https://github.com/cloudflare.png"
 website     = "https://developers.cloudflare.com/tunnel/"
 docs        = "https://developers.cloudflare.com/tunnel/setup/"

@@ -5,6 +5,7 @@ description = "Open-source identity and access management — SSO, OIDC, SAML, u
 version     = "26.8"
 categories  = ["security"]
 tags        = ["sso", "oidc", "saml", "oauth2", "iam", "identity"]
+platforms   = ["linux/amd64", "linux/arm64"]
 icon        = "https://github.com/keycloak.png"
 website     = "https://www.keycloak.org"
 docs        = "https://www.keycloak.org/server/containers"

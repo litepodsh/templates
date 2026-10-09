@@ -5,6 +5,7 @@ description = "VS Code running in the browser — a full IDE on a remote machine
 version     = "latest"
 categories  = ["developer-tools", "productivity"]
 tags        = ["vscode", "ide", "editor", "remote-development"]
+platforms   = ["linux/amd64", "linux/arm64"]
 icon        = "https://github.com/coder.png"
 website     = "https://coder.com/docs/code-server"
 docs        = "https://coder.com/docs/code-server/install"

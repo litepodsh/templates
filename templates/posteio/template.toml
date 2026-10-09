@@ -5,6 +5,7 @@ description = "All-in-one mail server — SMTP, IMAP, POP3, webmail, antispam an
 version     = "latest"
 categories  = ["email", "communication"]
 tags        = ["mail-server", "smtp", "imap", "webmail", "antispam"]
+platforms   = ["linux/amd64"]
 icon        = "https://github.com/analogic.png"
 website     = "https://poste.io"
 docs        = "https://poste.io/doc/getting-started"

@@ -5,6 +5,7 @@ description = "Self-hosted feature flag service with release toggles, experiment
 version     = "latest"
 categories  = ["developer-tools", "devops"]
 tags        = ["feature-flags", "flags", "experiments", "postgresql"]
+platforms   = ["linux/amd64", "linux/arm64"]
 icon        = "https://github.com/Unleash.png"
 website     = "https://www.getunleash.io"
 docs        = "https://docs.getunleash.io/deploy/getting-started"

@@ -5,6 +5,7 @@ description = "In-process analytical SQL database, self-hosted as a Quack (clien
 version     = "1.5.6"
 categories  = ["database", "analytics"]
 tags        = ["sql", "analytics", "olap", "parquet", "quack"]
+platforms   = ["linux/amd64", "linux/arm64"]
 icon        = "https://github.com/duckdb.png"
 website     = "https://duckdb.org"
 docs        = "https://duckdb.org/docs/current/quack/overview"

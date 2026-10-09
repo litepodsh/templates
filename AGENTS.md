@@ -30,6 +30,11 @@ templates/<id>/
 Folder name must equal `template.toml`'s `[template].id` and match
 `^[a-z0-9][a-z0-9._-]*$` (enforced in `src/lib/server/catalog.ts`).
 
+## Platforms
+
+After adding a template or changing any `image:`, run `just platforms <id>`.
+It rewrites `[template].platforms` from the registries. Never hand-edit it.
+
 ## Verify before commit
 
 ```sh

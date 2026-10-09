@@ -5,6 +5,7 @@ description = "Open-source dashboards and visualization for metrics, logs and tr
 version     = "latest"
 categories  = ["monitoring", "developer-tools"]
 tags        = ["dashboards", "metrics", "visualization", "observability"]
+platforms   = ["linux/amd64", "linux/arm/v7", "linux/arm64"]
 icon        = "https://github.com/grafana.png"
 website     = "https://grafana.com"
 docs        = "https://grafana.com/docs/grafana/latest/setup-grafana/installation/docker/"

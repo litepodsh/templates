@@ -5,6 +5,7 @@ description = "Modern publishing platform for newsletters, blogs, and member-onl
 version     = "latest"
 categories  = ["blog", "cms"]
 tags        = ["ghost", "publishing", "newsletter", "mysql"]
+platforms   = ["linux/amd64", "linux/arm64"]
 icon        = "https://github.com/TryGhost.png"
 website     = "https://ghost.org"
 docs        = "https://ghost.org/docs/"

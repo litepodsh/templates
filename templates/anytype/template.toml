@@ -5,6 +5,7 @@ description = "P2P local-first workspace for notes, docs, projects, and a custom
 version     = "latest"
 categories  = ["productivity", "p2p"]
 tags        = ["notes", "anytype", "sync", "p2p", "local-first"]
+platforms   = ["linux/amd64", "linux/arm64"]
 icon        = "https://github.com/anyproto.png"
 website     = "https://anytype.io"
 docs        = "https://doc.anytype.io"

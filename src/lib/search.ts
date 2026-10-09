@@ -2,7 +2,7 @@ import Fuse, { type IFuseOptions } from 'fuse.js';
 import type { TemplateSummary } from '$lib/types';
 
 /**
- * Shared by the catalog UI and the `/api/v1/templates/search` endpoint so both
+ * Shared by the catalog UI and the `/api/v1/templates` endpoint so both
  * rank identically — a result the browser shows and a result LitePod fetches
  * should never disagree.
  *
@@ -37,21 +37,29 @@ export type SearchParams = {
 	query?: string;
 	/** One or more categories — a template passes if it matches ANY of them. */
 	category?: string | string[];
+	/** One or more architectures (`arm64`) or platforms (`linux/arm64`) — ANY must match. */
+	arch?: string | string[];
 	limit?: number;
 };
 
-function normalizeCategories(category: SearchParams['category']): string[] {
-	if (!category) return [];
-	return Array.isArray(category) ? category : [category];
+function normalizeList(value: string | string[] | undefined): string[] {
+	if (!value) return [];
+	return Array.isArray(value) ? value : [value];
+}
+
+/** `arm64` matches `linux/arm64`; a full platform must match exactly. */
+export function supportsArch(template: TemplateSummary, arch: string): boolean {
+	return template.platforms.some((platform) => platform === arch || platform.split('/')[1] === arch);
 }
 
 export function searchTemplates(
 	templates: TemplateSummary[],
 	fuse: Fuse<TemplateSummary>,
-	{ query, category, limit }: SearchParams = {},
+	{ query, category, arch, limit }: SearchParams = {},
 ): SearchHit[] {
 	const term = query?.trim() ?? '';
-	const wanted = normalizeCategories(category);
+	const wanted = normalizeList(category);
+	const archs = normalizeList(arch);
 
 	// Fuse orders by relevance; with no term keep the catalog's own A-Z order.
 	let hits: SearchHit[] = term
@@ -60,6 +68,11 @@ export function searchTemplates(
 
 	if (wanted.length > 0) {
 		hits = hits.filter((hit) => hit.template.categories.some((c) => wanted.includes(c)));
+	}
+
+	// Templates with unknown platforms never pass an arch filter.
+	if (archs.length > 0) {
+		hits = hits.filter((hit) => archs.some((a) => supportsArch(hit.template, a)));
 	}
 
 	// Applied after filtering so a category never silently truncates the results.

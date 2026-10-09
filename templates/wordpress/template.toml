@@ -5,6 +5,7 @@ description = "The world's most popular CMS — a basic single-site install back
 version     = "latest"
 categories  = ["cms", "blog"]
 tags        = ["wordpress", "cms", "blog", "php", "mariadb"]
+platforms   = ["linux/amd64", "linux/arm64"]
 icon        = "https://github.com/WordPress.png"
 website     = "https://wordpress.org"
 docs        = "https://hub.docker.com/_/wordpress"

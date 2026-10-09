@@ -5,6 +5,7 @@ description = "Open-source collaborative wiki and documentation software with re
 version     = "latest"
 categories  = ["wiki", "productivity"]
 tags        = ["documentation", "collaboration", "wiki", "knowledge-base", "drawio"]
+platforms   = ["linux/amd64", "linux/arm64"]
 icon        = "https://raw.githubusercontent.com/docmost/docmost/main/apps/client/public/icons/app-icon-512x512.png"
 website     = "https://docmost.com"
 docs        = "https://docmost.com/docs"

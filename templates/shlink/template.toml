@@ -6,6 +6,7 @@ version     = "stable"
 icon        = "https://github.com/shlinkio.png"
 categories  = ["productivity", "analytics"]
 tags        = ["url-shortener", "links", "analytics", "mariadb"]
+platforms   = ["linux/amd64", "linux/arm64"]
 website     = "https://shlink.io"
 docs        = "https://shlink.io/documentation/install-docker-image/"
 source      = "https://github.com/shlinkio/shlink"

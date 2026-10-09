@@ -2,7 +2,7 @@
 id          = "rabbitmq"
 name        = "RabbitMQ"
 description = "Message broker with AMQP support and the RabbitMQ management interface."
-version     = "latest-management"
+version     = "management"
 icon        = "https://github.com/rabbitmq.png"
 categories  = ["developer-tools", "database"]
 tags        = ["message-queue", "amqp", "broker", "management"]

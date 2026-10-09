@@ -5,6 +5,7 @@ description = "Open-source low-code platform for building internal tools, dashbo
 version     = "2.2"
 categories  = ["developer-tools", "low-code"]
 tags        = ["appsmith", "internal-tools", "low-code", "dashboards"]
+platforms   = ["linux/amd64", "linux/arm64"]
 icon        = "https://github.com/appsmithorg.png"
 website     = "https://www.appsmith.com"
 docs        = "https://docs.appsmith.com"

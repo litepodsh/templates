@@ -6,6 +6,7 @@ version     = "latest"
 icon        = "https://github.com/TheTorProject.png"
 categories  = ["privacy", "developer-tools"]
 tags        = ["tor", "browser", "privacy", "vnc"]
+platforms   = ["linux/amd64"]
 website     = "https://www.torproject.org/download/"
 docs        = "https://hub.docker.com/r/ich777/torbrowser"
 source      = "https://github.com/ich777/docker-torbrowser"

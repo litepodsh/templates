@@ -5,6 +5,7 @@ description = "Open-source auth infrastructure for apps — OIDC, OAuth 2.0, SAM
 version     = "1.44.0"
 categories  = ["security"]
 tags        = ["sso", "oidc", "oauth2", "saml", "iam", "identity", "auth"]
+platforms   = ["linux/amd64", "linux/arm64"]
 icon        = "https://github.com/logto-io.png"
 website     = "https://logto.io"
 docs        = "https://docs.logto.io/logto-oss/get-started-with-oss"

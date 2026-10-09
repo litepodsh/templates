@@ -5,6 +5,7 @@ description = "Universal document format conversion powered by deep-learning mod
 version     = "latest"
 categories  = ["ai", "developer-tools"]
 tags        = ["document", "pdf", "conversion", "ocr"]
+platforms   = ["linux/amd64", "linux/arm64"]
 icon        = "https://raw.githubusercontent.com/docling-project/docling/main/docs/assets/logo.svg"
 website     = "https://ds4sd.github.io/docling/"
 docs        = "https://ds4sd.github.io/docling/"

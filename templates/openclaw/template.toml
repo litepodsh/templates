@@ -5,6 +5,7 @@ description = "Self-hosted personal AI agent gateway for WhatsApp, Telegram, Dis
 version     = "2026.9.8"
 categories  = ["ai", "automation"]
 tags        = ["agent", "llm", "chatbot", "whatsapp", "telegram", "discord", "browser"]
+platforms   = ["linux/amd64", "linux/arm64"]
 icon        = "logo.svg"
 website     = "https://openclaw.ai"
 docs        = "https://docs.openclaw.ai"

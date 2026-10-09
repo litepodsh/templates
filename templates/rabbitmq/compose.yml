@@ -1,6 +1,6 @@
 services:
   rabbitmq:
-    image: docker.io/library/rabbitmq:latest-management
+    image: docker.io/library/rabbitmq:management
     restart: unless-stopped
     ports:
       - "${RABBITMQ_AMQP_PORT}:5672"

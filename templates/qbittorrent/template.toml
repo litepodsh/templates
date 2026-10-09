@@ -5,6 +5,7 @@ description = "Free BitTorrent client with a full-featured Web UI, RSS auto-down
 version     = "latest"
 categories  = ["downloads", "networking"]
 tags        = ["bittorrent", "torrent", "downloads", "webui"]
+platforms   = ["linux/amd64", "linux/arm64"]
 icon        = "https://github.com/qbittorrent.png"
 website     = "https://www.qbittorrent.org"
 docs        = "https://docs.linuxserver.io/images/docker-qbittorrent/"

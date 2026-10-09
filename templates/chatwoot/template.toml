@@ -5,6 +5,7 @@ description = "Open-source omnichannel customer support desk — live chat, emai
 version     = "4.18.0"
 categories  = ["communication", "business"]
 tags        = ["live-chat", "helpdesk", "customer-support", "inbox", "whatsapp", "crm"]
+platforms   = ["linux/amd64", "linux/arm64"]
 icon        = "https://raw.githubusercontent.com/chatwoot/chatwoot/develop/public/brand-assets/logo_thumbnail.svg"
 website     = "https://www.chatwoot.com"
 docs        = "https://www.chatwoot.com/docs/self-hosted"

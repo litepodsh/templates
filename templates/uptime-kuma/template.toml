@@ -5,6 +5,7 @@ description = "Self-hosted uptime monitoring with HTTP, TCP, DNS, ping, push and
 version     = "2.3.2"
 categories  = ["monitoring", "developer-tools"]
 tags        = ["uptime", "status-page", "alerts", "monitoring"]
+platforms   = ["linux/amd64", "linux/arm/v7", "linux/arm64"]
 icon        = "https://raw.githubusercontent.com/louislam/uptime-kuma/master/public/icon.svg"
 website     = "https://uptime.kuma.pet"
 docs        = "https://github.com/louislam/uptime-kuma/wiki"

@@ -6,6 +6,7 @@ version     = "nightly"
 icon        = "https://github.com/lightpanda-io.png"
 categories  = ["developer-tools", "automation"]
 tags        = ["browser", "headless", "cdp", "playwright", "scraping"]
+platforms   = ["linux/amd64", "linux/arm64"]
 website     = "https://lightpanda.io"
 docs        = "https://docs.lightpanda.io/"
 source      = "https://github.com/lightpanda-io/browser"

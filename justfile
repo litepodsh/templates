@@ -28,3 +28,11 @@ fmt:
 # check: Run type checking
 check:
 	bun run check
+
+# platforms: Fill [template].platforms from the registries (all templates, or the given ids)
+platforms *ids:
+	bun scripts/platforms.ts {{ids}}
+
+# platforms-check: Fail if any template's platforms are stale
+platforms-check *ids:
+	bun scripts/platforms.ts --check {{ids}}

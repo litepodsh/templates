@@ -6,6 +6,7 @@ version     = "latest"
 icon        = "https://github.com/rustfs.png"
 categories  = ["storage", "database"]
 tags        = ["s3", "object-storage", "rust", "minio-compatible"]
+platforms   = ["linux/amd64", "linux/arm64"]
 website     = "https://rustfs.com"
 docs        = "https://docs.rustfs.com/installation/docker/"
 source      = "https://github.com/rustfs/rustfs"

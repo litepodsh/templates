@@ -5,6 +5,7 @@ description = "Multi-model database: documents, graphs, vectors, and SQL over a 
 version     = "latest"
 categories  = ["database"]
 tags        = ["surrealdb", "graph", "multi-model", "nosql", "vectors"]
+platforms   = ["linux/amd64", "linux/arm64"]
 icon        = "https://github.com/surrealdb.png"
 website     = "https://surrealdb.com"
 docs        = "https://surrealdb.com/docs"

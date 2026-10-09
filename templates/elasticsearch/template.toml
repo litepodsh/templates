@@ -5,6 +5,7 @@ description = "Distributed search and analytics engine — full-text search, vec
 version     = "9.5.1"
 categories  = ["database", "developer-tools"]
 tags        = ["search", "analytics", "full-text", "vector-search", "lucene"]
+platforms   = ["linux/amd64", "linux/arm64"]
 icon        = "https://github.com/elastic.png"
 website     = "https://www.elastic.co/elasticsearch"
 docs        = "https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html"

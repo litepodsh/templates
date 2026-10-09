@@ -5,6 +5,7 @@ description = "Lightweight S3-compatible object storage designed for self-hostin
 version     = "2.0.0"
 categories  = ["storage", "developer-tools"]
 tags        = ["s3", "object-storage", "minio-alternative", "distributed"]
+platforms   = ["linux/amd64", "linux/arm64"]
 icon        = "https://github.com/deuxfleurs-org.png"
 website     = "https://garagehq.deuxfleurs.fr"
 docs        = "https://garagehq.deuxfleurs.fr/documentation/quick-start/"

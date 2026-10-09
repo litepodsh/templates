@@ -10,6 +10,8 @@ export type TemplateSearchInput = {
 	query?: string;
 	/** One or more categories — templates matching ANY of them are returned. */
 	category?: string | string[];
+	/** One or more architectures — templates supporting ANY of them are returned. */
+	arch?: string | string[];
 	limit?: number;
 };
 
@@ -36,14 +38,17 @@ export async function findCachedTemplates(input: TemplateSearchInput): Promise<T
 	return results;
 }
 
+function sortedList(value: string | string[] | undefined): string[] {
+	if (Array.isArray(value)) return [...value].sort();
+	return value ? [value] : [];
+}
+
 function cacheKey(input: TemplateSearchInput): string {
-	const categories = Array.isArray(input.category)
-		? [...input.category].sort()
-		: input.category
-			? [input.category]
-			: [];
 	const hash = createHash('sha256')
-		.update(JSON.stringify([input.query ?? '', categories, input.limit ?? null]))
+		.update(
+			JSON.stringify([input.query ?? '', sortedList(input.category), sortedList(input.arch), input.limit ?? null]),
+		)
 		.digest('base64url');
-	return `templates:search:v1:${hash}`;
+	// v2: results now carry `platforms` and the key includes `arch`.
+	return `templates:search:v2:${hash}`;
 }

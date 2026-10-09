@@ -5,6 +5,7 @@ description = "Self-hosted GitHub Actions runner that registers itself with a re
 version     = "latest"
 categories  = ["developer-tools", "ci-cd"]
 tags        = ["github", "actions", "ci", "runner", "self-hosted"]
+platforms   = ["linux/amd64", "linux/arm64"]
 icon        = "https://github.com/actions.png"
 website     = "https://docs.github.com/en/actions/hosting-your-own-runners"
 docs        = "https://github.com/myoung34/docker-github-actions-runner"

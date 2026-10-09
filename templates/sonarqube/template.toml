@@ -5,6 +5,7 @@ description = "Continuous code quality and security analysis — static analysis
 version     = "community"
 categories  = ["developer-tools", "devops"]
 tags        = ["code-quality", "static-analysis", "sast", "ci", "postgresql"]
+platforms   = ["linux/amd64", "linux/arm64"]
 icon        = "https://github.com/SonarSource.png"
 website     = "https://www.sonarsource.com/products/sonarqube/"
 docs        = "https://docs.sonarsource.com/sonarqube-community-build/setup-and-upgrade/install-the-server/introduction/"

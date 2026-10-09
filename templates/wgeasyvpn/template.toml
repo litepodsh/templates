@@ -5,6 +5,7 @@ description = "WireGuard VPN server with a browser-based client management inter
 version     = "15"
 categories  = ["networking", "security"]
 tags        = ["wireguard", "vpn", "mesh", "remote-access"]
+platforms   = ["linux/amd64", "linux/arm64"]
 icon        = "https://github.com/wg-easy.png"
 website     = "https://wg-easy.github.io/wg-easy/"
 docs        = "https://wg-easy.github.io/wg-easy/v15.3/getting-started/"

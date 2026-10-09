@@ -5,6 +5,7 @@ description = "Time-series database and monitoring system — scrapes metrics fr
 version     = "latest"
 categories  = ["monitoring", "devops"]
 tags        = ["metrics", "monitoring", "time-series", "promql", "alerting"]
+platforms   = ["linux/amd64", "linux/arm/v7", "linux/arm64"]
 icon        = "https://github.com/prometheus.png"
 website     = "https://prometheus.io"
 docs        = "https://prometheus.io/docs/prometheus/latest/installation/"
