@@ -1,10 +1,10 @@
 ## Before first boot
 
 Anubis is an anti-bot gateway: visitors reach Anubis first, and Anubis
-forwards approved requests to `ANUBIS_TARGET`. The template ships **no
-website of its own**: Anubis boots with a placeholder target, and visitors get
-a gateway error after the challenge until you point `ANUBIS_TARGET` at your
-site (see [Point Anubis at your website](#point-anubis-at-your-website)).
+forwards approved requests to `ANUBIS_TARGET`. The bundled `demo-web` Nginx
+service is private and provides a working target for a new deployment; replace
+it with your site (see
+[Point Anubis at your website](#point-anubis-at-your-website)).
 
 Before making the service public, update these `.env` values:
 
@@ -13,7 +13,7 @@ Before making the service public, update these `.env` values:
   Adding a scheme breaks cookies and redirects. For example, `app.example.com`
   (not `https://app.example.com`).
 - `ANUBIS_TARGET` — the URL of the website Anubis should protect. It starts
-  as the placeholder `http://my-site-a1b2c3-web:3000`; replace it.
+  as `http://demo-web:80` so you can verify the template immediately.
 - `ANUBIS_DIFFICULTY` — proof-of-work difficulty. `4` is the default; increase
   it carefully because higher values cost legitimate visitors more CPU time.
 - `ANUBIS_PORT` — the direct host port for standalone use. litepod domains use
@@ -50,8 +50,7 @@ podman compose -f templates/anubis/compose.yml \
 ```
 
 Open <http://localhost:8923>. Anubis shows a browser challenge, then proxies
-the request to `ANUBIS_TARGET`. With the placeholder target you get a gateway
-error after the challenge, which confirms Anubis itself is working. Metrics listen on port
+the request to the private Nginx demo page. Metrics listen on port
 `9090` inside the Compose network only; they are deliberately not published on
 the host. The healthcheck executes the Anubis binary directly and does not use
 this port.
@@ -74,7 +73,10 @@ network, so the template also works with plain local Podman Compose.
 
 ## Point Anubis at your website
 
-Pick **one** option, set `ANUBIS_TARGET`, save, and redeploy Anubis.
+The bundled `demo-web` page is only a placeholder. Pick **one** option, set
+`ANUBIS_TARGET`, save, and redeploy Anubis. Once Anubis points at your site,
+you can delete the `demo-web` service and Anubis's `depends_on: demo-web` from
+`compose.yml`.
 
 ### Option A — website deployed in litepod (internal network, recommended)
 
@@ -109,7 +111,8 @@ already connected through litepod's internal network. Use `http://`, not
 `https://`: internal traffic does not go through Caddy's TLS.
 
 If you add the website as another service inside this same Compose file
-instead, use its Compose service name and internal port, for example
+instead, use its Compose service name and internal port, as `demo-web` does
+(`http://demo-web:80`). For example
 `http://web:3000`.
 
 ### Option B — website hosted elsewhere (external network)
