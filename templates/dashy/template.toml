@@ -5,6 +5,7 @@ description = "Customizable self-hosted dashboard for your homelab, links, widge
 version     = "latest"
 categories  = ["dashboard", "productivity"]
 tags        = ["homepage", "dashboard", "homelab", "widgets"]
+platforms   = ["linux/amd64", "linux/arm64"]
 icon        = "https://dashy.to/img/dashy.png"
 website     = "https://dashy.to"
 docs        = "https://dashy.to/docs/"

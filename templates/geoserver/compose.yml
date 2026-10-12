@@ -1,6 +1,6 @@
 services:
   geoserver:
-    image: docker.io/geoserver/geoserver:latest
+    image: docker.osgeo.org/geoserver:stable-latest
     restart: unless-stopped
     expose:
       - "8080"

@@ -5,6 +5,7 @@ description = "Open-source secrets management platform — store, sync, and rota
 version     = "latest"
 categories  = ["security", "developer-tools"]
 tags        = ["secrets", "vault", "env", "postgresql", "redis"]
+platforms   = ["linux/amd64", "linux/arm64"]
 icon        = "https://github.com/Infisical.png"
 website     = "https://infisical.com"
 docs        = "https://infisical.com/docs/self-hosting/deployment-options/docker-compose"

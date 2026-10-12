@@ -5,6 +5,7 @@ description = "Stateless API for converting HTML, Markdown, and Office documents
 version     = "8"
 categories  = ["developer-tools", "productivity"]
 tags        = ["pdf", "conversion", "api", "chromium", "libreoffice"]
+platforms   = ["linux/amd64", "linux/arm/v7", "linux/arm64"]
 icon        = "https://github.com/gotenberg.png"
 website     = "https://gotenberg.dev"
 docs        = "https://gotenberg.dev/docs/getting-started/introduction"

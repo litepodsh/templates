@@ -5,6 +5,7 @@ description = "Virtual hand-drawn style whiteboard for sketches and diagrams. Ru
 version     = "latest"
 categories  = ["productivity", "collaboration"]
 tags        = ["whiteboard", "drawing", "diagrams", "excalidraw"]
+platforms   = ["linux/amd64", "linux/arm/v7", "linux/arm64"]
 icon        = "https://github.com/excalidraw.png"
 website     = "https://excalidraw.com"
 docs        = "https://github.com/excalidraw/excalidraw/blob/master/docs/self-hosting.md"

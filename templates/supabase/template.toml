@@ -5,6 +5,7 @@ description = "Minimal self-hosted Supabase: Postgres, Auth, REST, Studio, and K
 version     = "3.0.0"
 categories  = ["backend", "database"]
 tags        = ["supabase", "baas", "postgres", "auth", "rest"]
+platforms   = ["linux/amd64", "linux/arm64"]
 icon        = "https://github.com/supabase.png"
 website     = "https://supabase.com"
 docs        = "https://supabase.com/docs"

@@ -6,6 +6,7 @@ version     = "latest"
 icon        = "https://github.com/vrtmrz.png"
 categories  = ["productivity", "storage"]
 tags        = ["obsidian", "notes", "sync", "couchdb"]
+platforms   = ["linux/amd64", "linux/arm64"]
 website     = "https://github.com/vrtmrz/obsidian-livesync"
 docs        = "https://github.com/vrtmrz/obsidian-livesync/blob/main/docs/setup_own_server.md"
 source      = "https://github.com/vrtmrz/obsidian-livesync"

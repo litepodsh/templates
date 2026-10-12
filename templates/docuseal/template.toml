@@ -5,6 +5,7 @@ description = "Open-source document signing platform — build PDF forms, send t
 version     = "latest"
 categories  = ["productivity", "business"]
 tags        = ["e-signature", "documents", "pdf", "forms", "docusign"]
+platforms   = ["linux/amd64", "linux/arm64"]
 icon        = "https://github.com/docusealco.png"
 website     = "https://www.docuseal.com"
 docs        = "https://www.docuseal.com/docs"

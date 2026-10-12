@@ -5,6 +5,7 @@ description = "Locally hosted web toolkit for PDF operations — merge, split, c
 version     = "latest"
 categories  = ["productivity", "documents"]
 tags        = ["pdf", "ocr", "documents", "conversion", "self-hosted"]
+platforms   = ["linux/amd64", "linux/arm64"]
 icon        = "https://github.com/Stirling-Tools.png"
 website     = "https://www.stirlingpdf.com"
 docs        = "https://docs.stirlingpdf.com"

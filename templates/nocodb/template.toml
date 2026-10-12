@@ -5,6 +5,7 @@ description = "Open-source Airtable alternative — spreadsheets, forms, views, 
 version     = "latest"
 categories  = ["database", "developer-tools"]
 tags        = ["nocodb", "airtable", "spreadsheet", "low-code", "postgres"]
+platforms   = ["linux/amd64", "linux/arm/v7", "linux/arm64"]
 icon        = "https://github.com/nocodb.png"
 website     = "https://nocodb.com"
 docs        = "https://docs.nocodb.com"

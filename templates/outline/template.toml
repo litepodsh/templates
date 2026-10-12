@@ -5,6 +5,7 @@ description = "Fast, collaborative knowledge base and team wiki with a real-time
 version     = "latest"
 categories  = ["wiki", "productivity"]
 tags        = ["wiki", "knowledge-base", "documentation", "postgresql", "redis"]
+platforms   = ["linux/amd64", "linux/arm64"]
 icon        = "https://github.com/outline.png"
 website     = "https://www.getoutline.com"
 docs        = "https://docs.getoutline.com/s/hosting"

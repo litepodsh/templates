@@ -5,6 +5,7 @@ description = "Web file manager for a single directory tree — browse, upload, 
 version     = "latest"
 categories  = ["storage", "productivity"]
 tags        = ["files", "file-manager", "upload", "sharing", "web"]
+platforms   = ["linux/amd64", "linux/arm/v7", "linux/arm64"]
 icon        = "https://github.com/filebrowser.png"
 website     = "https://filebrowser.org"
 docs        = "https://filebrowser.org/installation"

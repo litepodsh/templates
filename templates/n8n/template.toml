@@ -5,6 +5,7 @@ description = "Workflow automation tool — connect APIs, services and databases
 version     = "latest"
 categories  = ["automation", "developer-tools"]
 tags        = ["workflow", "automation", "integrations", "low-code", "webhooks"]
+platforms   = ["linux/amd64", "linux/arm64"]
 icon        = "https://github.com/n8n-io.png"
 website     = "https://n8n.io"
 docs        = "https://docs.n8n.io/hosting/"

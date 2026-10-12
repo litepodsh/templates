@@ -5,6 +5,7 @@ description = "Collaborative intrusion-prevention engine — parses logs, detect
 version     = "latest"
 categories  = ["security", "networking"]
 tags        = ["ips", "waf", "fail2ban", "security", "lapi"]
+platforms   = ["linux/amd64", "linux/arm/v7", "linux/arm64"]
 icon        = "https://github.com/crowdsecurity.png"
 website     = "https://www.crowdsec.net"
 docs        = "https://docs.crowdsec.net/docs/getting_started/install_crowdsec_docker/"

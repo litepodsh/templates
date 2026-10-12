@@ -14,6 +14,11 @@ export function formatVersion(version: string): string {
 	return version.startsWith('v') ? version : `v${version}`;
 }
 
+/** `linux/arm64` -> `arm64`, `linux/arm/v7` -> `arm/v7`; every template targets Linux. */
+export function formatPlatform(platform: string): string {
+	return platform.replace(/^linux\//, '');
+}
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type WithoutChild<T> = T extends { child?: any } ? Omit<T, "child"> : T;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

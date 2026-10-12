@@ -16,7 +16,8 @@ services:
       SLOG_LEVEL: ${ANUBIS_SLOG_LEVEL}
       USE_REMOTE_ADDRESS: ${ANUBIS_USE_REMOTE_ADDRESS}
     healthcheck:
-      test: ["CMD-SHELL", "/ko-app/anubis --healthcheck"]
+      # Exec form: the Anubis image ships no shell, so CMD-SHELL always fails.
+      test: ["CMD", "/ko-app/anubis", "--healthcheck"]
       interval: 5s
       timeout: 30s
       retries: 5
@@ -24,8 +25,9 @@ services:
     depends_on:
       - demo-web
 
-  # demo-web:
-  #   image: docker.io/nginx:alpine
-  #   restart: unless-stopped
-  #   expose:
-  #     - "80"
+  # Placeholder site so the template works out of the box; see setup.md.
+  demo-web:
+    image: docker.io/nginx:alpine
+    restart: unless-stopped
+    expose:
+      - "80"

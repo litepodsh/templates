@@ -36,7 +36,7 @@ services:
       retries: 10
 
   redis:
-    image: docker.io/eqalpha/keydb:6.3.3
+    image: docker.io/eqalpha/keydb:latest
     restart: unless-stopped
     volumes:
       - heyform_keydb_data:/data

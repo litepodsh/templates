@@ -5,6 +5,7 @@ description = "End-to-end encrypted photo storage and backup using your external
 version     = "latest"
 categories  = ["photos", "storage"]
 tags        = ["photos", "backup", "encryption", "e2ee", "gallery", "s3"]
+platforms   = ["linux/amd64", "linux/arm64"]
 icon        = "https://github.com/ente-io.png"
 website     = "https://ente.io"
 docs        = "https://ente.io/help/self-hosting/"

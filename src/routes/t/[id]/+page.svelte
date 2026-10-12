@@ -4,6 +4,7 @@
 	import CheckIcon from '@lucide/svelte/icons/check';
 	import CodeIcon from '@lucide/svelte/icons/code';
 	import CopyIcon from '@lucide/svelte/icons/copy';
+	import CpuIcon from '@lucide/svelte/icons/cpu';
 	import ExternalLinkIcon from '@lucide/svelte/icons/external-link';
 	import PackageIcon from '@lucide/svelte/icons/package';
 	import { marked } from 'marked';
@@ -17,7 +18,7 @@
 	import * as Table from '$lib/components/ui/table/index.js';
 	import { Badge } from '$lib/components/ui/badge/index.js';
 	import { Button } from '$lib/components/ui/button/index.js';
-	import { formatVersion } from '$lib/utils';
+	import { formatPlatform, formatVersion } from '$lib/utils';
 	import type { TemplateDetail, TemplateFile } from '$lib/types';
 
 	let copied = $state('');
@@ -154,6 +155,12 @@
 						{#if template.license}
 							<Badge variant="outline">{template.license}</Badge>
 						{/if}
+						{#each template.platforms as platform (platform)}
+							<Badge variant="outline" title="Every image publishes {platform}">
+								<CpuIcon />
+								{formatPlatform(platform)}
+							</Badge>
+						{/each}
 					</div>
 				</div>
 			</div>

@@ -5,6 +5,7 @@ description = "Open-source experience management — in-app and link surveys, fe
 version     = "latest"
 categories  = ["forms", "analytics"]
 tags        = ["surveys", "forms", "feedback", "postgresql", "nps"]
+platforms   = ["linux/amd64", "linux/arm64"]
 icon        = "https://github.com/formbricks.png"
 website     = "https://formbricks.com"
 docs        = "https://formbricks.com/docs/self-hosting/setup/docker"

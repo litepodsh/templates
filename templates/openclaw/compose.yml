@@ -2,7 +2,7 @@ services:
   openclaw:
     # coollabsio build: openclaw + nginx front proxy (basic auth on :8080)
     # that configures openclaw.json from env vars on every start.
-    image: docker.io/coollabsio/openclaw:${OPENCLAW_VERSION}
+    image: docker.io/coollabsio/openclaw:2026.9.8
     restart: unless-stopped
     ports:
       - "${OPENCLAW_PORT}:8080"
@@ -63,7 +63,7 @@ services:
 
   browser:
     # Chromium desktop; reachable only through openclaw at /browser/.
-    image: docker.io/coollabsio/openclaw-browser:${OPENCLAW_BROWSER_VERSION}
+    image: docker.io/coollabsio/openclaw-browser:0.3.0
     restart: unless-stopped
     environment:
       PUID: 1000

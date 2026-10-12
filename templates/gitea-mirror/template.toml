@@ -5,6 +5,7 @@ description = "Automatically mirror GitHub repositories to your self-hosted Gite
 version     = "latest"
 categories  = ["developer-tools", "collaboration"]
 tags        = ["git", "forge", "mirror", "backup", "migration"]
+platforms   = ["linux/amd64", "linux/arm64"]
 icon        = "https://raw.githubusercontent.com/RayLabsHQ/gitea-mirror/main/public/logo.png"
 website     = "https://github.com/RayLabsHQ/gitea-mirror"
 docs        = "https://github.com/RayLabsHQ/gitea-mirror#readme"

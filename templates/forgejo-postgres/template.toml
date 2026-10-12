@@ -5,6 +5,7 @@ description = "Community-maintained self-hosted Git forge with PostgreSQL, web U
 version     = "16"
 categories  = ["developer-tools", "collaboration"]
 tags        = ["git", "forge", "code-hosting", "postgresql", "forgejo"]
+platforms   = ["linux/amd64", "linux/arm64"]
 icon        = "https://codeberg.org/forgejo/forgejo/raw/branch/forgejo/assets/logo.svg"
 website     = "https://forgejo.org"
 docs        = "https://forgejo.org/docs/latest/admin/installation/docker/"

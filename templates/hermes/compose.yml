@@ -1,6 +1,6 @@
 services:
   hermes:
-    image: docker.io/nousresearch/hermes-agent:${HERMES_VERSION}
+    image: docker.io/nousresearch/hermes-agent:v2026.9.24
     restart: unless-stopped
     # Inside the image, `gateway run` is supervised by s6-overlay, which also
     # runs the dashboard when HERMES_DASHBOARD=1.

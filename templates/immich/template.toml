@@ -5,6 +5,7 @@ description = "Self-hosted photo and video backup — mobile auto-upload, ML-pow
 version     = "release"
 categories  = ["photos", "media"]
 tags        = ["photos", "backup", "gallery", "machine-learning", "postgresql"]
+platforms   = ["linux/amd64", "linux/arm64"]
 icon        = "https://github.com/immich-app.png"
 website     = "https://immich.app"
 docs        = "https://docs.immich.app/install/docker-compose"

@@ -5,6 +5,7 @@ description = "Network-wide DNS server with ad and tracker blocking, encrypted D
 version     = "latest"
 categories  = ["networking", "security"]
 tags        = ["dns", "ad-blocking", "privacy", "dhcp", "dns-over-tls", "dns-over-quic"]
+platforms   = ["linux/amd64", "linux/arm/v7", "linux/arm64"]
 icon        = "https://github.com/AdguardTeam.png"
 website     = "https://adguard.com/adguard-home/overview.html"
 docs        = "https://github.com/AdguardTeam/AdGuardHome/wiki"

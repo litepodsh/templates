@@ -5,6 +5,7 @@ description = "Lightweight, self-hosted password manager compatible with the Bit
 version     = "latest"
 categories  = ["security", "productivity"]
 tags        = ["password-manager", "bitwarden", "vault", "secrets"]
+platforms   = ["linux/amd64", "linux/arm/v7", "linux/arm64"]
 icon        = "logo.svg"
 website     = "https://github.com/dani-garcia/vaultwarden"
 docs        = "https://github.com/dani-garcia/vaultwarden/wiki"

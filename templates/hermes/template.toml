@@ -5,6 +5,7 @@ description = "Open agent runtime from Nous Research with an OpenAI-compatible g
 version     = "v2026.9.24"
 categories  = ["ai", "developer-tools"]
 tags        = ["agent", "llm", "openai-compatible", "chatbot"]
+platforms   = ["linux/amd64", "linux/arm64"]
 icon        = "logo.png"
 website     = "https://hermes-agent.nousresearch.com"
 docs        = "https://hermes-agent.nousresearch.com/docs/user-guide/docker"

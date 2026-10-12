@@ -5,6 +5,7 @@ description = "Open-source identity provider — SSO with OIDC, SAML, LDAP and p
 version     = "2026.8.3"
 categories  = ["security"]
 tags        = ["sso", "oidc", "saml", "ldap", "iam", "identity", "mfa"]
+platforms   = ["linux/amd64", "linux/arm64"]
 icon        = "https://github.com/goauthentik.png"
 website     = "https://goauthentik.io"
 docs        = "https://docs.goauthentik.io/install-config/install/docker-compose"

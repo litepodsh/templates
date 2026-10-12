@@ -19,7 +19,7 @@ register({
 	path: '/api/v1/templates',
 	summary: 'List or search templates',
 	description:
-		'Without `q`, returns every valid template sorted by name. With `q`, runs a fuzzy search (Fuse.js, weighted towards the name) and returns matches ordered by relevance. Searches (`q` or `category`) are limited to 250 requests per minute per client IP; exceeding that quota blocks searches from that client for 5 minutes. The response shape is the same either way.',
+		'Without `q`, returns every valid template sorted by name. With `q`, runs a fuzzy search (Fuse.js, weighted towards the name) and returns matches ordered by relevance. Searches (`q`, `category` or `arch`) are limited to 250 requests per minute per client IP; exceeding that quota blocks searches from that client for 5 minutes. The response shape is the same either way.',
 	tags: ['templates'],
 	operationId: 'listTemplates',
 	params: [
@@ -38,6 +38,14 @@ register({
 			description: 'Keep only templates declaring one of these categories. Repeat the parameter to OR multiple values. Combines with `q`.',
 			schema: { type: 'array', items: { type: 'string' } },
 			example: 'email',
+		},
+		{
+			name: 'arch',
+			in: 'query',
+			required: false,
+			description: 'Keep only templates whose every image publishes this architecture (`arm64`) or platform (`linux/arm64`). Repeat to OR multiple values. Templates with unknown platforms are excluded. Combines with `q` and `category`.',
+			schema: { type: 'array', items: { type: 'string' } },
+			example: 'arm64',
 		},
 		{
 			name: 'limit',
@@ -72,6 +80,7 @@ register({
 export const GET: RequestHandler = async ({ url, ...event }) => {
 	const query = url.searchParams.get('q') ?? undefined;
 	const categories = url.searchParams.getAll('category');
+	const archs = url.searchParams.getAll('arch');
 	const rawLimit = url.searchParams.get('limit');
 
 	let limit: number | undefined;
@@ -82,7 +91,7 @@ export const GET: RequestHandler = async ({ url, ...event }) => {
 		}
 	}
 
-	if (query || categories.length > 0) {
+	if (query || categories.length > 0 || archs.length > 0) {
 		const client = clientAddress(event);
 		if (!isSearchRateLimitAllowlisted(event, client)) {
 			const result = await consumeSearchRateLimit('api', client);
@@ -98,11 +107,12 @@ export const GET: RequestHandler = async ({ url, ...event }) => {
 	const hidden = supportsDomainMarkers(url) ? new Set<string>() : await templatesUsingDomainMarkers();
 	const visible = (templates: TemplateSummary[]) => templates.filter((template) => !hidden.has(template.id));
 
-	if (!query && categories.length === 0) return ok(visible(await listTemplates()));
+	if (!query && categories.length === 0 && archs.length === 0) return ok(visible(await listTemplates()));
 
 	return ok(visible(await findCachedTemplates({
 		query,
 		category: categories,
+		arch: archs,
 		limit,
 	})));
 };

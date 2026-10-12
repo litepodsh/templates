@@ -6,6 +6,7 @@ version     = "latest"
 icon        = "https://github.com/plausible.png"
 categories  = ["analytics", "monitoring"]
 tags        = ["web-analytics", "privacy", "clickhouse", "postgresql"]
+platforms   = ["linux/amd64", "linux/arm64"]
 website     = "https://plausible.io"
 docs        = "https://github.com/plausible/community-edition"
 source      = "https://github.com/plausible/community-edition"

@@ -6,6 +6,7 @@ version     = "latest"
 icon        = "https://github.com/pocketbase.png"
 categories  = ["developer-tools", "database"]
 tags        = ["backend", "sqlite", "api", "auth"]
+platforms   = ["linux/amd64", "linux/arm/v7", "linux/arm64"]
 website     = "https://pocketbase.io"
 docs        = "https://pocketbase.io/docs"
 source      = "https://github.com/pocketbase/pocketbase"

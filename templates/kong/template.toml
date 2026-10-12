@@ -5,6 +5,7 @@ description = "Cloud-native API gateway (OSS/community edition) with the built-i
 version     = "latest"
 categories  = ["networking", "developer-tools"]
 tags        = ["api-gateway", "reverse-proxy", "kong", "postgres", "microservices"]
+platforms   = ["linux/amd64", "linux/arm64"]
 icon        = "https://github.com/Kong.png"
 website     = "https://konghq.com"
 docs        = "https://developer.konghq.com/gateway/install/docker/"

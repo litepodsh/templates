@@ -5,6 +5,7 @@ description = "Feature flags and A/B experimentation platform with built-in stat
 version     = "latest"
 categories  = ["developer-tools", "devops"]
 tags        = ["feature-flags", "experiments", "ab-testing", "mongodb"]
+platforms   = ["linux/amd64", "linux/arm64"]
 icon        = "https://github.com/growthbook.png"
 website     = "https://www.growthbook.io"
 docs        = "https://docs.growthbook.io/self-host"

@@ -5,6 +5,7 @@ description = "Open-source home automation hub that puts local control and priva
 version     = "stable"
 categories  = ["home-automation", "iot"]
 tags        = ["smart-home", "automation", "iot", "mqtt", "zigbee"]
+platforms   = ["linux/amd64", "linux/arm64"]
 icon        = "https://github.com/home-assistant.png"
 website     = "https://www.home-assistant.io"
 docs        = "https://www.home-assistant.io/installation/linux#docker-compose"

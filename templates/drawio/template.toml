@@ -5,6 +5,7 @@ description = "Self-hosted diagram editor (flowcharts, UML, network diagrams). F
 version     = "latest"
 categories  = ["productivity", "developer-tools"]
 tags        = ["diagrams", "drawio", "flowchart", "uml", "whiteboard"]
+platforms   = ["linux/amd64", "linux/arm64"]
 icon        = "https://github.com/jgraph.png"
 website     = "https://www.drawio.com"
 docs        = "https://www.drawio.com/doc/faq/configure-diagram-editor"

@@ -5,6 +5,7 @@ description = "Feature flag and remote config platform with segment targeting an
 version     = "latest"
 categories  = ["developer-tools", "devops"]
 tags        = ["feature-flags", "remote-config", "flags", "postgresql"]
+platforms   = ["linux/amd64", "linux/arm64"]
 icon        = "https://github.com/Flagsmith.png"
 website     = "https://www.flagsmith.com"
 docs        = "https://docs.flagsmith.com/deployment-self-hosting/hosting-guides/docker"

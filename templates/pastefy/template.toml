@@ -5,6 +5,7 @@ description = "Open-source self-hosted Pastebin with syntax highlighting, sharin
 version     = "latest"
 categories  = ["developer-tools", "productivity"]
 tags        = ["pastebin", "snippets", "sharing", "code", "mysql"]
+platforms   = ["linux/amd64"]
 icon        = "https://github.com/interaapps.png"
 website     = "https://pastefy.app"
 docs        = "https://docs.pastefy.app/self-hosting/configuration.html"

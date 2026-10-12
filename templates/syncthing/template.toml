@@ -6,6 +6,7 @@ version     = "latest"
 icon        = "https://github.com/syncthing.png"
 categories  = ["storage", "productivity"]
 tags        = ["sync", "files", "p2p", "backup"]
+platforms   = ["linux/amd64", "linux/arm/v7", "linux/arm64"]
 website     = "https://syncthing.net"
 docs        = "https://docs.syncthing.net"
 source      = "https://github.com/syncthing/syncthing"

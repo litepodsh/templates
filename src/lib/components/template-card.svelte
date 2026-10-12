@@ -1,8 +1,9 @@
 <script lang="ts">
+	import CpuIcon from '@lucide/svelte/icons/cpu';
 	import PackageIcon from '@lucide/svelte/icons/package';
 	import * as Card from '$lib/components/ui/card/index.js';
 	import { Badge } from '$lib/components/ui/badge/index.js';
-	import { formatVersion } from '$lib/utils';
+	import { formatPlatform, formatVersion } from '$lib/utils';
 	import type { TemplateSummary } from '$lib/types';
 
 	let { template }: { template: TemplateSummary } = $props();
@@ -52,7 +53,15 @@
 	{/if}
 
 	<Card.Footer class="justify-between border-t text-xs text-muted-foreground">
-		<span>{displayedVersion}</span>
+		<span class="flex items-center gap-2">
+			{displayedVersion}
+			{#if template.platforms.length > 0}
+				<span class="flex items-center gap-1" title="Supported platforms">
+					<CpuIcon class="size-3" />
+					{template.platforms.map(formatPlatform).join(' · ')}
+				</span>
+			{/if}
+		</span>
 		{#if template.ports.length > 0}
 			<span>{template.ports.map((port) => port.container).join(' · ')}</span>
 		{/if}

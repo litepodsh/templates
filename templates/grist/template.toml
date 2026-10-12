@@ -5,6 +5,7 @@ description = "Modern relational spreadsheet — combines the flexibility of a s
 version     = "latest"
 categories  = ["database", "productivity"]
 tags        = ["spreadsheet", "low-code", "airtable", "database", "python"]
+platforms   = ["linux/amd64", "linux/arm64"]
 icon        = "https://github.com/gristlabs.png"
 website     = "https://www.getgrist.com"
 docs        = "https://support.getgrist.com/self-managed/"

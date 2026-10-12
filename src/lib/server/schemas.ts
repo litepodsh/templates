@@ -32,6 +32,7 @@ export const templateSummarySchema = z.object({
 	appVersion: z.string().optional(),
 	categories: z.array(z.string()),
 	tags: z.array(z.string()),
+	platforms: z.array(z.string()),
 	icon: templateIconSchema.nullable(),
 	website: z.string().optional(),
 	docs: z.string().optional(),
@@ -74,6 +75,7 @@ export function envelope<T extends z.ZodTypeAny>(dataSchema: T) {
 export const listTemplatesQuerySchema = z.object({
 	q: z.string().optional(),
 	category: z.array(z.string()).optional(),
+	arch: z.array(z.string()).optional(),
 	limit: z.number().int().min(1).max(100).optional(),
 });
 
