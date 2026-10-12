@@ -1,0 +1,21 @@
+[template]
+id          = "electerm-web"
+name        = "electerm-web"
+description = "Browser-based electerm: an SSH, SFTP, telnet, serial and RDP/VNC client you reach from any device."
+version     = "latest"
+categories  = ["developer-tools", "networking"]
+tags        = ["ssh", "sftp", "terminal", "telnet", "rdp", "vnc", "file-manager"]
+platforms   = ["linux/amd64", "linux/arm64"]
+icon        = "https://raw.githubusercontent.com/electerm/electerm-resource/master/static/images/electerm.png"
+website     = "https://electerm.org"
+docs        = "https://github.com/electerm/electerm-web#readme"
+source      = "https://github.com/electerm/electerm-web"
+license     = "MIT"
+
+[files]
+setup = "setup.md"
+
+[[ports]]
+container   = 5577
+description = "Web UI"
+primary     = true

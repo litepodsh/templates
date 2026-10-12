@@ -1,0 +1,25 @@
+services:
+  electerm-web:
+    image: docker.io/zxdong262/electerm-web:latest
+    restart: unless-stopped
+    # tini as PID 1 so the node process reaps ssh/sftp children.
+    init: true
+    expose:
+      - "5577"
+    # Uncomment to publish the UI directly on the host instead of only exposing it to the Compose network.
+    # ports:
+    #   - "${ELECTERM_PORT}:5577"
+    environment:
+      DB_PATH: /home/electerm/data
+      HOST: 0.0.0.0
+      # Login is mandatory here: without it anyone who reaches the UI gets a root shell.
+      ENABLE_AUTH: ${ELECTERM_ENABLE_AUTH}
+      DISABLE_LOCAL_TERMINAL: ${ELECTERM_DISABLE_LOCAL_TERMINAL}
+      SERVER_USER: ${ELECTERM_USER}
+      SERVER_PASS: ${ELECTERM_PASSWORD}
+      SERVER_SECRET: ${ELECTERM_SERVER_SECRET}
+    volumes:
+      - electerm_data:/home/electerm/data
+
+volumes:
+  electerm_data:
