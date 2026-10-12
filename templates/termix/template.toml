@@ -1,0 +1,21 @@
+[template]
+id          = "termix"
+name        = "Termix"
+description = "Self-hosted server management with an SSH terminal, remote desktop (RDP/VNC), SFTP file manager and plugins."
+version     = "latest"
+categories  = ["developer-tools", "networking"]
+tags        = ["ssh", "terminal", "sftp", "rdp", "vnc", "remote-desktop", "server-management"]
+platforms   = ["linux/amd64", "linux/arm64"]
+icon        = "https://raw.githubusercontent.com/Termix-SSH/Termix/main/public/icon.svg"
+website     = "https://termix.site"
+docs        = "https://docs.termix.site"
+source      = "https://github.com/Termix-SSH/Termix"
+license     = "Apache-2.0"
+
+[files]
+setup = "setup.md"
+
+[[ports]]
+container   = 8080
+description = "Web UI"
+primary     = true
