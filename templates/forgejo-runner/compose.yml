@@ -1,0 +1,64 @@
+services:
+  docker-in-docker:
+    image: data.forgejo.org/oci/docker:dind
+    restart: unless-stopped
+    # Jobs run as containers inside this daemon, isolated from the host's Podman.
+    privileged: true
+    command: ["dockerd", "-H", "tcp://0.0.0.0:2375", "--tls=false"]
+    volumes:
+      - dind_data:/var/lib/docker
+    # Every job container lives inside this daemon, so these limits cap all CI work.
+    deploy:
+      resources:
+        limits:
+          cpus: "${JOBS_CPU_LIMIT}"
+          memory: ${JOBS_MEMORY_LIMIT}
+
+  runner:
+    image: data.forgejo.org/forgejo/runner:13
+    restart: unless-stopped
+    depends_on:
+      - docker-in-docker
+    environment:
+      DOCKER_HOST: tcp://docker-in-docker:2375
+      FORGEJO_URL: ${FORGEJO_URL}
+      RUNNER_UUID: ${RUNNER_UUID}
+      RUNNER_TOKEN: ${RUNNER_TOKEN}
+      RUNNER_LABELS: ${RUNNER_LABELS}
+      RUNNER_CAPACITY: ${RUNNER_CAPACITY}
+    volumes:
+      - runner_data:/data
+    # Config is rebuilt from the environment on every start, so editing .env + redeploy is enough.
+    command:
+      - bash
+      - -ec
+      - |
+        cat > /data/config.yml <<CFG
+        runner:
+          file: /data/.runner
+          capacity: $$RUNNER_CAPACITY
+          labels: ["$${RUNNER_LABELS//,/\",\"}"]
+          envs:
+            DOCKER_HOST: tcp://dind.docker.internal:2375
+        cache:
+          dir: /data/cache
+        container:
+          docker_host: tcp://docker-in-docker:2375
+          options: --add-host=dind.docker.internal:host-gateway
+        server:
+          connections:
+            forgejo:
+              url: $$FORGEJO_URL
+              uuid: $$RUNNER_UUID
+              token: $$RUNNER_TOKEN
+        CFG
+        exec forgejo-runner --config /data/config.yml daemon
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256m
+
+volumes:
+  dind_data:
+  runner_data:

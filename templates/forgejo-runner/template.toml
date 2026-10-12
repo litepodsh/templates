@@ -1,0 +1,16 @@
+[template]
+id          = "forgejo-runner"
+name        = "Forgejo Runner"
+description = "Self-hosted Forgejo Actions runner with an isolated Docker-in-Docker daemon for jobs."
+version     = "13"
+categories  = ["developer-tools", "ci-cd"]
+tags        = ["forgejo", "actions", "ci", "runner", "self-hosted", "docker-in-docker"]
+platforms   = ["linux/amd64", "linux/arm64"]
+icon        = "https://codeberg.org/forgejo/forgejo/raw/branch/forgejo/assets/logo.svg"
+website     = "https://forgejo.org/docs/latest/admin/actions/"
+docs        = "https://forgejo.org/docs/latest/admin/actions/installation/docker/"
+source      = "https://code.forgejo.org/forgejo/runner"
+license     = "GPL-3.0-or-later"
+
+[files]
+setup = "setup.md"
