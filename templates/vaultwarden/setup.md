@@ -2,9 +2,11 @@
 
 ## `DOMAIN`
 
-Set `VAULTWARDEN_DOMAIN` to the exact external URL you serve the vault from,
-including the scheme (`https://vault.example.com`). Passkeys, WebAuthn and U2F
-two-factor all break if it is wrong or left as `localhost`.
+`VAULTWARDEN_DOMAIN` is `{{url}}`: LitePod fills it with the app's domain on
+every deploy. Add your own HTTPS domain (`https://vault.example.com`) and
+redeploy — the web vault, passkeys, WebAuthn and U2F two-factor need HTTPS and
+break on the generated plain-http address. Outside LitePod, set it to that
+exact external URL.
 
 ## `ADMIN_TOKEN`
 

@@ -1,4 +1,5 @@
-import { listTemplates } from '$lib/server/catalog';
+import { listTemplates, templatesUsingDomainMarkers } from '$lib/server/catalog';
+import { supportsDomainMarkers } from '$lib/server/domain-markers';
 import {
 	clientAddress,
 	consumeSearchRateLimit,
@@ -8,6 +9,7 @@ import { fail, ok } from '$lib/server/response';
 import { findCachedTemplates } from '$lib/server/template-search-cache';
 import { templateSummarySchema } from '$lib/server/schemas';
 import { register } from '$lib/server/openapi-registry';
+import type { TemplateSummary } from '$lib/types';
 import type { RequestHandler } from './$types';
 
 const MAX_LIMIT = 100;
@@ -44,6 +46,14 @@ register({
 			description: 'Cap the number of results. Applied after filtering.',
 			schema: { type: 'integer', minimum: 1, maximum: 100 },
 			example: 20,
+		},
+		{
+			name: 'features',
+			in: 'query',
+			required: false,
+			description: 'Client capabilities. `domain-markers` includes templates whose env uses `{{url}}`/`{{domain}}` markers; without it they are omitted.',
+			schema: { type: 'string' },
+			example: 'domain-markers',
 		},
 	],
 	responses: {
@@ -84,11 +94,15 @@ export const GET: RequestHandler = async ({ url, ...event }) => {
 		}
 	}
 
-	if (!query && categories.length === 0) return ok(await listTemplates());
+	// Older LitePod installs would pass `{{url}}` to the container literally.
+	const hidden = supportsDomainMarkers(url) ? new Set<string>() : await templatesUsingDomainMarkers();
+	const visible = (templates: TemplateSummary[]) => templates.filter((template) => !hidden.has(template.id));
 
-	return ok(await findCachedTemplates({
+	if (!query && categories.length === 0) return ok(visible(await listTemplates()));
+
+	return ok(visible(await findCachedTemplates({
 		query,
 		category: categories,
 		limit,
-	}));
+	})));
 };

@@ -14,13 +14,16 @@ from Ghost Admin first if you need it.
 
 ## Before first boot
 
-Replace `MYSQL_ROOT_PASSWORD` in `.env`, set `GHOST_URL` to the address
-readers will actually use, and configure the `GHOST_MAIL_*` SMTP values. Ghost
-bakes its URL into every generated link, so changing it later means rewriting
-URLs in the database:
+Configure the `GHOST_MAIL_*` SMTP values. `GHOST_URL` is `{{url}}`: LitePod
+fills it with the app's domain on every deploy, so adding your own domain (for
+example `https://blog.example.com`) and redeploying is enough. Do that before
+sharing links or sending newsletters — copies already sent out keep the old
+address.
 
-```toml
-GHOST_URL = "https://blog.example.com"
+Outside LitePod, set it by hand:
+
+```dotenv
+GHOST_URL=https://blog.example.com
 ```
 
 The shipped SMTP placeholders show Mailgun's standard relay settings. Replace

@@ -90,6 +90,103 @@ podman compose -f templates/mailpit/compose.yml down -v
 > Template `.env` files are catalog content, not secrets. `.gitignore` carries a
 > `!templates/**/.env` negation so they stay tracked — don't remove it.
 
+### `.env` markers
+
+LitePod replaces `{{...}}` markers in `.env` values when it deploys a template. A marker may sit
+inside a larger value (`APP_KEY=base64:{{base64_32}}`, `DSN=postgres://u:{{password_32}}@db/app`).
+Anything that isn't one of the markers below is left exactly as written — LitePod never guesses
+from text like `changeme`.
+
+#### Secrets — resolved once, when the app is created
+
+| Marker | Value |
+| ------ | ----- |
+| `{{password_N}}` | N random alphanumeric chars |
+| `{{password_N_symbols}}` | N chars, alphanumeric + `!%^*-_+.,~` |
+| `{{password_N_readable}}` | N chars without look-alikes (`I O l 0 1`), for passwords people retype |
+| `{{openssl_rand_N}}` / `{{hex_upper_N}}` | N random bytes, hex (lower / upper) |
+| `{{base64_N}}` / `{{base64url_N}}` | N random bytes, Base64 (standard / URL-safe) |
+| `{{uuid_v4}}` / `{{uuid_v7}}` | a random / time-ordered UUID |
+
+N is 1–128. The generated value is stored; redeploys keep it.
+
+#### Public URLs — resolved on every deploy
+
+> LitePod versions that resolve these markers ask the catalog for `features=domain-markers`. Older
+> ones never see templates that use them, so they can't pass `{{url}}` to a container literally.
+
+A service that needs to know its own public address (links, emails, CORS, OAuth callbacks) gets it
+from a domain marker instead of `localhost`:
+
+| Marker | Value |
+| ------ | ----- |
+| `{{url}}` | `http(s)://host` of the **primary** port's domain |
+| `{{domain}}` | `host` only — no scheme, no port, no trailing slash |
+| `{{url:PORT}}` / `{{domain:PORT}}` | the domain of the `[[ports]]` entry with that container port |
+
+For every port a marker references (plus the primary port), LitePod generates a domain
+(`litepod-xxxx.<ip>.sslip.io`), routes it to the service that exposes that port, and injects the
+URL. The variable stays **bound**: if the user later puts `fotos.example.com` on that route, the
+next redeploy gets the new value. Replacing the marker with literal text unbinds it.
+
+Example — Ente has a web app (3000, primary), public albums (3002) and an API (8080) on two
+services:
+
+```toml
+# template.toml
+[[ports]]
+container   = 3000
+description = "Photos web app"
+primary     = true
+
+[[ports]]
+container   = 3002
+description = "Public albums web app"
+
+[[ports]]
+container   = 8080
+description = "Museum API server"
+```
+
+```env
+# .env
+ENTE_API_ORIGIN={{url:8080}}
+ENTE_ALBUMS_ORIGIN={{url:3002}}
+```
+
+```yaml
+# compose.yml — unchanged, it only references ${VAR}
+  ente-web:
+    expose: ["3000", "3002"]
+    environment:
+      ENTE_API_ORIGIN: ${ENTE_API_ORIGIN}
+```
+
+Rules:
+
+- `PORT` must be declared in `[[ports]]`, and exactly one service may expose it (via `ports:` or
+  `expose:`). If two services expose the same container port, add `service = "<name>"` to that
+  `[[ports]]` entry.
+- Only the primary port and ports referenced by a marker get a domain. Don't reference an admin or
+  metrics port unless it's meant to be public.
+- Values have no trailing slash. Add one in the template if the app wants it:
+  `GITEA_ROOT_URL={{url}}/`.
+- The scheme is `http` on generated domains and becomes `https` once the user adds a domain with a
+  certificate.
+- Internal services (databases, caches) need no marker — they talk over the Compose network by
+  service name (`db:5432`).
+
+Two optional `[template]` flags tell LitePod's UI to warn the user:
+
+```toml
+[template]
+requires_https = true   # doesn't fully work over http (WebAuthn, browser crypto, Secure cookies)
+url_persisted  = true   # stores its URL on first boot; changing the env alone doesn't move it
+```
+
+Set `url_persisted` when the app reads its URL once and saves it in its database (WordPress
+`siteurl`, Nextcloud `trusted_domains`, …), and explain the in-app step in `setup.md`.
+
 ## API
 
 | Method | Route | Returns |

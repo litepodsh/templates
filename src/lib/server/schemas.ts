@@ -4,6 +4,8 @@ export const templatePortSchema = z.object({
 	container: z.number().int(),
 	description: z.string().optional(),
 	primary: z.boolean().optional(),
+	/** Compose service that owns the port; only needed when several services expose it. */
+	service: z.string().optional(),
 });
 
 export const templateIconSchema = z.object({
@@ -36,6 +38,10 @@ export const templateSummarySchema = z.object({
 	source: z.string().optional(),
 	license: z.string().optional(),
 	ports: z.array(templatePortSchema),
+	/** The app does not fully work over plain http (WebAuthn, browser crypto, Secure cookies). */
+	requiresHttps: z.boolean(),
+	/** The app stores its URL internally on first boot; changing the env alone does not move it. */
+	urlPersisted: z.boolean(),
 	ui: z.string(),
 });
 

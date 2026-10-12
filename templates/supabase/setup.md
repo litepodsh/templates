@@ -10,8 +10,9 @@ Replace all placeholder secrets in `.env`, especially `POSTGRES_PASSWORD`,
 `JWT_SECRET`, `ANON_KEY`, `SERVICE_ROLE_KEY`, and `PG_META_CRYPTO_KEY`.
 The anon and service-role keys must be valid JWTs signed with `JWT_SECRET`.
 
-Set `SITE_URL`, `API_EXTERNAL_URL`, and `SUPABASE_PUBLIC_URL` to your public
-domains. Configure SMTP or set `ENABLE_EMAIL_AUTOCONFIRM=true` for testing.
+Set `SITE_URL` to your frontend's public URL. `API_EXTERNAL_URL` and
+`SUPABASE_PUBLIC_URL` are `{{url}}`: LitePod fills them with the Kong route's
+domain on every deploy (outside LitePod, set them to the API's public URL). Configure SMTP or set `ENABLE_EMAIL_AUTOCONFIRM=true` for testing.
 
 ## Litepod
 

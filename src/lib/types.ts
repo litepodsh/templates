@@ -10,6 +10,8 @@ export type TemplatePort = {
 	container: number;
 	description?: string;
 	primary?: boolean;
+	/** Compose service that owns the port; only needed when several services expose it. */
+	service?: string;
 };
 
 export type TemplateIcon = {
@@ -42,6 +44,10 @@ export type TemplateSummary = {
 	source?: string;
 	license?: string;
 	ports: TemplatePort[];
+	/** The app does not fully work over plain http (WebAuthn, browser crypto, Secure cookies). */
+	requiresHttps: boolean;
+	/** The app stores its URL internally on first boot; changing the env alone does not move it. */
+	urlPersisted: boolean;
 	/**
 	 * Canonical URL for this template's data — `${DOMAIN}/api/v1/templates/{id}`,
 	 * or the relative path when `DOMAIN` is unset. Lets API consumers (LitePod)

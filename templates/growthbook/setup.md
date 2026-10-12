@@ -22,6 +22,6 @@ Changing `ENCRYPTION_KEY` later requires migrating existing data sources: Growth
 
 # Different host or port
 
-If the UI is not reachable at `localhost:3000`, update `GROWTHBOOK_APP_ORIGIN` and
-`GROWTHBOOK_API_HOST` to the public URLs. GrowthBook uses them to generate links and the
-API's CORS rules.
+`GROWTHBOOK_APP_ORIGIN` (`{{url}}`) and `GROWTHBOOK_API_HOST` (`{{url:3100}}`) are filled
+by litepod with the domains of the UI and API routes on every deploy. GrowthBook uses them to
+generate links and the API's CORS rules. Outside litepod, set them to the public URLs.

@@ -6,6 +6,7 @@ import * as z from 'zod';
 import { parse as parseYaml } from 'yaml';
 import { sanitizeMarkdown } from '$lib/server/markdown';
 import { uiBaseUrl } from '$lib/server/config';
+import { envUsesDomainMarkers, validateDomainMarkers } from '$lib/server/domain-markers';
 import type { TemplateDetail, TemplateSummary } from '$lib/types';
 
 export type { TemplateDetail, TemplateSummary } from '$lib/types';
@@ -43,6 +44,8 @@ const manifestSchema = z.object({
 		docs: z.string().optional(),
 		source: z.string().optional(),
 		license: z.string().optional(),
+		requires_https: z.boolean().default(false),
+		url_persisted: z.boolean().default(false),
 	}),
 	files: z
 		.object({
@@ -57,6 +60,7 @@ const manifestSchema = z.object({
 				container: z.number().int(),
 				description: z.string().optional(),
 				primary: z.boolean().optional(),
+				service: z.string().optional(),
 			}),
 		)
 		.default([]),
@@ -70,11 +74,14 @@ type LoadedTemplate = {
 	files: Manifest['files'];
 	iconFilename: string | null;
 	setupFilename: string | null;
+	/** The `.env` uses `{{url}}`-style domain markers; see the feature gate in the API routes. */
+	usesDomainMarkers: boolean;
 };
 
 type ComposeService = {
 	image?: unknown;
 	ports?: unknown;
+	expose?: unknown;
 };
 
 type ComposeDoc = {
@@ -113,8 +120,11 @@ function readPrimaryImageTag(compose: string, primaryPort: number | undefined): 
 }
 
 function serviceOwnsPort(service: ComposeService, port: number): boolean {
-	const ports = service.ports;
-	if (!Array.isArray(ports)) return false;
+	// `expose:` counts too: most templates only expose their port to the proxy.
+	const ports = [
+		...(Array.isArray(service.ports) ? service.ports : []),
+		...(Array.isArray(service.expose) ? service.expose : []),
+	];
 	return ports.some((entry) => {
 		if (typeof entry === 'number') return entry === port;
 		if (typeof entry === 'string') {
@@ -191,11 +201,21 @@ async function loadTemplate(dir: string, id: string): Promise<LoadedTemplate | n
 	const appVersion = await readComposeAppVersion(composePath, primaryPort(manifest.ports));
 	const setupFilename = await resolveSetupFilename(dir, manifest.files.setup);
 
+	const compose = composePath ? await readFile(composePath, 'utf8').catch(() => '') : '';
+	const envPath = resolveInside(dir, manifest.files.env);
+	const env = envPath ? await readFile(envPath, 'utf8').catch(() => '') : '';
+	const markerErrors = validateDomainMarkers(env, manifest.ports, compose);
+	if (markerErrors.length > 0) {
+		console.error(`[templates] ${id} has invalid domain markers — skipping:\n  ${markerErrors.join('\n  ')}`);
+		return null;
+	}
+
 	return {
 		dir,
 		files: manifest.files,
 		iconFilename,
 		setupFilename,
+		usesDomainMarkers: envUsesDomainMarkers(env),
 		summary: {
 			id,
 			name: manifest.template.name,
@@ -214,6 +234,8 @@ async function loadTemplate(dir: string, id: string): Promise<LoadedTemplate | n
 			source: manifest.template.source,
 			license: manifest.template.license,
 			ports: manifest.ports,
+			requiresHttps: manifest.template.requires_https,
+			urlPersisted: manifest.template.url_persisted,
 			ui: uiBaseUrl(id),
 		},
 	};
@@ -352,6 +374,13 @@ function catalog(): Promise<Map<string, LoadedTemplate>> {
 async function find(id: string): Promise<LoadedTemplate | null> {
 	if (!isValidId(id)) return null;
 	return (await catalog()).get(id) ?? null;
+}
+
+/** Ids of templates whose `.env` uses `{{url}}`-style domain markers (see the feature gate in the API routes). */
+export async function templatesUsingDomainMarkers(): Promise<Set<string>> {
+	return new Set(
+		[...(await catalog()).values()].filter((template) => template.usesDomainMarkers).map((template) => template.summary.id),
+	);
 }
 
 export async function listTemplates(): Promise<TemplateSummary[]> {

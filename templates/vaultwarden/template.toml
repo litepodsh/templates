@@ -10,6 +10,7 @@ website     = "https://github.com/dani-garcia/vaultwarden"
 docs        = "https://github.com/dani-garcia/vaultwarden/wiki"
 source      = "https://github.com/dani-garcia/vaultwarden"
 license     = "AGPL-3.0"
+requires_https = true  # browser-side crypto needs a secure context; use a custom domain with HTTPS
 
 [files]
 setup = "setup.md"

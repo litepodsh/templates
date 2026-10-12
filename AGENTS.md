@@ -17,6 +17,24 @@ by reading the existing templates.
 - Every tunable goes in `.env` and is referenced as `${VAR}` in the compose
   file. Hard-coded values belong in `.env` defaults, not in `compose.yml`.
 
+## `.env` markers
+
+Full reference: `README.md` → "`.env` markers".
+
+- Secrets: never ship a fixed password/key. Use a marker — `{{password_32}}`,
+  `{{base64_32}}`, `{{openssl_rand_32}}`, `{{uuid_v4}}`, … LitePod generates
+  the value once at app creation.
+- Public URLs: a variable holding the app's own public address must be
+  `{{url}}` / `{{domain}}` (primary port) or
+  `{{url:PORT}}` / `{{domain:PORT}}` (another `[[ports]]` entry), never
+  `http://localhost:…`. Every `PORT` in a marker must be a declared
+  `[[ports]].container` owned by exactly one service (`ports:` or `expose:`);
+  add `[[ports]].service` when it's ambiguous. No trailing slash in the value —
+  write `{{url}}/` if the app needs one.
+- Set `[template].requires_https = true` for apps that break over plain http,
+  and `url_persisted = true` (plus a `setup.md` note) for apps that store their
+  URL internally on first boot.
+
 ## Template folder layout
 
 ```

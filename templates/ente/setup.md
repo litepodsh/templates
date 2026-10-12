@@ -48,12 +48,13 @@ Create these domain routes in Litepod:
 | Public albums | `ente-web:3002` | `https://albums.photos.example.com` |
 
 The Photos user interface has no separate origin variable; its domain is the
-route that targets `ente-web:3000`. Set `ENTE_API_ORIGIN` to the complete public
-HTTPS URL routed to `ente-museum:8080`, and set `ENTE_ALBUMS_ORIGIN` to the
-complete public HTTPS URL routed to `ente-web:3002`. Do not add a trailing
-slash.
+route that targets `ente-web:3000`. `ENTE_API_ORIGIN` is `{{url:8080}}` and
+`ENTE_ALBUMS_ORIGIN` is `{{url:3002}}`: LitePod creates a domain for each of
+those routes on the first deploy and keeps the variables pointing at them. Put
+your HTTPS domains on the same routes and redeploy — no env edit needed.
 
-For example:
+Outside LitePod, set them to the complete public HTTPS URLs, without a
+trailing slash:
 
 ```dotenv
 ENTE_API_ORIGIN=https://api.photos.example.com

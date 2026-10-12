@@ -2,7 +2,7 @@
 
 Set at least one AI provider key such as `ANTHROPIC_API_KEY` or `OPENROUTER_API_KEY` — the container exits without one. With several keys set, the primary model is picked by provider priority; pin one with `OPENCLAW_PRIMARY_MODEL` (e.g. `anthropic/claude-sonnet-4-5-20250929`).
 
-If you serve OpenClaw on a domain, add it to `OPENCLAW_ALLOWED_ORIGINS` (e.g. `https://claw.example.com`), or the Control UI will be rejected by CORS.
+`OPENCLAW_ALLOWED_ORIGINS` is `{{url}}`: litepod fills it with the app's domain on every deploy. To allow more origins, replace it with a comma-separated list of plain URLs (e.g. `https://claw.example.com`), or the Control UI will be rejected by CORS.
 
 # After deploying
 

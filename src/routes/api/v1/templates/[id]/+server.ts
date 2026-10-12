@@ -1,4 +1,5 @@
-import { getTemplate } from '$lib/server/catalog';
+import { getTemplate, templatesUsingDomainMarkers } from '$lib/server/catalog';
+import { supportsDomainMarkers } from '$lib/server/domain-markers';
 import { fail, ok } from '$lib/server/response';
 import { templateDetailSchema } from '$lib/server/schemas';
 import { register } from '$lib/server/openapi-registry';
@@ -22,6 +23,14 @@ register({
 			schema: { type: 'string' },
 			example: 'mailpit',
 		},
+		{
+			name: 'features',
+			in: 'query',
+			required: false,
+			description: 'Client capabilities. Without `domain-markers`, templates whose env uses `{{url}}`/`{{domain}}` markers return 404.',
+			schema: { type: 'string' },
+			example: 'domain-markers',
+		},
 	],
 	responses: {
 		'200': { description: 'The template', schema: templateDetailSchema },
@@ -37,9 +46,13 @@ function encode(file: TemplateFile) {
 	};
 }
 
-export const GET: RequestHandler = async ({ params }) => {
+export const GET: RequestHandler = async ({ params, url }) => {
 	const template = await getTemplate(params.id);
 	if (!template) return fail(404, `Template "${params.id}" not found`);
+	// Older LitePod installs would pass `{{url}}` to the container literally.
+	if (!supportsDomainMarkers(url) && (await templatesUsingDomainMarkers()).has(template.id)) {
+		return fail(404, `Template "${params.id}" not found`);
+	}
 
 	return ok({
 		...template,

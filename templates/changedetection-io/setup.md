@@ -37,7 +37,7 @@ login screen of the app stays hidden.
 
 ## Public URL
 
-Set `CHANGEDETECTION_BASE_URL` in `.env` to the domain litepod routes to this
-container (for example `https://cd.example.com`). Without it, notification
-alert links and generated absolute URLs point at the internal address instead
-of the public domain.
+`CHANGEDETECTION_BASE_URL` is `{{url}}`: litepod fills it with the domain it
+routes to this container on every deploy, so notification links and absolute
+URLs follow the domain when you change it. Outside litepod, set it to the
+public URL (for example `https://cd.example.com`).
