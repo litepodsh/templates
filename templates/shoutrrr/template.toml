@@ -1,0 +1,22 @@
+[template]
+id             = "shoutrrr"
+name           = "Shoutrrr"
+description    = "Open-source alternative to Buffer, Typefully and Hootsuite: write once and schedule posts to X, Bluesky, LinkedIn, Facebook, Instagram, Threads and Discord."
+version        = "1.5"
+categories     = ["social-media", "marketing"]
+tags           = ["scheduling", "social", "buffer", "hootsuite", "laravel", "php"]
+platforms      = ["linux/amd64", "linux/arm64"]
+icon           = "https://raw.githubusercontent.com/coollabsio/shoutrrr/main/public/favicon.svg"
+website        = "https://shoutrrr.com"
+docs           = "https://github.com/coollabsio/shoutrrr#self-hosting"
+source         = "https://github.com/coollabsio/shoutrrr"
+license        = "Apache-2.0"
+requires_https = true
+
+[files]
+setup = "setup.md"
+
+[[ports]]
+container   = 8080
+description = "Web UI"
+primary     = true

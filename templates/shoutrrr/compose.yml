@@ -1,0 +1,61 @@
+services:
+  shoutrrr:
+    image: ghcr.io/coollabsio/shoutrrr:1.5
+    restart: unless-stopped
+    ports:
+      - "${SHOUTRRR_PORT}:8080"
+    environment:
+      APP_NAME: Shoutrrr
+      APP_ENV: production
+      APP_KEY: ${SHOUTRRR_APP_KEY}
+      APP_DEBUG: ${SHOUTRRR_APP_DEBUG}
+      APP_URL: ${SHOUTRRR_APP_URL}
+      OCTANE_SERVER: frankenphp
+      OCTANE_HTTPS: ${SHOUTRRR_OCTANE_HTTPS}
+      SESSION_SECURE_COOKIE: ${SHOUTRRR_SESSION_SECURE_COOKIE}
+      TRUSTED_PROXIES: ${SHOUTRRR_TRUSTED_PROXIES}
+      # SQLite + database-backed cache/queue/session: no external services.
+      DB_CONNECTION: sqlite
+      DB_DATABASE: /var/www/html/database/sqlite/database.sqlite
+      CACHE_STORE: database
+      QUEUE_CONNECTION: database
+      SESSION_DRIVER: database
+      QUEUE_WORKER_ENABLED: "true"
+      QUEUE_WORKER_COUNT: ${SHOUTRRR_QUEUE_WORKER_COUNT}
+      SCHEDULER_ENABLED: "true"
+      INERTIA_SSR_ENABLED: ${SHOUTRRR_INERTIA_SSR_ENABLED}
+      SOCIALITE_ENABLED: ${SHOUTRRR_SOCIALITE_ENABLED}
+      FILESYSTEM_DISK: ${SHOUTRRR_FILESYSTEM_DISK}
+      AWS_ACCESS_KEY_ID: ${SHOUTRRR_AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${SHOUTRRR_AWS_SECRET_ACCESS_KEY}
+      AWS_DEFAULT_REGION: ${SHOUTRRR_AWS_DEFAULT_REGION}
+      AWS_BUCKET: ${SHOUTRRR_AWS_BUCKET}
+      AWS_ENDPOINT: ${SHOUTRRR_AWS_ENDPOINT}
+      AWS_URL: ${SHOUTRRR_AWS_URL}
+      AWS_USE_PATH_STYLE_ENDPOINT: ${SHOUTRRR_AWS_USE_PATH_STYLE_ENDPOINT}
+      X_CLIENT_ID: ${SHOUTRRR_X_CLIENT_ID}
+      X_CLIENT_SECRET: ${SHOUTRRR_X_CLIENT_SECRET}
+      X_REDIRECT_URI: ${SHOUTRRR_APP_URL}/accounts/callback/x
+      LINKEDIN_CLIENT_ID: ${SHOUTRRR_LINKEDIN_CLIENT_ID}
+      LINKEDIN_CLIENT_SECRET: ${SHOUTRRR_LINKEDIN_CLIENT_SECRET}
+      LINKEDIN_REDIRECT_URI: ${SHOUTRRR_APP_URL}/accounts/callback/linkedin
+      FACEBOOK_CLIENT_ID: ${SHOUTRRR_FACEBOOK_CLIENT_ID}
+      FACEBOOK_CLIENT_SECRET: ${SHOUTRRR_FACEBOOK_CLIENT_SECRET}
+      FACEBOOK_REDIRECT_URI: ${SHOUTRRR_APP_URL}/accounts/callback/meta
+      THREADS_CLIENT_ID: ${SHOUTRRR_THREADS_CLIENT_ID}
+      THREADS_CLIENT_SECRET: ${SHOUTRRR_THREADS_CLIENT_SECRET}
+      THREADS_REDIRECT_URI: ${SHOUTRRR_APP_URL}/accounts/callback/threads
+    volumes:
+      - shoutrrr_storage:/var/www/html/storage
+      - shoutrrr_sqlite:/var/www/html/database/sqlite
+    stop_grace_period: 60s
+    healthcheck:
+      test: ["CMD", "healthcheck-octane"]
+      start_period: 15s
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  shoutrrr_storage:
+  shoutrrr_sqlite:
