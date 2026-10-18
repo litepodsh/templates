@@ -1,0 +1,21 @@
+[template]
+id          = "aptabase"
+name        = "Aptabase"
+description = "Privacy-first analytics for desktop, mobile and web apps, with SDKs for Tauri, Electron, Swift, Flutter, .NET MAUI and more."
+version     = "main"
+categories  = ["analytics", "monitoring"]
+tags        = ["app-analytics", "desktop", "mobile", "privacy", "clickhouse", "postgresql"]
+platforms   = ["linux/amd64", "linux/arm64"]
+icon        = "https://github.com/aptabase.png"
+website     = "https://aptabase.com"
+docs        = "https://github.com/aptabase/self-hosting"
+source      = "https://github.com/aptabase/aptabase"
+license     = "AGPL-3.0"
+
+[files]
+setup = "setup.md"
+
+[[ports]]
+container   = 8080
+description = "Dashboard and event ingestion API"
+primary     = true

@@ -1,0 +1,67 @@
+# Aptabase publishes only a rolling `main` image; there are no release tags.
+services:
+  aptabase:
+    image: ghcr.io/aptabase/aptabase:main
+    restart: unless-stopped
+    expose:
+      - "8080"
+    # Uncomment to publish Aptabase directly on the host instead of only exposing it to the Compose network.
+    # ports:
+    #   - "${APTABASE_PORT}:8080"
+    environment:
+      BASE_URL: ${APTABASE_BASE_URL}
+      AUTH_SECRET: ${APTABASE_AUTH_SECRET}
+      DATABASE_URL: Server=db;Port=5432;User Id=${APTABASE_DB_USER};Password=${APTABASE_DB_PASSWORD};Database=${APTABASE_DB_NAME}
+      CLICKHOUSE_URL: Host=clickhouse;Port=8123;Username=${APTABASE_CLICKHOUSE_USER};Password=${APTABASE_CLICKHOUSE_PASSWORD}
+      SMTP_HOST: ${APTABASE_SMTP_HOST}
+      SMTP_PORT: ${APTABASE_SMTP_PORT}
+      SMTP_USERNAME: ${APTABASE_SMTP_USERNAME}
+      SMTP_PASSWORD: ${APTABASE_SMTP_PASSWORD}
+      SMTP_FROM_ADDRESS: ${APTABASE_SMTP_FROM_ADDRESS}
+    depends_on:
+      db:
+        condition: service_healthy
+      clickhouse:
+        condition: service_healthy
+
+  db:
+    image: docker.io/library/postgres:18-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${APTABASE_DB_NAME}
+      POSTGRES_USER: ${APTABASE_DB_USER}
+      POSTGRES_PASSWORD: ${APTABASE_DB_PASSWORD}
+    volumes:
+      # Postgres 18 keeps its data under /var/lib/postgresql/18/docker.
+      - aptabase_db_data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${APTABASE_DB_USER} -d ${APTABASE_DB_NAME}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  # 26.8 is an LTS line; do not downgrade over an existing data volume.
+  clickhouse:
+    image: docker.io/clickhouse/clickhouse-server:26.8.30.8-alpine
+    restart: unless-stopped
+    environment:
+      CLICKHOUSE_USER: ${APTABASE_CLICKHOUSE_USER}
+      CLICKHOUSE_PASSWORD: ${APTABASE_CLICKHOUSE_PASSWORD}
+    volumes:
+      - aptabase_clickhouse_data:/var/lib/clickhouse
+      - aptabase_clickhouse_logs:/var/log/clickhouse-server
+    ulimits:
+      nofile:
+        soft: 262144
+        hard: 262144
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:8123/ping || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
+volumes:
+  aptabase_db_data:
+  aptabase_clickhouse_data:
+  aptabase_clickhouse_logs:

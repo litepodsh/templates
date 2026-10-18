@@ -2,7 +2,7 @@
 id          = "plausible"
 name        = "Plausible Analytics"
 description = "Privacy-friendly web analytics with PostgreSQL and ClickHouse."
-version     = "latest"
+version     = "3.2.1"
 icon        = "https://github.com/plausible.png"
 categories  = ["analytics", "monitoring"]
 tags        = ["web-analytics", "privacy", "clickhouse", "postgresql"]
