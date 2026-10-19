@@ -1,0 +1,59 @@
+services:
+  wealthfolio:
+    image: docker.io/wealthfolio/wealthfolio:3.10.0
+    restart: unless-stopped
+    # The server only reads its login hash from the environment; load the one
+    # written by wealthfolio-auth.
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - export WF_AUTH_PASSWORD_HASH="$$(cat /auth/password.hash)" && exec /usr/local/bin/wealthfolio-server
+    expose:
+      - "8088"
+    # Uncomment to publish Wealthfolio directly on the host instead of only exposing it to the Compose network.
+    # ports:
+    #   - "${WF_PORT}:8088"
+    environment:
+      WF_LISTEN_ADDR: 0.0.0.0:8088
+      WF_DB_PATH: /data/wealthfolio.db
+      WF_SECRET_KEY: ${WF_SECRET_KEY}
+      WF_CORS_ALLOW_ORIGINS: ${WF_CORS_ALLOW_ORIGINS}
+      WF_AUTH_TOKEN_TTL_MINUTES: ${WF_AUTH_TOKEN_TTL_MINUTES}
+      WF_REQUEST_TIMEOUT_MS: ${WF_REQUEST_TIMEOUT_MS}
+    volumes:
+      - wealthfolio_data:/data
+      - wealthfolio_auth:/auth:ro
+    depends_on:
+      wealthfolio-auth:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://127.0.0.1:8088/api/v1/healthz"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
+    tmpfs:
+      - /tmp:size=64M
+
+  # Hashes WF_PASSWORD with Argon2id on every start, so changing the password
+  # in .env and redeploying takes effect.
+  wealthfolio-auth:
+    image: docker.io/library/alpine:3.22
+    environment:
+      WF_PASSWORD: ${WF_PASSWORD}
+    command:
+      - sh
+      - -ec
+      - |
+        apk add --no-cache -q argon2
+        salt=$$(head -c 16 /dev/urandom | base64)
+        printf '%s' "$$WF_PASSWORD" | argon2 "$$salt" -id -e > /auth/password.hash
+        chmod 644 /auth/password.hash
+    volumes:
+      - wealthfolio_auth:/auth
+
+volumes:
+  wealthfolio_data:
+  wealthfolio_auth:

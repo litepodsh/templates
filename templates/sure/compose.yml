@@ -1,0 +1,89 @@
+x-db-env: &db_env
+  POSTGRES_USER: ${SURE_DB_USER}
+  POSTGRES_PASSWORD: ${SURE_DB_PASSWORD}
+  POSTGRES_DB: ${SURE_DB_NAME}
+
+x-rails-env: &rails_env
+  <<: *db_env
+  SECRET_KEY_BASE: ${SURE_SECRET_KEY_BASE}
+  SELF_HOSTED: "true"
+  APP_DOMAIN: ${SURE_APP_DOMAIN}
+  ONBOARDING_STATE: ${SURE_ONBOARDING_STATE}
+  RAILS_FORCE_SSL: ${SURE_RAILS_FORCE_SSL}
+  RAILS_ASSUME_SSL: ${SURE_RAILS_ASSUME_SSL}
+  DB_HOST: db
+  DB_PORT: 5432
+  REDIS_URL: redis://redis:6379/1
+  SMTP_ADDRESS: ${SURE_SMTP_ADDRESS}
+  SMTP_PORT: ${SURE_SMTP_PORT}
+  SMTP_USERNAME: ${SURE_SMTP_USERNAME}
+  SMTP_PASSWORD: ${SURE_SMTP_PASSWORD}
+  SMTP_TLS_ENABLED: ${SURE_SMTP_TLS_ENABLED}
+  EMAIL_SENDER: ${SURE_EMAIL_SENDER}
+  # AI features call the OpenAI API and incur costs; set spend limits first.
+  OPENAI_ACCESS_TOKEN: ${SURE_OPENAI_ACCESS_TOKEN}
+  OPENAI_MODEL: ${SURE_OPENAI_MODEL}
+  OPENAI_URI_BASE: ${SURE_OPENAI_URI_BASE}
+
+services:
+  web:
+    image: ghcr.io/we-promise/sure:0.7.5-hotfix.2
+    restart: unless-stopped
+    expose:
+      - "3000"
+    # Uncomment to publish Sure directly on the host instead of only exposing it to the Compose network.
+    # ports:
+    #   - "${SURE_PORT}:3000"
+    environment:
+      <<: *rails_env
+    volumes:
+      - sure_storage:/rails/storage
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  # Runs imports, account syncs and market data jobs.
+  worker:
+    image: ghcr.io/we-promise/sure:0.7.5-hotfix.2
+    restart: unless-stopped
+    command: bundle exec sidekiq
+    environment:
+      <<: *rails_env
+    volumes:
+      - sure_storage:/rails/storage
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  db:
+    image: docker.io/library/postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      <<: *db_env
+    volumes:
+      - sure_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${SURE_DB_USER} -d ${SURE_DB_NAME}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: docker.io/library/redis:8-alpine
+    restart: unless-stopped
+    volumes:
+      - sure_redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  sure_storage:
+  sure_db_data:
+  sure_redis_data:

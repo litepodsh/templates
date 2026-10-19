@@ -1,0 +1,21 @@
+[template]
+id          = "sure"
+name        = "Sure"
+description = "Self-hosted personal finance app for tracking accounts, budgets, investments and net worth. Community fork of Maybe Finance."
+version     = "0.7.5-hotfix.2"
+categories  = ["finance"]
+tags        = ["personal-finance", "budgeting", "net-worth", "rails", "postgresql", "redis"]
+platforms   = ["linux/amd64", "linux/arm64"]
+icon        = "https://github.com/we-promise.png"
+website     = "https://sure.am"
+docs        = "https://github.com/we-promise/sure/blob/main/docs/hosting/docker.md"
+source      = "https://github.com/we-promise/sure"
+license     = "AGPL-3.0"
+
+[files]
+setup = "setup.md"
+
+[[ports]]
+container   = 3000
+description = "Web UI"
+primary     = true
