@@ -7,14 +7,51 @@
 	import { page } from '$app/state';
 	import { CategoriesFilter } from '$lib/components/custom/categories-filter/index.js';
 	import PageContainer from '$lib/components/page-container.svelte';
+	import Seo from '$lib/components/seo.svelte';
 	import TemplateCard from '$lib/components/template-card.svelte';
 	import * as Alert from '$lib/components/ui/alert/index.js';
 	import * as Empty from '$lib/components/ui/empty/index.js';
 	import * as InputGroup from '$lib/components/ui/input-group/index.js';
 	import { findTemplates } from '$lib/templates.remote';
+	import { SITE_DESCRIPTION, SITE_NAME } from '$lib/seo';
 	import type { TemplateSummary } from '$lib/types';
 
 	const DEBOUNCE_MS = 200;
+
+	const allTemplates = $derived(page.data.templates as TemplateSummary[]);
+	// Filtered views duplicate the catalog; keep them out of the index.
+	const hasQuery = $derived(page.url.searchParams.has('q') || page.url.searchParams.has('category'));
+	const origin = $derived(page.data.origin as string);
+	const structuredData = $derived([
+		{
+			'@context': 'https://schema.org',
+			'@type': 'WebSite',
+			name: SITE_NAME,
+			url: `${origin}/`,
+			description: SITE_DESCRIPTION,
+			potentialAction: {
+				'@type': 'SearchAction',
+				target: { '@type': 'EntryPoint', urlTemplate: `${origin}/?q={search_term_string}` },
+				'query-input': 'required name=search_term_string',
+			},
+		},
+		{
+			'@context': 'https://schema.org',
+			'@type': 'CollectionPage',
+			name: 'Self-hosted app templates',
+			url: `${origin}/`,
+			mainEntity: {
+				'@type': 'ItemList',
+				numberOfItems: allTemplates.length,
+				itemListElement: allTemplates.map((template, index) => ({
+					'@type': 'ListItem',
+					position: index + 1,
+					url: `${origin}/t/${template.id}`,
+					name: template.name,
+				})),
+			},
+		},
+	]);
 
 	// Seeded from the URL so a search survives reloads and can be shared.
 	let search = $state(page.url.searchParams.get('q') ?? '');
@@ -85,9 +122,13 @@
 	});
 </script>
 
-<svelte:head>
-	<title>Templates — litepod.sh</title>
-</svelte:head>
+<Seo
+	title="Self-Hosted App Templates for Docker Compose & Podman | LitePod"
+	description="Browse {allTemplates.length}+ free self-hosted app templates: ready-to-deploy Docker Compose and Podman stacks with env files, setup notes and a public REST API."
+	path="/"
+	noindex={hasQuery}
+	structuredData={structuredData}
+/>
 
 <PageContainer maxW="w-full">
 	{@const templates = page.data.templates as TemplateSummary[]}
@@ -100,7 +141,7 @@
 
 		<div class="max-w-2xl flex flex-col gap-2">
 			<p class="font-mono text-[0.6875rem] font-medium uppercase tracking-[0.16em] text-[#a9381e] dark:text-primary">Litepod catalog</p>
-			<h1 class="text-3xl font-medium tracking-[-0.055em] sm:text-4xl">Template catalog</h1>
+			<h1 class="text-3xl font-medium tracking-[-0.055em] sm:text-4xl">Self-hosted app templates</h1>
 			<p class="max-w-[65ch] text-sm leading-relaxed text-muted-foreground">
 				{templates.length}
 				{templates.length === 1 ? 'template' : 'templates'} — one folder per app, each with a compose

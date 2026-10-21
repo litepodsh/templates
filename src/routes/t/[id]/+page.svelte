@@ -13,6 +13,7 @@
 	import { AnimatedTabs } from '$lib/components/custom/animated-tabs/index.js';
 	import PageContainer from '$lib/components/page-container.svelte';
 	import ReadOnlyCodeEditor from '$lib/components/read-only-code-editor.svelte';
+	import Seo from '$lib/components/seo.svelte';
 	import SetupCodeBlock from '$lib/components/setup-code-block.svelte';
 	import * as Card from '$lib/components/ui/card/index.js';
 	import * as Table from '$lib/components/ui/table/index.js';
@@ -24,9 +25,59 @@
 	let copied = $state('');
 	let activeFile = $state('compose');
 
-	// `<svelte:head>` can't live inside a block, so the title is derived from the
-	// route param rather than from the awaited template.
-	const title = $derived(`${page.params.id} — Templates`);
+	// `<Seo>` can't live inside a block, so metadata is derived at the top level
+	// from the loaded template.
+	const seoTemplate = $derived(page.data.template as TemplateDetail);
+	const origin = $derived(page.data.origin as string);
+	const title = $derived(`${seoTemplate.name} — Self-Hosted Docker Compose Template | LitePod`);
+	const seoDescription = $derived(
+		truncate(
+			`Self-host ${seoTemplate.name} with Docker Compose or Podman. ${seoTemplate.description} Ready-to-deploy compose.yml, .env and setup notes.`,
+			160,
+		),
+	);
+	const seoKeywords = $derived([
+		seoTemplate.name,
+		`${seoTemplate.name} docker compose`,
+		`self-host ${seoTemplate.name}`,
+		`${seoTemplate.name} podman`,
+		...seoTemplate.categories,
+		...seoTemplate.tags,
+	]);
+	const structuredData = $derived([
+		{
+			'@context': 'https://schema.org',
+			'@type': 'SoftwareApplication',
+			name: seoTemplate.name,
+			description: seoTemplate.description,
+			url: `${origin}/t/${seoTemplate.id}`,
+			applicationCategory: 'DeveloperApplication',
+			applicationSubCategory: seoTemplate.categories.join(', ') || undefined,
+			operatingSystem: 'Linux',
+			softwareVersion: seoTemplate.appVersion ?? seoTemplate.version,
+			keywords: [...seoTemplate.categories, ...seoTemplate.tags].join(', ') || undefined,
+			license: seoTemplate.license,
+			image: seoTemplate.icon ? new URL(seoTemplate.icon.path, origin).href : undefined,
+			sameAs: [seoTemplate.website, seoTemplate.source].filter(Boolean),
+			softwareHelp: seoTemplate.docs ? { '@type': 'CreativeWork', url: seoTemplate.docs } : undefined,
+			offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+		},
+		{
+			'@context': 'https://schema.org',
+			'@type': 'BreadcrumbList',
+			itemListElement: [
+				{ '@type': 'ListItem', position: 1, name: 'Templates', item: `${origin}/` },
+				{ '@type': 'ListItem', position: 2, name: seoTemplate.name, item: `${origin}/t/${seoTemplate.id}` },
+			],
+		},
+	]);
+
+	/** Cuts at a word boundary so meta descriptions don't end mid-word. */
+	function truncate(text: string, max: number): string {
+		const clean = text.replace(/\s+/g, ' ').trim();
+		if (clean.length <= max) return clean;
+		return `${clean.slice(0, clean.lastIndexOf(' ', max - 1))}…`;
+	}
 
 	type SetupChunk =
 		| { kind: 'html'; content: string }
@@ -110,9 +161,14 @@
 	}
 </script>
 
-<svelte:head>
-	<title>{title}</title>
-</svelte:head>
+<Seo
+	{title}
+	description={seoDescription}
+	keywords={seoKeywords}
+	type="article"
+	path="/t/{seoTemplate.id}"
+	{structuredData}
+/>
 
 <PageContainer>
 	<Button variant="ghost" size="sm" class="-ml-2 w-fit" href="/">
@@ -134,7 +190,13 @@
 					style:view-transition-name="template-icon-{template.id}"
 				>
 					{#if template.icon}
-						<img src={template.icon.path} alt="" class="size-10 object-contain" />
+						<img
+							src={template.icon.path}
+							alt="{template.name} logo"
+							width="40"
+							height="40"
+							class="size-10 object-contain"
+						/>
 					{:else}
 						<PackageIcon class="size-6 text-muted-foreground" />
 					{/if}

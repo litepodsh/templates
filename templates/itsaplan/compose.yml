@@ -1,0 +1,164 @@
+x-db-url: &db-url postgres://${ITSAPLAN_DB_USER}:${ITSAPLAN_DB_PASSWORD}@postgres:5432/${ITSAPLAN_DB_NAME}
+
+services:
+  postgres:
+    image: docker.io/library/postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${ITSAPLAN_DB_USER}
+      POSTGRES_PASSWORD: ${ITSAPLAN_DB_PASSWORD}
+      POSTGRES_DB: ${ITSAPLAN_DB_NAME}
+    volumes:
+      - itsaplan_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${ITSAPLAN_DB_USER} -d ${ITSAPLAN_DB_NAME}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # S3-compatible store for issue attachments. The api streams the bytes through
+  # itself, so RustFS stays inside the Compose network.
+  minio:
+    image: docker.io/rustfs/rustfs:1.0.3
+    restart: unless-stopped
+    environment:
+      RUSTFS_ACCESS_KEY: ${ITSAPLAN_S3_ACCESS_KEY_ID}
+      RUSTFS_SECRET_KEY: ${ITSAPLAN_S3_SECRET_ACCESS_KEY}
+    volumes:
+      - itsaplan_rustfs_data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "-o", "/dev/null", "http://127.0.0.1:9000/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  # One-shot: creates the attachments bucket, then exits.
+  minio-init:
+    image: docker.io/rustfs/rustfs:1.0.3
+    restart: "no"
+    depends_on:
+      minio:
+        condition: service_healthy
+    environment:
+      S3_ACCESS_KEY_ID: ${ITSAPLAN_S3_ACCESS_KEY_ID}
+      S3_SECRET_ACCESS_KEY: ${ITSAPLAN_S3_SECRET_ACCESS_KEY}
+      S3_BUCKET: ${ITSAPLAN_S3_BUCKET}
+    entrypoint:
+      - /bin/sh
+      - -c
+      - >-
+        curl -fsS -X PUT --aws-sigv4 aws:amz:us-east-1:s3
+        --user "$$S3_ACCESS_KEY_ID:$$S3_SECRET_ACCESS_KEY"
+        "http://minio:9000/$$S3_BUCKET" && echo "bucket ready: $$S3_BUCKET"
+
+  # One-shot: dumps the database and applies migrations before api, worker and bot start.
+  migrate:
+    image: ghcr.io/croffasia/itsaplan-api:1.6.0
+    restart: "no"
+    command: ["bun", "run", "packages/db/src/migrate.ts"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: *db-url
+      BACKUP_RETENTION_DAYS: ${ITSAPLAN_BACKUP_RETENTION_DAYS}
+    volumes:
+      - itsaplan_db_backups:/backups
+
+  api:
+    image: ghcr.io/croffasia/itsaplan-api:1.6.0
+    restart: unless-stopped
+    command: ["bun", "run", "apps/api/src/index.ts"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+      minio-init:
+        condition: service_completed_successfully
+    expose:
+      - "3000"
+    environment:
+      NODE_ENV: production
+      API_PORT: 3000
+      DATABASE_URL: *db-url
+      BETTER_AUTH_SECRET: ${ITSAPLAN_BETTER_AUTH_SECRET}
+      APP_ENCRYPTION_KEY: ${ITSAPLAN_APP_ENCRYPTION_KEY}
+      API_URL: ${ITSAPLAN_API_URL}
+      APP_URL: ${ITSAPLAN_APP_URL}
+      COOKIE_DOMAIN: ${ITSAPLAN_COOKIE_DOMAIN}
+      S3_ENDPOINT: http://minio:9000
+      S3_BUCKET: ${ITSAPLAN_S3_BUCKET}
+      S3_ACCESS_KEY_ID: ${ITSAPLAN_S3_ACCESS_KEY_ID}
+      S3_SECRET_ACCESS_KEY: ${ITSAPLAN_S3_SECRET_ACCESS_KEY}
+      S3_REGION: ${ITSAPLAN_S3_REGION}
+      SSRF_ALLOWED_HOSTS: ${ITSAPLAN_SSRF_ALLOWED_HOSTS}
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:3000/"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  # Webhook and notification delivery, agent schedules and agent runs.
+  worker:
+    image: ghcr.io/croffasia/itsaplan-worker:1.6.0
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: *db-url
+      APP_ENCRYPTION_KEY: ${ITSAPLAN_APP_ENCRYPTION_KEY}
+      TELEMETRY_DISABLED: ${ITSAPLAN_TELEMETRY_DISABLED}
+      SSRF_ALLOWED_HOSTS: ${ITSAPLAN_SSRF_ALLOWED_HOSTS}
+      S3_ENDPOINT: http://minio:9000
+      S3_BUCKET: ${ITSAPLAN_S3_BUCKET}
+      S3_ACCESS_KEY_ID: ${ITSAPLAN_S3_ACCESS_KEY_ID}
+      S3_SECRET_ACCESS_KEY: ${ITSAPLAN_S3_SECRET_ACCESS_KEY}
+      S3_REGION: ${ITSAPLAN_S3_REGION}
+
+  # Telegram bot. The token is set in god mode. Keep a single replica.
+  bot:
+    image: ghcr.io/croffasia/itsaplan-bot:1.6.0
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: *db-url
+      APP_ENCRYPTION_KEY: ${ITSAPLAN_APP_ENCRYPTION_KEY}
+
+  web:
+    image: ghcr.io/croffasia/itsaplan-web:1.6.0
+    restart: unless-stopped
+    depends_on:
+      - api
+    expose:
+      - "3001"
+    environment:
+      NODE_ENV: production
+      PORT: 3001
+      HOSTNAME: 0.0.0.0
+      API_URL: ${ITSAPLAN_API_URL}
+      SERVICE_URL_API: http://api:3000
+      PRIVACY_URL: ${ITSAPLAN_PRIVACY_URL}
+      TERMS_URL: ${ITSAPLAN_TERMS_URL}
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:3001/login"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+volumes:
+  itsaplan_postgres_data:
+  itsaplan_rustfs_data:
+  itsaplan_db_backups:

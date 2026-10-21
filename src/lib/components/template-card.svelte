@@ -26,6 +26,8 @@
 					<img
 						src={template.icon.path}
 						alt=""
+						width="32"
+						height="32"
 						loading="lazy"
 						class="size-8 object-contain"
 					/>

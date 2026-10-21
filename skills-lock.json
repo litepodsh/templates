@@ -25,6 +25,30 @@
       "skillPath": "skills/redesign-skill/SKILL.md",
       "computedHash": "b405eee0e0e80fc243f731d9aa368bca307e356db7e6157d27101d369dac6726"
     },
+    "seo": {
+      "source": "agricidaniel/claude-seo",
+      "sourceType": "github",
+      "skillPath": "skills/seo/SKILL.md",
+      "computedHash": "93ab38c550dc55094f6f616ac150dba2a09a5154cfb9b912246343adf411d62b"
+    },
+    "seo-audit": {
+      "source": "agricidaniel/claude-seo",
+      "sourceType": "github",
+      "skillPath": "skills/seo-audit/SKILL.md",
+      "computedHash": "ad118adc5ec68480497fd056b7ed733f99fcfd7dc2499152c226799faeba714e"
+    },
+    "seo-google": {
+      "source": "agricidaniel/claude-seo",
+      "sourceType": "github",
+      "skillPath": "skills/seo-google/SKILL.md",
+      "computedHash": "2a5141a1a74a8bfae7f88ce30568e7f8ae0e735caabe92c0f2d4941383736ed4"
+    },
+    "seo-page": {
+      "source": "agricidaniel/claude-seo",
+      "sourceType": "github",
+      "skillPath": "skills/seo-page/SKILL.md",
+      "computedHash": "65dbef381db8394601f8912518b6004a902ee8d6dd242890a16aadf78bc95f81"
+    },
     "stitch-design-taste": {
       "source": "Leonxlnx/taste-skill",
       "sourceType": "github",

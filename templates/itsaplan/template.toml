@@ -1,0 +1,26 @@
+[template]
+id             = "itsaplan"
+name           = "It's a Plan"
+description    = "Self-hosted project management and issue tracker where AI agents work as teammates, with a REST API, webhooks and MCP."
+version        = "1.6.0"
+categories     = ["project-management", "productivity"]
+tags           = ["issue-tracker", "kanban", "ai-agents", "mcp", "linear-alternative", "postgresql"]
+platforms      = ["linux/amd64", "linux/arm64"]
+icon           = "logo.svg"
+website        = "https://itsaplan.dev"
+docs           = "https://github.com/croffasia/itsaplan/blob/main/docs/self-hosting.md"
+source         = "https://github.com/croffasia/itsaplan"
+license        = "AGPL-3.0"
+requires_https = true
+
+[files]
+setup = "setup.md"
+
+[[ports]]
+container   = 3001
+description = "Web app"
+primary     = true
+
+[[ports]]
+container   = 3000
+description = "API (auth, REST, MCP, webhooks)"

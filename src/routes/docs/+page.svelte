@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { mode } from 'mode-watcher';
 	import { onMount } from 'svelte';
+	import Seo from '$lib/components/seo.svelte';
 
 	let container = $state<HTMLDivElement | null>(null);
 	let instance: { destroy?: () => void } | null = $state(null);
@@ -62,9 +63,17 @@
 	});
 </script>
 
-<svelte:head>
-	<title>API docs — Templates</title>
-</svelte:head>
+<Seo
+	title="Templates REST API Reference — LitePod"
+	description="Public read-only REST API for the LitePod self-hosted template catalog: list, search and fetch Docker Compose templates, env files and icons. OpenAPI 3 spec included."
+	keywords={['rest api', 'openapi', 'template api']}
+	path="/docs"
+/>
+<!-- Scalar renders client-side; this gives crawlers a heading and a link to the spec. -->
+<h1 class="sr-only">Templates REST API reference</h1>
+<noscript>
+	<p class="p-6">The interactive reference needs JavaScript. Read the <a href="/api/v1/openapi.json">OpenAPI spec</a> directly.</p>
+</noscript>
 
 <div bind:this={container} class="scalar-host"></div>
 

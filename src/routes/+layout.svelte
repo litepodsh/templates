@@ -28,8 +28,15 @@
 </script>
 
 	<svelte:head>
-		<link rel="icon" href={favicon} />
-		<title>{APP_NAME}</title>
+		<link rel="icon" href={favicon} type="image/svg+xml" />
+		<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+		<link rel="manifest" href="/manifest.webmanifest" />
+		<link rel="sitemap" type="application/xml" href="/sitemap.xml" />
+		<meta name="theme-color" content="#f4f0e9" media="(prefers-color-scheme: light)" />
+		<meta name="theme-color" content="#1a2520" media="(prefers-color-scheme: dark)" />
+		<meta name="application-name" content="LitePod Templates" />
+		<meta name="author" content="LitePod" />
+		<meta name="format-detection" content="telephone=no" />
 	</svelte:head>
 
 <!--

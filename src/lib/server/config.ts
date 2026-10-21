@@ -15,3 +15,12 @@ export function uiBaseUrl(id: string): string {
 	const path = `/t/${id}`;
 	return domain ? `${domain}${path}` : path;
 }
+
+/**
+ * Absolute origin for canonical links, Open Graph tags and the sitemap. Search
+ * engines need absolute URLs, so this falls back to the request origin when
+ * `DOMAIN` is unset rather than going relative like `uiBaseUrl`.
+ */
+export function siteOrigin(url: URL): string {
+	return domain || url.origin;
+}

@@ -459,3 +459,25 @@ export async function readTemplateIcon(
 		return null;
 	}
 }
+
+/**
+ * Newest modification time across each template's folder entries, keyed by
+ * id — the sitemap's `<lastmod>`. Templates whose folder can't be read are
+ * left out rather than given a made-up date.
+ */
+export async function templatesLastModified(): Promise<Map<string, Date>> {
+	const result = new Map<string, Date>();
+	await Promise.all(
+		[...(await catalog()).values()].map(async (template) => {
+			try {
+				const entries = await readdir(template.dir);
+				const stats = await Promise.all(entries.map((entry) => stat(path.join(template.dir, entry))));
+				const newest = Math.max(...stats.map((s) => s.mtimeMs));
+				if (Number.isFinite(newest)) result.set(template.summary.id, new Date(newest));
+			} catch {
+				// Unreadable folder: omit lastmod for this template.
+			}
+		}),
+	);
+	return result;
+}
