@@ -85,21 +85,24 @@ Traffic stays on litepod's internal `litepod-network` and never leaves the
 host.
 
 1. Deploy the website application first.
-2. In litepod, open the website application and note its service's generated
-   runtime name and its internal HTTP port (the container port, not a public
-   host port).
-3. Set `ANUBIS_TARGET` to that alias and port:
+2. Open the website application in litepod, go to its **Containers** tab and
+   click the **Internal URL** shown under the container name (for example
+   `http://my-site-a1b2c3:3000`). It copies to your clipboard. The host part
+   is a stable alias on litepod's internal network: it keeps working after
+   every redeploy of the website, unlike the container name, which changes
+   with each release (`…-release-<hash>`).
+3. Paste it as `ANUBIS_TARGET`:
 
 ```toml
-ANUBIS_TARGET = "http://<target-runtime-name>-<service>:<internal-port>"
+ANUBIS_TARGET = "http://my-site-a1b2c3:3000"
 ```
 
-For example, if litepod displays a target service with runtime name
-`my-site-a1b2c3` and service name `web` on port `3000`, use:
+   If the Internal URL has no port, add the port your website listens on
+   inside the container, as in the example above.
 
-```toml
-ANUBIS_TARGET = "http://my-site-a1b2c3-web:3000"
-```
+> The stable alias exists once the website has been deployed with a litepod
+> version that supports it. If the name does not resolve, redeploy the website
+> once.
 
 4. Move the website's public domain to Anubis: remove the domain from the
    website application and add it to the **anubis** service (see
@@ -112,8 +115,10 @@ already connected through litepod's internal network. Use `http://`, not
 
 If you add the website as another service inside this same Compose file
 instead, use its Compose service name and internal port, as `demo-web` does
-(`http://demo-web:80`). For example
-`http://web:3000`.
+(`http://demo-web:80`). For example `http://web:3000`.
+
+If the website is itself a Compose application deployed separately in litepod,
+use the service container name listed in its Containers tab.
 
 ### Option B — website hosted elsewhere (external network)
 
