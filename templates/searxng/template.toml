@@ -1,0 +1,18 @@
+[template]
+id          = "searxng"
+name        = "SearXNG"
+description = "Privacy-respecting metasearch engine that aggregates results from over 70 search services without tracking or profiling users."
+version     = "2026.10.24-ef0ec03da"
+categories  = ["search", "privacy"]
+tags        = ["search", "metasearch", "privacy", "python"]
+platforms   = ["linux/amd64", "linux/arm/v7", "linux/arm64"]
+icon        = "https://raw.githubusercontent.com/searxng/searxng/master/src/brand/searxng-wordmark.svg"
+website     = "https://docs.searxng.org"
+docs        = "https://docs.searxng.org/admin/installation-docker.html"
+source      = "https://github.com/searxng/searxng"
+license     = "AGPL-3.0"
+
+[[ports]]
+container   = 8080
+description = "Web UI"
+primary     = true

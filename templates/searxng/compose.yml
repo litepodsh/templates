@@ -1,0 +1,23 @@
+services:
+  searxng:
+    image: docker.io/searxng/searxng:2026.10.24-ef0ec03da
+    restart: unless-stopped
+    ports:
+      - "${SEARXNG_PORT}:8080"
+    environment:
+      SEARXNG_BASE_URL: ${SEARXNG_BASE_URL}
+      SEARXNG_SECRET: ${SEARXNG_SECRET}
+      SEARXNG_LIMITER: ${SEARXNG_LIMITER}
+    volumes:
+      - searxng_config:/etc/searxng
+      - searxng_cache:/var/cache/searxng
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1:8080/healthz"]
+      start_period: 20s
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+volumes:
+  searxng_config:
+  searxng_cache:
