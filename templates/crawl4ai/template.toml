@@ -1,0 +1,18 @@
+[template]
+id          = "crawl4ai"
+name        = "Crawl4AI"
+description = "Open-source web crawler and scraper that turns pages into clean, LLM-ready Markdown, with a REST API, playground and MCP endpoint."
+version     = "0.9.5"
+categories  = ["ai", "developer-tools"]
+tags        = ["crawler", "scraping", "markdown", "llm", "rag", "mcp", "playwright"]
+platforms   = ["linux/amd64", "linux/arm64"]
+icon        = "https://raw.githubusercontent.com/unclecode/crawl4ai/main/docs/assets/images/logo.png"
+website     = "https://crawl4ai.com"
+docs        = "https://docs.crawl4ai.com/core/docker-deployment/"
+source      = "https://github.com/unclecode/crawl4ai"
+license     = "Apache-2.0"
+
+[[ports]]
+container   = 11235
+description = "REST API, /playground and /mcp"
+primary     = true

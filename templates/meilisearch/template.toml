@@ -1,0 +1,18 @@
+[template]
+id          = "meilisearch"
+name        = "Meilisearch"
+description = "Fast, typo-tolerant search engine with a RESTful API, faceted search and hybrid semantic search for apps and websites."
+version     = "v1.55.0"
+categories  = ["search", "developer-tools"]
+tags        = ["search", "full-text", "api", "typo-tolerant", "rust"]
+platforms   = ["linux/amd64", "linux/arm64"]
+icon        = "https://raw.githubusercontent.com/meilisearch/meilisearch/main/assets/logo.svg"
+website     = "https://www.meilisearch.com"
+docs        = "https://www.meilisearch.com/docs"
+source      = "https://github.com/meilisearch/meilisearch"
+license     = "MIT"
+
+[[ports]]
+container   = 7700
+description = "HTTP API and dashboard"
+primary     = true

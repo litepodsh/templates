@@ -1,0 +1,18 @@
+[template]
+id          = "typesense"
+name        = "Typesense"
+description = "Fast, typo-tolerant, in-memory search engine and open-source alternative to Algolia, with vector and hybrid search."
+version     = "30.2"
+categories  = ["search", "developer-tools"]
+tags        = ["search", "full-text", "api", "typo-tolerant", "vector-search", "algolia"]
+platforms   = ["linux/amd64", "linux/arm64"]
+icon        = "https://raw.githubusercontent.com/typesense/typesense/master/docs-site/content/.vuepress/public/typesense-logo.svg"
+website     = "https://typesense.org"
+docs        = "https://typesense.org/docs"
+source      = "https://github.com/typesense/typesense"
+license     = "GPL-3.0"
+
+[[ports]]
+container   = 8108
+description = "HTTP API"
+primary     = true

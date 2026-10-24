@@ -1,0 +1,26 @@
+services:
+  typesense:
+    image: docker.io/typesense/typesense:30.2
+    restart: unless-stopped
+    ports:
+      - "${TYPESENSE_PORT}:8108"
+    environment:
+      TYPESENSE_API_KEY: ${TYPESENSE_API_KEY}
+      TYPESENSE_DATA_DIR: /data
+      TYPESENSE_ENABLE_CORS: ${TYPESENSE_ENABLE_CORS}
+    volumes:
+      - typesense_data:/data
+    healthcheck:
+      # The image ships no curl/wget; probe /health over bash's /dev/tcp.
+      test:
+        - CMD
+        - bash
+        - -c
+        - 'exec 3<>/dev/tcp/127.0.0.1/8108 && printf "GET /health HTTP/1.0\r\n\r\n" >&3 && grep -q "\"ok\":true" <&3'
+      start_period: 15s
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+volumes:
+  typesense_data:

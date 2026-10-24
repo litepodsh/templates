@@ -1,0 +1,21 @@
+services:
+  meilisearch:
+    image: docker.io/getmeili/meilisearch:v1.55.0
+    restart: unless-stopped
+    ports:
+      - "${MEILISEARCH_PORT}:7700"
+    environment:
+      MEILI_ENV: ${MEILISEARCH_ENV}
+      MEILI_MASTER_KEY: ${MEILISEARCH_MASTER_KEY}
+      MEILI_NO_ANALYTICS: ${MEILISEARCH_NO_ANALYTICS}
+    volumes:
+      - meilisearch_data:/meili_data
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:7700/health"]
+      start_period: 10s
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+volumes:
+  meilisearch_data:

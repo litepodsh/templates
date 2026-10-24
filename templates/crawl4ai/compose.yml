@@ -1,0 +1,22 @@
+services:
+  crawl4ai:
+    image: docker.io/unclecode/crawl4ai:0.9.5
+    restart: unless-stopped
+    ports:
+      - "${CRAWL4AI_PORT}:11235"
+    environment:
+      CRAWL4AI_API_TOKEN: ${CRAWL4AI_API_TOKEN}
+      CRAWL4AI_ALLOW_DEEP_CRAWL: ${CRAWL4AI_ALLOW_DEEP_CRAWL}
+      OPENAI_API_KEY: ${CRAWL4AI_OPENAI_API_KEY}
+      ANTHROPIC_API_KEY: ${CRAWL4AI_ANTHROPIC_API_KEY}
+      GEMINI_API_KEY: ${CRAWL4AI_GEMINI_API_KEY}
+      LLM_PROVIDER: ${CRAWL4AI_LLM_PROVIDER}
+    # Chromium needs shared memory.
+    shm_size: "1gb"
+    mem_limit: ${CRAWL4AI_MEMORY_LIMIT}
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:11235/health"]
+      start_period: 40s
+      interval: 30s
+      timeout: 10s
+      retries: 3
