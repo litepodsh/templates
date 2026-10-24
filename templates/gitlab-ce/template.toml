@@ -1,0 +1,26 @@
+[template]
+id          = "gitlab-ce"
+name        = "GitLab CE"
+description = "GitLab Community Edition: Git hosting, issues, merge requests and CI/CD in one self-hosted DevOps platform."
+version     = "19.5.1"
+categories  = ["developer-tools", "collaboration"]
+tags        = ["git", "forge", "code-hosting", "ci", "devops", "gitlab"]
+platforms   = ["linux/amd64", "linux/arm64"]
+icon        = "https://github.com/gitlabhq.png"
+website     = "https://about.gitlab.com"
+docs        = "https://docs.gitlab.com/install/docker/"
+source      = "https://gitlab.com/gitlab-org/gitlab-foss"
+license     = "MIT"
+url_persisted = true
+
+[files]
+setup = "setup.md"
+
+[[ports]]
+container   = 80
+description = "Web UI and Git over HTTP"
+primary     = true
+
+[[ports]]
+container   = 22
+description = "Git over SSH"

@@ -2,7 +2,7 @@
 id          = "uptime-kuma"
 name        = "Uptime Kuma"
 description = "Self-hosted uptime monitoring with HTTP, TCP, DNS, ping, push and Docker checks."
-version     = "2.3.2"
+version     = "2"
 categories  = ["monitoring", "developer-tools"]
 tags        = ["uptime", "status-page", "alerts", "monitoring"]
 platforms   = ["linux/amd64", "linux/arm/v7", "linux/arm64"]

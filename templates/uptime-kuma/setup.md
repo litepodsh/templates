@@ -1,18 +1,8 @@
-## Which version `latest` gives you
+## Which version
 
-Upstream publishes the 2.x line under the `2` / `2.x.y` tags and keeps `latest`
-pointing at the **1.x** branch. This template pins `latest`, so a fresh deploy
-gets Uptime Kuma 1.x.
-
-If you previously ran this template on a 2.x tag, **do not** pull over it: 1.x
-cannot read an `/app/data` written by 2.x and the container will fail to start.
-Either wipe the volume and start over:
-
-```sh
-podman compose -f templates/uptime-kuma/compose.yml down -v
-```
-
-or stay on 2.x by changing the image to `docker.io/louislam/uptime-kuma:2`.
+This template pins the `2` tag, which follows the latest 2.x release. Upstream keeps
+`latest` on the **1.x** branch, so don't switch to it: 1.x cannot read an `/app/data`
+written by 2.x and the container will fail to start.
 
 ## First boot
 

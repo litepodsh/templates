@@ -1,0 +1,27 @@
+services:
+  gitlab:
+    image: docker.io/gitlab/gitlab-ce:19.5.1-ce.0
+    restart: unless-stopped
+    hostname: ${GITLAB_DOMAIN}
+    shm_size: 256m
+    expose:
+      - "80"
+    ports:
+      - "${GITLAB_SSH_PORT}:22"
+    environment:
+      GITLAB_ROOT_PASSWORD: ${GITLAB_ROOT_PASSWORD}
+      GITLAB_OMNIBUS_CONFIG: |
+        external_url '${GITLAB_EXTERNAL_URL}'
+        nginx['listen_port'] = 80
+        nginx['listen_https'] = false
+        letsencrypt['enable'] = false
+        gitlab_rails['gitlab_shell_ssh_port'] = ${GITLAB_SSH_PORT}
+    volumes:
+      - gitlab_config:/etc/gitlab
+      - gitlab_logs:/var/log/gitlab
+      - gitlab_data:/var/opt/gitlab
+
+volumes:
+  gitlab_config:
+  gitlab_logs:
+  gitlab_data:
