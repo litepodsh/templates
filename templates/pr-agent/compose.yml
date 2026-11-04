@@ -1,0 +1,50 @@
+services:
+  pr-agent:
+    # Upstream's github_app, gitlab_webhook and gitea_app tags differ only in their default
+    # command, so this one image serves every provider through the command below.
+    image: docker.io/pragent/pr-agent:0.49.0-github_app
+    restart: unless-stopped
+    expose:
+      - "3000"
+    environment:
+      PR_AGENT_PROVIDER: ${PR_AGENT_PROVIDER}
+      GUNICORN_WORKERS: ${PR_AGENT_WORKERS}
+      CONFIG__MODEL: ${PR_AGENT_MODEL}
+      CONFIG__FALLBACK_MODELS: ${PR_AGENT_FALLBACK_MODELS}
+      CONFIG__CUSTOM_MODEL_MAX_TOKENS: ${PR_AGENT_CUSTOM_MODEL_MAX_TOKENS}
+      OPENAI__KEY: ${OPENAI_API_KEY}
+      OPENAI__API_BASE: ${OPENAI_API_BASE}
+      ANTHROPIC__KEY: ${ANTHROPIC_API_KEY}
+      GOOGLE_AI_STUDIO__GEMINI_API_KEY: ${GEMINI_API_KEY}
+      GITHUB__APP_ID: ${GITHUB_APP_ID}
+      GITHUB_PRIVATE_KEY_BASE64: ${GITHUB_PRIVATE_KEY_BASE64}
+      GITHUB__WEBHOOK_SECRET: ${PR_AGENT_WEBHOOK_SECRET}
+      GITLAB__URL: ${GITLAB_URL}
+      GITLAB__PERSONAL_ACCESS_TOKEN: ${GITLAB_TOKEN}
+      GITLAB__SHARED_SECRET: ${PR_AGENT_WEBHOOK_SECRET}
+      GITEA__URL: ${GITEA_URL}
+      GITEA__PERSONAL_ACCESS_TOKEN: ${GITEA_TOKEN}
+      GITEA__WEBHOOK_SECRET: ${PR_AGENT_WEBHOOK_SECRET}
+    command:
+      - sh
+      - -c
+      - |
+        case "$$PR_AGENT_PROVIDER" in
+          github) server=github_app ;;
+          gitlab) server=gitlab_webhook ;;
+          gitea) server=gitea_app ;;
+          *) echo "PR_AGENT_PROVIDER must be github, gitlab or gitea" >&2; exit 1 ;;
+        esac
+        export CONFIG__GIT_PROVIDER="$$PR_AGENT_PROVIDER"
+        # LitePod env values can't hold newlines, so the PEM key arrives base64-encoded.
+        export GITHUB__PRIVATE_KEY="$$(printf %s "$$GITHUB_PRIVATE_KEY_BASE64" | base64 -d)"
+        unset GITHUB_PRIVATE_KEY_BASE64
+        # Copied from the image's own command. Recheck it against upstream's Dockerfile when bumping the tag.
+        exec python -m gunicorn -k uvicorn.workers.UvicornWorker -c pr_agent/servers/gunicorn_config.py --forwarded-allow-ips "*" "pr_agent.servers.$$server:app"
+    healthcheck:
+      # No -f: the Gitea server answers 404 on /, which still proves it's up.
+      test: ["CMD", "curl", "-sS", "-o", "/dev/null", "http://localhost:3000/"]
+      start_period: 40s
+      interval: 30s
+      timeout: 10s
+      retries: 3

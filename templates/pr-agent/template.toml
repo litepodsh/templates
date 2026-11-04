@@ -1,0 +1,21 @@
+[template]
+id          = "pr-agent"
+name        = "PR-Agent"
+description = "AI code reviewer that describes, reviews and suggests improvements on pull requests from GitHub, GitLab or Gitea webhooks."
+version     = "0.49.0"
+categories  = ["developer-tools", "ai"]
+tags        = ["code-review", "pull-requests", "llm", "github", "gitlab", "gitea", "forgejo", "webhooks"]
+platforms   = ["linux/amd64", "linux/arm64"]
+icon        = "https://github.com/The-PR-Agent.png"
+website     = "https://www.pr-agent.ai"
+docs        = "https://docs.pr-agent.ai/installation/"
+source      = "https://github.com/The-PR-Agent/pr-agent"
+license     = "MIT"
+
+[files]
+setup = "setup.md"
+
+[[ports]]
+container   = 3000
+description = "Webhook receiver"
+primary     = true
