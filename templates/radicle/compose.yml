@@ -1,0 +1,63 @@
+services:
+  node:
+    image: quay.io/radicle_garden/radicle-node:1.10.2
+    restart: unless-stopped
+    ports:
+      - "${RADICLE_P2P_PORT}:8776"
+    environment:
+      RAD_HOME: /var/lib/radicle
+      # No passphrase: the node has to start unattended, so the volume is the trust boundary.
+      RAD_PASSPHRASE: ""
+      RADICLE_ALIAS: ${RADICLE_ALIAS}
+      RADICLE_EXTERNAL_ADDRESS: ${RADICLE_DOMAIN}:${RADICLE_P2P_PORT}
+      RADICLE_SEEDING_POLICY: ${RADICLE_SEEDING_POLICY}
+    volumes:
+      - radicle_home:/var/lib/radicle
+    entrypoint: ["sh", "-ec"]
+    # The identity is created once. Config is rebuilt from the environment on every start, so editing .env + redeploy is enough.
+    command:
+      - |
+        [ -f "$$RAD_HOME/keys/radicle" ] || rad auth --alias "$$RADICLE_ALIAS"
+        # Take the bootstrap seeds from this image's defaults: without them the node never finds the network.
+        rm -f "$$RAD_HOME/config.json"
+        rad config init --alias "$$RADICLE_ALIAS" > /dev/null
+        seeds=$$(sed -n '/"preferredSeeds"/,/\]/p' "$$RAD_HOME/config.json")
+        case "$$RADICLE_SEEDING_POLICY" in
+          allow) policy='{ "default": "allow", "scope": "all" }' ;;
+          *) policy='{ "default": "block" }' ;;
+        esac
+        cat > "$$RAD_HOME/config.json" <<CFG
+        {
+          $$seeds
+          "node": {
+            "alias": "$$RADICLE_ALIAS",
+            "listen": ["0.0.0.0:8776"],
+            "externalAddresses": ["$$RADICLE_EXTERNAL_ADDRESS"],
+            "seedingPolicy": $$policy
+          }
+        }
+        CFG
+        exec radicle-node --force
+    healthcheck:
+      test: ["CMD-SHELL", "test -S /var/lib/radicle/node/control.sock"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+      start_period: 10s
+
+  httpd:
+    image: quay.io/radicle_garden/radicle-httpd:0.29.0
+    restart: unless-stopped
+    depends_on:
+      node:
+        condition: service_healthy
+    expose:
+      - "8080"
+    command: ["--listen", "0.0.0.0:8080"]
+    environment:
+      RAD_HOME: /var/lib/radicle
+    volumes:
+      - radicle_home:/var/lib/radicle
+
+volumes:
+  radicle_home:

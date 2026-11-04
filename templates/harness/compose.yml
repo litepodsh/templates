@@ -1,0 +1,48 @@
+services:
+  harness:
+    image: docker.io/harness/harness:3.3.0
+    restart: unless-stopped
+    depends_on:
+      - docker-in-docker
+    expose:
+      - "3000"
+    ports:
+      - "${HARNESS_SSH_PORT}:3022"
+    environment:
+      GITNESS_URL_BASE: ${HARNESS_URL}
+      GITNESS_URL_REGISTRY: ${HARNESS_URL}
+      GITNESS_URL_GIT_SSH: ssh://${HARNESS_DOMAIN}:${HARNESS_SSH_PORT}
+      # Pipeline steps run inside the docker-in-docker daemon and clone from here.
+      GITNESS_URL_CONTAINER: http://harness:3000
+      GITNESS_DOCKER_HOST: tcp://docker-in-docker:2375
+      GITNESS_PRINCIPAL_ADMIN_EMAIL: ${HARNESS_ADMIN_EMAIL}
+      GITNESS_PRINCIPAL_ADMIN_PASSWORD: ${HARNESS_ADMIN_PASSWORD}
+      GITNESS_USER_SIGNUP_ENABLED: ${HARNESS_USER_SIGNUP_ENABLED}
+      GITNESS_PUBLIC_RESOURCE_CREATION_ENABLED: ${HARNESS_PUBLIC_RESOURCE_CREATION_ENABLED}
+      GITNESS_METRIC_ENABLED: ${HARNESS_METRIC_ENABLED}
+      GITNESS_GITSPACE_ENABLE: ${HARNESS_GITSPACE_ENABLE}
+      GITNESS_CI_PARALLEL_WORKERS: ${HARNESS_CI_PARALLEL_WORKERS}
+    volumes:
+      - harness_data:/data
+
+  docker-in-docker:
+    image: docker.io/library/docker:29-dind
+    restart: unless-stopped
+    # Pipeline steps run as containers inside this daemon, isolated from the host's Podman.
+    privileged: true
+    command: ["dockerd", "-H", "tcp://0.0.0.0:2375", "--tls=false"]
+    environment:
+      # Harness 3.3.0 talks to Docker over API 1.41, older than Docker 29 accepts by default.
+      DOCKER_MIN_API_VERSION: "1.24"
+    volumes:
+      - dind_data:/var/lib/docker
+    # Every step container lives inside this daemon, so these limits cap all CI work.
+    deploy:
+      resources:
+        limits:
+          cpus: "${JOBS_CPU_LIMIT}"
+          memory: ${JOBS_MEMORY_LIMIT}
+
+volumes:
+  harness_data:
+  dind_data:
