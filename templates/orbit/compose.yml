@@ -1,0 +1,47 @@
+services:
+  orbit:
+    image: ghcr.io/coollabsio/orbit:latest
+    restart: unless-stopped
+    # The server drains open sockets before it exits.
+    stop_grace_period: 40s
+    expose:
+      - "8080"
+    # Uncomment to publish Orbit directly on the host instead of only exposing it to the Compose network.
+    # ports:
+    #   - "${ORBIT_PORT_PUBLISHED}:8080"
+    environment:
+      # Orbit only reads ORBIT_* variables and refuses to start on an unknown one.
+      ORBIT_ENV: ${ORBIT_ENV}
+      ORBIT_BIND: ${ORBIT_BIND}
+      ORBIT_PORT: ${ORBIT_PORT}
+      ORBIT_PUBLIC_ORIGIN: ${ORBIT_PUBLIC_ORIGIN}
+      ORBIT_TRUSTED_PROXIES: ${ORBIT_TRUSTED_PROXIES}
+      ORBIT_APP_KEY: ${ORBIT_APP_KEY}
+      ORBIT_DATABASE_PATH: ${ORBIT_DATABASE_PATH}
+      ORBIT_ATTACHMENTS_PATH: ${ORBIT_ATTACHMENTS_PATH}
+      ORBIT_BACKUPS_PATH: ${ORBIT_BACKUPS_PATH}
+      ORBIT_JOBS_CONCURRENCY: ${ORBIT_JOBS_CONCURRENCY}
+      ORBIT_SHUTDOWN_DELAY_SECONDS: ${ORBIT_SHUTDOWN_DELAY_SECONDS}
+      ORBIT_UPLOAD_MAX_FILE_BYTES: ${ORBIT_UPLOAD_MAX_FILE_BYTES}
+      ORBIT_UPLOAD_MAX_REQUEST_BYTES: ${ORBIT_UPLOAD_MAX_REQUEST_BYTES}
+    volumes:
+      # Database and attachment staging; the backends path holds local backups.
+      - orbit_data:/var/lib/orbit
+      - orbit_backups:/var/backups/orbit
+    healthcheck:
+      test: ["CMD", "/orbit", "healthcheck"]
+      interval: 30s
+      timeout: 5s
+      start_period: 20s
+      retries: 3
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    read_only: true
+    tmpfs:
+      - /tmp:size=64M
+
+volumes:
+  orbit_data:
+  orbit_backups:

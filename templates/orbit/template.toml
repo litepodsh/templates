@@ -1,0 +1,22 @@
+[template]
+id          = "orbit"
+name        = "Orbit"
+description = "Self-hosted team workspace that combines tasks, docs, chat and mail, with an MCP server so AI clients can read and write your workspace."
+version     = "latest"
+categories  = ["collaboration", "productivity"]
+tags        = ["tasks", "docs", "chat", "wiki", "knowledge-base", "linear-alternative", "notion-alternative", "slack-alternative", "mcp", "sqlite"]
+platforms   = ["linux/amd64", "linux/arm64"]
+icon        = "logo.svg"
+website     = "https://orbit.so"
+docs        = "https://github.com/coollabsio/orbit/blob/main/docs/operations.md"
+source      = "https://github.com/coollabsio/orbit"
+license     = "Apache-2.0"
+requires_https = true  # production mode refuses to start without an https public origin; use a custom domain with HTTPS
+
+[files]
+setup = "setup.md"
+
+[[ports]]
+container   = 8080
+description = "Web UI, API and MCP server"
+primary     = true
