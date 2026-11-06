@@ -6,10 +6,10 @@ random secrets) and then `ocis server`. Log in with user `admin` and the
 
 # HTTPS required
 
-oCIS web requires a secure context — serve it over HTTPS. Attach a domain with a
-certificate to the route; `OCIS_URL` ({{url}}) then resolves to `https://…`.
-LitePod terminates TLS in front of the container (`PROXY_TLS=false`). For local
-testing only, set `OCIS_INSECURE=true` to run over plain http.
+oCIS requires HTTPS — its identity provider (OIDC issuer) refuses to start with
+an `http://` URL. Attach a domain with a certificate to the route; `OCIS_URL`
+({{url}}) then resolves to `https://…`. LitePod terminates TLS in front of the
+container (`PROXY_TLS=false`).
 
 # Data
 
