@@ -1,0 +1,26 @@
+[template]
+id          = "ente-auth"
+name        = "Ente Auth"
+description = "End-to-end encrypted two-factor authentication code sync, backed by your own Ente server."
+version     = "latest"
+categories  = ["security", "productivity"]
+tags        = ["2fa", "totp", "authenticator", "otp", "encryption", "e2ee", "sync"]
+platforms   = ["linux/amd64", "linux/arm64"]
+icon        = "https://github.com/ente-io.png"
+website     = "https://ente.com/auth"
+docs        = "https://ente.com/help/self-hosting/"
+source      = "https://github.com/ente-io/ente"
+license     = "AGPL-3.0"
+requires_https = true  # browser-side crypto needs a secure context; use a custom domain with HTTPS
+
+[files]
+setup = "setup.md"
+
+[[ports]]
+container   = 3003
+description = "Auth web app"
+primary     = true
+
+[[ports]]
+container   = 8080
+description = "Museum API server"

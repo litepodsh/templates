@@ -1,0 +1,34 @@
+[template]
+id          = "ente-locker"
+name        = "Ente Locker"
+description = "End-to-end encrypted document vault with public share links, backed by your own Ente server and MinIO storage."
+version     = "latest"
+categories  = ["storage", "security"]
+tags        = ["documents", "vault", "encryption", "e2ee", "sharing", "minio", "s3"]
+platforms   = ["linux/amd64", "linux/arm64"]
+icon        = "https://github.com/ente-io.png"
+website     = "https://ente.com/locker"
+docs        = "https://ente.com/help/self-hosting/"
+source      = "https://github.com/ente-io/ente"
+license     = "AGPL-3.0"
+requires_https = true  # browser-side crypto needs a secure context; use a custom domain with HTTPS
+
+[files]
+setup = "setup.md"
+
+[[ports]]
+container   = 3009
+description = "Locker web app"
+primary     = true
+
+[[ports]]
+container   = 3005
+description = "Public share links web app"
+
+[[ports]]
+container   = 8080
+description = "Museum API server"
+
+[[ports]]
+container   = 3201
+description = "MinIO console (object storage UI)"

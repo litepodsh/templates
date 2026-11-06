@@ -1,0 +1,71 @@
+# Ente Auth self-hosted stack: museum (API) + the Auth web app + Postgres.
+# Museum is configured entirely through ENTE_* environment overrides.
+#
+# No object storage is required: Auth keeps the encrypted 2FA secrets and their
+# metadata in Postgres, so museum's S3 slots are left unset.
+services:
+  ente-museum:
+    image: ghcr.io/ente/server:latest
+    restart: unless-stopped
+    expose:
+      - "8080"
+    # ports:
+    #   - "${ENTE_API_PORT}:8080"
+    environment:
+      ENTE_DB_HOST: ente-db
+      ENTE_DB_PORT: "5432"
+      ENTE_DB_NAME: ${ENTE_DB_NAME}
+      ENTE_DB_USER: ${ENTE_DB_USER}
+      ENTE_DB_PASSWORD: ${ENTE_DB_PASSWORD}
+      ENTE_KEY_ENCRYPTION: ${ENTE_KEY_ENCRYPTION}
+      ENTE_KEY_HASH: ${ENTE_KEY_HASH}
+      ENTE_JWT_SECRET: ${ENTE_JWT_SECRET}
+      ENTE_SMTP_HOST: ${ENTE_SMTP_HOST}
+      ENTE_SMTP_PORT: ${ENTE_SMTP_PORT}
+      ENTE_SMTP_USERNAME: ${ENTE_SMTP_USERNAME}
+      ENTE_SMTP_PASSWORD: ${ENTE_SMTP_PASSWORD}
+      ENTE_SMTP_EMAIL: ${ENTE_SMTP_EMAIL}
+    depends_on:
+      ente-db:
+        condition: service_healthy
+    networks:
+      - ente-internal
+
+  ente-web:
+    image: ghcr.io/ente/web:latest
+    restart: unless-stopped
+    expose:
+      - "3003"
+    # ports:
+    #   - "${ENTE_WEB_PORT}:3003"
+    environment:
+      # The web image rewrites this origin into the static Auth build at start.
+      ENTE_API_ORIGIN: ${ENTE_API_ORIGIN}
+    depends_on:
+      ente-museum:
+        condition: service_started
+    networks:
+      - ente-internal
+
+  ente-db:
+    image: docker.io/library/postgres:15
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${ENTE_DB_NAME}
+      POSTGRES_USER: ${ENTE_DB_USER}
+      POSTGRES_PASSWORD: ${ENTE_DB_PASSWORD}
+    volumes:
+      - ente_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${ENTE_DB_USER} -d ${ENTE_DB_NAME}"]
+      interval: ${ENTE_DB_HEALTHCHECK_INTERVAL}
+      timeout: ${ENTE_DB_HEALTHCHECK_TIMEOUT}
+      retries: ${ENTE_DB_HEALTHCHECK_RETRIES}
+    networks:
+      - ente-internal
+
+networks:
+  ente-internal:
+
+volumes:
+  ente_db_data:
