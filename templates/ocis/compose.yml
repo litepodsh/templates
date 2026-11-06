@@ -1,0 +1,29 @@
+# ownCloud Infinite Scale (oCIS) — a single Go binary that runs every service
+# in one container. `ocis init` generates the config (with random secrets) on
+# first start, then `ocis server` runs the full stack on port 9200.
+services:
+  ocis:
+    image: docker.io/owncloud/ocis:latest
+    restart: unless-stopped
+    expose:
+      - "9200"
+    # Uncomment to publish oCIS directly on the host instead of only exposing it to the Compose network.
+    # ports:
+    #   - "${OCIS_PORT}:9200"
+    entrypoint:
+      - /bin/sh
+    command: ["-c", "ocis init || true; exec ocis server"]
+    environment:
+      OCIS_URL: ${OCIS_URL}
+      OCIS_LOG_LEVEL: ${OCIS_LOG_LEVEL}
+      OCIS_LOG_COLOR: "false"
+      PROXY_TLS: "false"
+      IDM_ADMIN_PASSWORD: ${OCIS_ADMIN_PASSWORD}
+      OCIS_INSECURE: ${OCIS_INSECURE}
+    volumes:
+      - ocis_config:/etc/ocis
+      - ocis_data:/var/lib/ocis
+
+volumes:
+  ocis_config:
+  ocis_data:

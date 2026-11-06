@@ -1,0 +1,22 @@
+[template]
+id          = "nextcloud"
+name        = "Nextcloud"
+description = "Self-hosted personal cloud — file sync and sharing, WebDAV, contacts, calendar and a large app ecosystem. A Dropbox/Google Drive alternative."
+version     = "latest"
+categories  = ["storage", "collaboration"]
+tags        = ["nextcloud", "cloud", "files", "file-sync", "webdav", "collaboration", "php", "postgresql", "redis"]
+platforms   = ["linux/amd64", "linux/arm/v7", "linux/arm64"]
+icon        = "https://github.com/nextcloud.png"
+website     = "https://nextcloud.com"
+docs        = "https://docs.nextcloud.com/server/latest/admin_manual/installation/docker.html"
+source      = "https://github.com/nextcloud/server"
+license     = "AGPL-3.0"
+url_persisted = true
+
+[files]
+setup = "setup.md"
+
+[[ports]]
+container   = 80
+description = "Web UI, WebDAV & sync endpoint"
+primary     = true

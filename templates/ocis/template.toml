@@ -1,0 +1,22 @@
+[template]
+id          = "ocis"
+name        = "ownCloud Infinite Scale"
+description = "Modern file-sync and share platform — a Go rewrite of ownCloud with web UI, WebDAV, and desktop/mobile sync."
+version     = "latest"
+categories  = ["storage", "collaboration"]
+tags        = ["owncloud", "ocis", "cloud", "files", "file-sync", "webdav", "go"]
+platforms   = ["linux/amd64", "linux/arm64"]
+icon        = "https://github.com/owncloud.png"
+website     = "https://owncloud.com/ocis/"
+docs        = "https://doc.owncloud.com/ocis/next/"
+source      = "https://github.com/owncloud/ocis"
+license     = "Apache-2.0"
+requires_https = true
+
+[files]
+setup = "setup.md"
+
+[[ports]]
+container   = 9200
+description = "Web UI, WebDAV & sync endpoint"
+primary     = true
