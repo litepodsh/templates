@@ -194,6 +194,38 @@ url_persisted  = true   # stores its URL on first boot; changing the env alone d
 Set `url_persisted` when the app reads its URL once and saves it in its database (WordPress
 `siteurl`, Nextcloud `trusted_domains`, …), and explain the in-app step in `setup.md`.
 
+### Host networking (LAN discovery)
+
+Most templates stay on the Compose network and are reached by service name. Apps that must see
+broadcast/multicast traffic on the real LAN — Home Assistant's mDNS, Matter, HomeKit, SSDP — need
+the host's network namespace instead:
+
+```toml
+[template]
+network = "host"
+```
+
+and in `compose.yml`:
+
+```yaml
+services:
+  homeassistant:
+    network_mode: host
+    expose: ["8123"]   # declares what it listens on; `ports:` is invalid here
+```
+
+Rules the catalog enforces at load time (a violation skips the template):
+
+- Exactly one service sets `network_mode: host`, and it must not publish `ports:`.
+- The primary `[[ports]]` entry must belong to that service.
+- Every port in the manifest is reserved on the host, so keep it accurate: Litepod lists those as
+  host-network ports and flags collisions between two apps on the same server.
+
+LitePod resolves the app's HTTPS domain through the host gateway, so the domain keeps working while
+the container also answers on the LAN. Only clients that send `features=host-network` see these
+templates; older installs would attach the service to the shared proxy network, which Compose
+rejects.
+
 ## API
 
 | Method | Route | Returns |

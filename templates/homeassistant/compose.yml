@@ -1,15 +1,17 @@
-# Bridge networking — the Web UI works everywhere, but Home Assistant cannot
-# auto-discover LAN devices (Matter, HomeKit, Chromecast, mDNS/SSDP). Add those
-# integrations by IP, or switch this service to `network_mode: host` (see setup.md).
 services:
   homeassistant:
     image: ghcr.io/home-assistant/home-assistant:stable
     restart: unless-stopped
+    # Host networking is what makes auto-discovery work: mDNS, SSDP and
+    # Matter/HomeKit broadcasts never reach a bridged container. Litepod routes
+    # the HTTPS domain through the host gateway, and the port below is reserved
+    # on the host.
+    network_mode: host
+    # With network_mode: host this no longer publishes anything; it declares
+    # the port the service listens on so Litepod reserves 8123 on the host and
+    # can spot a conflict with another app.
     expose:
       - "8123"
-    # Uncomment to publish Home Assistant directly on the host instead of only exposing it to the Compose network.
-    # ports:
-    #   - "${HOMEASSISTANT_PORT}:8123"
     environment:
       TZ: ${HOMEASSISTANT_TZ}
     volumes:

@@ -1,5 +1,6 @@
-import { getTemplate, templatesUsingDomainMarkers } from '$lib/server/catalog';
+import { getTemplate, templatesUsingDomainMarkers, templatesUsingHostNetwork } from '$lib/server/catalog';
 import { supportsDomainMarkers } from '$lib/server/domain-markers';
+import { supportsHostNetwork } from '$lib/server/host-network';
 import { fail, ok } from '$lib/server/response';
 import { templateDetailSchema } from '$lib/server/schemas';
 import { register } from '$lib/server/openapi-registry';
@@ -27,9 +28,9 @@ register({
 			name: 'features',
 			in: 'query',
 			required: false,
-			description: 'Client capabilities. Without `domain-markers`, templates whose env uses `{{url}}`/`{{domain}}` markers return 404.',
+			description: 'Client capabilities, comma-separated. Without `domain-markers`, templates whose env uses `{{url}}`/`{{domain}}` markers return 404; without `host-network`, templates whose Compose runs a service with `network_mode: host` do too.',
 			schema: { type: 'string' },
-			example: 'domain-markers',
+			example: 'domain-markers,host-network',
 		},
 	],
 	responses: {
@@ -49,9 +50,14 @@ function encode(file: TemplateFile) {
 export const GET: RequestHandler = async ({ params, url }) => {
 	const template = await getTemplate(params.id);
 	if (!template) return fail(404, `Template "${params.id}" not found`);
-	// Older LitePod installs would pass `{{url}}` to the container literally.
-	if (!supportsDomainMarkers(url) && (await templatesUsingDomainMarkers()).has(template.id)) {
-		return fail(404, `Template "${params.id}" not found`);
+	// Older LitePod installs would pass `{{url}}` to the container literally,
+	// and they attach a host-networked service to a proxy network Compose
+	// rejects. Hide each kind from the installs that cannot handle it.
+	const hidden =
+		(!supportsDomainMarkers(url) && (await templatesUsingDomainMarkers()).has(template.id)) ||
+		(!supportsHostNetwork(url) && (await templatesUsingHostNetwork()).has(template.id));
+	if (hidden) {
+		return fail(404, `Template "${template.id}" not found`);
 	}
 
 	return ok({

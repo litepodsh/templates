@@ -7,6 +7,7 @@ import { parse as parseYaml } from 'yaml';
 import { sanitizeMarkdown } from '$lib/server/markdown';
 import { uiBaseUrl } from '$lib/server/config';
 import { envUsesDomainMarkers, validateDomainMarkers } from '$lib/server/domain-markers';
+import { validateHostNetwork } from '$lib/server/host-network';
 import type { TemplateDetail, TemplateSummary } from '$lib/types';
 
 export type { TemplateDetail, TemplateSummary } from '$lib/types';
@@ -47,6 +48,8 @@ const manifestSchema = z.object({
 		license: z.string().optional(),
 		requires_https: z.boolean().default(false),
 		url_persisted: z.boolean().default(false),
+		/** `host` puts the app's service in the host network namespace (LAN discovery). */
+		network: z.enum(['bridge', 'host']).default('bridge'),
 	}),
 	files: z
 		.object({
@@ -77,6 +80,8 @@ type LoadedTemplate = {
 	setupFilename: string | null;
 	/** The `.env` uses `{{url}}`-style domain markers; see the feature gate in the API routes. */
 	usesDomainMarkers: boolean;
+	/** The template needs a Compose service in the host netns; see the feature gate in the API routes. */
+	usesHostNetwork: boolean;
 };
 
 type ComposeService = {
@@ -210,6 +215,11 @@ async function loadTemplate(dir: string, id: string): Promise<LoadedTemplate | n
 		console.error(`[templates] ${id} has invalid domain markers — skipping:\n  ${markerErrors.join('\n  ')}`);
 		return null;
 	}
+	const hostNetworkErrors = validateHostNetwork(manifest.template.network, manifest.ports, compose);
+	if (hostNetworkErrors.length > 0) {
+		console.error(`[templates] ${id} has invalid host networking — skipping:\n  ${hostNetworkErrors.join('\n  ')}`);
+		return null;
+	}
 
 	return {
 		dir,
@@ -217,6 +227,7 @@ async function loadTemplate(dir: string, id: string): Promise<LoadedTemplate | n
 		iconFilename,
 		setupFilename,
 		usesDomainMarkers: envUsesDomainMarkers(env),
+		usesHostNetwork: manifest.template.network === 'host',
 		summary: {
 			id,
 			name: manifest.template.name,
@@ -382,6 +393,13 @@ async function find(id: string): Promise<LoadedTemplate | null> {
 export async function templatesUsingDomainMarkers(): Promise<Set<string>> {
 	return new Set(
 		[...(await catalog()).values()].filter((template) => template.usesDomainMarkers).map((template) => template.summary.id),
+	);
+}
+
+/** Ids of templates whose Compose runs a service in the host network namespace (see the feature gate in the API routes). */
+export async function templatesUsingHostNetwork(): Promise<Set<string>> {
+	return new Set(
+		[...(await catalog()).values()].filter((template) => template.usesHostNetwork).map((template) => template.summary.id),
 	);
 }
 

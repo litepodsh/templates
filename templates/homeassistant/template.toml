@@ -11,6 +11,10 @@ website     = "https://www.home-assistant.io"
 docs        = "https://www.home-assistant.io/installation/linux#docker-compose"
 source      = "https://github.com/home-assistant/core"
 license     = "Apache-2.0"
+# The service runs in the host network namespace so LAN discovery (mDNS,
+# Matter, HomeKit, SSDP) works. LitePod honours this only on versions that
+# advertise the `host-network` catalog feature.
+network     = "host"
 
 [files]
 setup = "setup.md"

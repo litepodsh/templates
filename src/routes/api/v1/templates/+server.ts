@@ -1,5 +1,6 @@
-import { listTemplates, templatesUsingDomainMarkers } from '$lib/server/catalog';
+import { listTemplates, templatesUsingDomainMarkers, templatesUsingHostNetwork } from '$lib/server/catalog';
 import { supportsDomainMarkers } from '$lib/server/domain-markers';
+import { supportsHostNetwork } from '$lib/server/host-network';
 import {
 	clientAddress,
 	consumeSearchRateLimit,
@@ -59,9 +60,9 @@ register({
 			name: 'features',
 			in: 'query',
 			required: false,
-			description: 'Client capabilities. `domain-markers` includes templates whose env uses `{{url}}`/`{{domain}}` markers; without it they are omitted.',
+			description: 'Client capabilities, comma-separated. `domain-markers` includes templates whose env uses `{{url}}`/`{{domain}}` markers; `host-network` includes templates whose Compose runs a service with `network_mode: host` (LAN discovery). Without a capability its templates are omitted.',
 			schema: { type: 'string' },
-			example: 'domain-markers',
+			example: 'domain-markers,host-network',
 		},
 	],
 	responses: {
@@ -103,8 +104,16 @@ export const GET: RequestHandler = async ({ url, ...event }) => {
 		}
 	}
 
-	// Older LitePod installs would pass `{{url}}` to the container literally.
-	const hidden = supportsDomainMarkers(url) ? new Set<string>() : await templatesUsingDomainMarkers();
+	// Older LitePod installs would pass `{{url}}` to the container literally,
+	// and they attach a host-networked service to a proxy network Compose
+	// rejects. Hide each kind from the installs that cannot handle it.
+	const hidden = new Set<string>();
+	if (!supportsDomainMarkers(url)) {
+		for (const id of await templatesUsingDomainMarkers()) hidden.add(id);
+	}
+	if (!supportsHostNetwork(url)) {
+		for (const id of await templatesUsingHostNetwork()) hidden.add(id);
+	}
 	const visible = (templates: TemplateSummary[]) => templates.filter((template) => !hidden.has(template.id));
 
 	if (!query && categories.length === 0 && archs.length === 0) return ok(visible(await listTemplates()));
