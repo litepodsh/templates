@@ -19,7 +19,6 @@ services:
       OCIS_LOG_COLOR: "false"
       PROXY_TLS: "false"
       IDM_ADMIN_PASSWORD: ${OCIS_ADMIN_PASSWORD}
-      OCIS_INSECURE: ${OCIS_INSECURE}
     volumes:
       - ocis_config:/etc/ocis
       - ocis_data:/var/lib/ocis
