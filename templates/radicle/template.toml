@@ -1,0 +1,27 @@
+[template]
+id          = "radicle"
+name        = "Radicle Seed Node"
+description = "Peer-to-peer code forge seed node: replicates Git repositories over the Radicle network and serves them over HTTP."
+version     = "1.10.2"
+categories  = ["developer-tools", "collaboration"]
+tags        = ["git", "forge", "code-hosting", "p2p", "decentralized", "seed-node", "radicle"]
+platforms   = ["linux/amd64", "linux/arm64"]
+icon        = "https://github.com/radicle-dev.png"
+website     = "https://radicle.dev"
+docs        = "https://radicle.dev/guides/seeder"
+source      = "https://github.com/radicle-dev/heartwood"
+license     = "MIT OR Apache-2.0"
+
+[files]
+setup = "setup.md"
+
+[[ports]]
+container   = 8080
+service     = "httpd"
+description = "HTTP API and Git clone over HTTP"
+primary     = true
+
+[[ports]]
+container   = 8776
+service     = "node"
+description = "Radicle peer-to-peer protocol"
