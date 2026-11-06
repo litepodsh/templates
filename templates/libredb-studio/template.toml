@@ -1,0 +1,21 @@
+[template]
+id          = "libredb-studio"
+name        = "LibreDB Studio"
+description = "Self-hosted database IDE for 40+ engines — PostgreSQL, MySQL, MongoDB, Redis, SQLite, ClickHouse and more — with ER diagrams, schema diff, SSO and an AI query agent."
+version     = "1.2.0"
+categories  = ["database", "developer-tools"]
+tags        = ["sql", "database", "ide", "postgresql", "mysql", "mongodb", "redis", "clickhouse", "admin"]
+platforms   = ["linux/amd64", "linux/arm64"]
+icon        = "logo.svg"
+website     = "https://libredb.org"
+docs        = "https://github.com/libredb/libredb-studio/tree/main/docs"
+source      = "https://github.com/libredb/libredb-studio"
+license     = "MIT"
+
+[files]
+setup = "setup.md"
+
+[[ports]]
+container   = 3000
+description = "Web UI"
+primary     = true

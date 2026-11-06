@@ -1,0 +1,42 @@
+services:
+  libredb-studio:
+    image: ghcr.io/libredb/libredb-studio:1.2.0
+    restart: unless-stopped
+    expose:
+      - "3000"
+    environment:
+      # Admin account, seeded into the store on first boot (STORAGE_PROVIDER
+      # sqlite/postgres). Later sign-ins read the accounts table; change the
+      # password in Admin -> Accounts, not here.
+      ADMIN_EMAIL: ${LIBREDB_ADMIN_EMAIL}
+      ADMIN_PASSWORD: ${LIBREDB_ADMIN_PASSWORD}
+      # Session signing secret, 32+ chars. Also derives the key that encrypts
+      # stored connection credentials when server-side storage is on.
+      JWT_SECRET: ${LIBREDB_JWT_SECRET}
+      # false keeps cookies working when Studio is reached over plain HTTP on a
+      # non-loopback host. Set true once the app is served over HTTPS.
+      AUTH_COOKIE_SECURE: ${LIBREDB_AUTH_COOKIE_SECURE}
+      NEXT_PUBLIC_AUTH_PROVIDER: ${LIBREDB_AUTH_PROVIDER}
+      # sqlite keeps connections, saved queries and audit trail on the volume;
+      # "local" would keep them in each browser's localStorage instead.
+      STORAGE_PROVIDER: ${LIBREDB_STORAGE_PROVIDER}
+      STORAGE_SQLITE_PATH: ${LIBREDB_STORAGE_SQLITE_PATH}
+      # Optional AI agent, off by default: it turns on by itself once a model is
+      # configured — uncomment together with the LIBREDB_LLM_* block in .env.
+      # LLM_PROVIDER: ${LIBREDB_LLM_PROVIDER}
+      # LLM_API_KEY: ${LIBREDB_LLM_API_KEY}
+      # LLM_MODEL: ${LIBREDB_LLM_MODEL}
+      # LOCAL ONLY, e.g. an Ollama container on this network:
+      # LLM_API_URL: ${LIBREDB_LLM_API_URL}
+    volumes:
+      - libredb_data:/app/data
+    # The image is trixie-slim with no curl/wget, so the probe uses Node's fetch.
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://localhost:3000/api/db/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
+volumes:
+  libredb_data:
