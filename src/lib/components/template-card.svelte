@@ -14,8 +14,7 @@
 	const displayedVersion = $derived(formatVersion(template.appVersion ?? template.version));
 </script>
 
-<div class="rounded-[1.8125rem] bg-lp-deep p-2.5 ring-1 ring-foreground/10 transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] hover:-translate-y-0.5">
-<Card.Root class="group relative gap-4 transition-colors hover:bg-accent/30">
+<Card.Root class="group relative gap-4 transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] hover:-translate-y-0.5 hover:bg-accent/30">
 	<Card.Header class="gap-3">
 		<div class="flex items-start gap-3">
 			<div
@@ -72,8 +71,7 @@
 	<!-- Stretched link: the whole card is one click target, no nested interactives. -->
 	<a
 		href="/t/{template.id}"
-		class="absolute inset-0 rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+		class="absolute inset-0 rounded-[1.25rem] outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
 		aria-label="Open {template.name} template"
 	></a>
 </Card.Root>
-</div>

@@ -15,7 +15,7 @@
 	bind:this={ref}
 	data-slot="card"
 	data-size={size}
-	class={cn("gap-(--card-spacing) overflow-hidden rounded-[1.25rem] bg-card py-(--card-spacing) text-sm text-card-foreground shadow-[0_20px_40px_-28px_rgb(26_37_32_/_42%)] ring-1 ring-foreground/8 [--card-spacing:--spacing(5)] has-[>img:first-child]:pt-0 data-[size=sm]:[--card-spacing:--spacing(4)] dark:ring-foreground/10 *:[img:first-child]:rounded-t-[1.25rem] *:[img:last-child]:rounded-b-[1.25rem] group/card flex flex-col", className)}
+	class={cn("gap-(--card-spacing) overflow-hidden rounded-[1.25rem] bg-card py-(--card-spacing) text-sm text-card-foreground shadow-[0_20px_40px_-28px_color-mix(in_oklch,var(--lp-shadow)_42%,transparent)] ring-1 ring-foreground/8 [--card-spacing:--spacing(5)] has-[>img:first-child]:pt-0 data-[size=sm]:[--card-spacing:--spacing(4)] dark:ring-foreground/10 *:[img:first-child]:rounded-t-[1.25rem] *:[img:last-child]:rounded-b-[1.25rem] group/card flex flex-col", className)}
 	{...restProps}
 >
 	{@render children?.()}

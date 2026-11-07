@@ -1,10 +1,10 @@
 <script lang="ts">
 	import './layout.css';
 	import favicon from '$lib/assets/favicon.svg';
-	import BoxesIcon from '@lucide/svelte/icons/boxes';
 	import FileJsonIcon from '@lucide/svelte/icons/file-json';
 	import GitPullRequestIcon from '@lucide/svelte/icons/git-pull-request';
 	import ThemeToggle from '$lib/components/theme-toggle.svelte';
+	import LitepodMark from '$lib/components/litepod-mark.svelte';
 	import { browser } from '$app/env';
 	import { onNavigate } from '$app/navigation';
 	import { ModeWatcher } from 'mode-watcher';
@@ -32,8 +32,8 @@
 		<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 		<link rel="manifest" href="/manifest.webmanifest" />
 		<link rel="sitemap" type="application/xml" href="/sitemap.xml" />
-		<meta name="theme-color" content="#f4f0e9" media="(prefers-color-scheme: light)" />
-		<meta name="theme-color" content="#1a2520" media="(prefers-color-scheme: dark)" />
+		<meta name="theme-color" content="#fafafa" media="(prefers-color-scheme: light)" />
+		<meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)" />
 		<meta name="application-name" content="LitePod Templates" />
 		<meta name="author" content="LitePod" />
 		<meta name="format-detection" content="telephone=no" />
@@ -57,16 +57,11 @@
 {/if}
 
 <div class="relative min-h-svh overflow-hidden bg-background text-foreground">
-	<div class="litepod-ambient" aria-hidden="true">
-		<div class="litepod-orb litepod-orb--one"></div>
-		<div class="litepod-orb litepod-orb--two"></div>
-	</div>
-
 	<div class="relative z-10">
 		<header class="mx-auto w-full max-w-7xl px-4 pt-4 sm:px-6 sm:pt-6">
-			<div class="flex min-h-14 items-center justify-between gap-4 rounded-full bg-lp-surface/90 px-3 shadow-[0_18px_45px_-32px_rgb(26_37_32_/_45%)] ring-1 ring-foreground/10 backdrop-blur-md sm:px-4">
+			<div class="lp-raised flex min-h-14 items-center justify-between gap-4 rounded-full bg-lp-surface/90 px-3 ring-1 ring-foreground/10 backdrop-blur-md sm:px-4">
 				<a href="/" class="flex items-center gap-2 font-semibold tracking-tight">
-					<BoxesIcon class="size-5" />
+					<LitepodMark class="size-5" />
 					Templates
 				</a>
 				<div class="flex items-center gap-1">
@@ -82,7 +77,7 @@
 						rel="noreferrer"
 					>
 						<GitPullRequestIcon class="size-4" />
-						Contribuir
+						Contribute
 					</Button>
 					<span
 						class="font-mono text-xs text-muted-foreground"

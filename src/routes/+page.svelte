@@ -140,7 +140,6 @@
 		{@const visible = results ?? templates}
 
 		<div class="max-w-2xl flex flex-col gap-2">
-			<p class="font-mono text-[0.6875rem] font-medium uppercase tracking-[0.16em] text-[#a9381e] dark:text-primary">Litepod catalog</p>
 			<h1 class="text-3xl font-medium tracking-[-0.055em] sm:text-4xl">Self-hosted app templates</h1>
 			<p class="max-w-[65ch] text-sm leading-relaxed text-muted-foreground">
 				{templates.length}

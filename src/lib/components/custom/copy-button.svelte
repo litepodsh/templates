@@ -102,7 +102,7 @@
 		/>
 		<CheckIcon
 			class={cn(
-				'absolute size-full text-emerald-500 transition-all duration-200 ease-out',
+				'absolute size-full text-success transition-all duration-200 ease-out',
 				copied ? 'scale-100 opacity-100' : 'scale-50 opacity-0',
 			)}
 			aria-hidden="true"
