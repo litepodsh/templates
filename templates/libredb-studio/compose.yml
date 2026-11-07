@@ -31,8 +31,13 @@ services:
     volumes:
       - libredb_data:/app/data
     # The image is trixie-slim with no curl/wget, so the probe uses Node's fetch.
+    # Use the CMD-SHELL form, not the CMD array form: podman-compose < 1.4 mangles
+    # array-form CMD tests into a broken shell command whenever the command contains
+    # quotes or shell metacharacters (the =>, () and ' in this probe). The mangled
+    # command fails every run, so the container never reports healthy and LitePod
+    # times out the deploy. CMD-SHELL is passed through verbatim.
     healthcheck:
-      test: ["CMD", "node", "-e", "fetch('http://localhost:3000/api/db/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      test: ["CMD-SHELL", "node -e \"fetch('http://localhost:3000/api/db/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))\""]
       interval: 30s
       timeout: 5s
       retries: 3
