@@ -16,6 +16,18 @@ by reading the existing templates.
   implicit registry fallback.
 - Every tunable goes in `.env` and is referenced as `${VAR}` in the compose
   file. Hard-coded values belong in `.env` defaults, not in `compose.yml`.
+- Never name a service `api`, `app`, `buildkit`, `caddy`, `dragonfly` or
+  `libsql`. LitePod's own containers use those names on the shared network and
+  it refuses the template. Prefix them with the app: `kodus-api`, `nextcloud`.
+  `tests/catalog-reserved-services.test.ts` enforces this; keep its list in sync
+  with `RESERVED_SERVICE_NAMES` in LitePod.
+- LitePod passes the environment through its own env file, not a `.env` next to
+  the compose. Upstream `env_file: .env` therefore gives containers nothing:
+  list the variables under `environment:`. When several services share them,
+  put them once in an `x-<id>-env` anchor and use `environment: *anchor`
+  (no `<<:` merge keys; see `chatwoot`, `kodus`).
+- `image:` tags are literal. LitePod pre-pulls them without `.env`
+  interpolation.
 
 ## `.env` markers
 
