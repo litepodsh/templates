@@ -87,6 +87,18 @@ Templates target **Podman**, so:
 - prefer named volumes over bind mounts so they work rootless
 - put every tunable in `.env` and reference it as `${VAR}` in the compose file
 
+LitePod adds a few rules of its own:
+
+- **Reserved service names.** `api`, `app`, `buildkit`, `caddy`, `dragonfly` and `libsql` are
+  taken by LitePod's containers on the shared network, and a template that uses one fails to
+  create. Prefix the name with the app (`kodus-api`, `nextcloud`).
+  `tests/catalog-reserved-services.test.ts` checks every template.
+- **No `env_file: .env`.** LitePod hands Compose its own env file, so containers only see what
+  `environment:` lists. Several services that share variables can use one `x-<id>-env` anchor
+  with `environment: *anchor`. Avoid `<<:` merge keys.
+- **Literal image tags.** `image:` is pre-pulled without `.env` interpolation, so write the tag
+  in the compose file, not as `${VAR}`.
+
 Verify a template actually runs before committing it:
 
 ```sh
