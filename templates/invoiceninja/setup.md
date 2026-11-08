@@ -1,6 +1,6 @@
 # Invoice Ninja
 
-Four services: `app` (PHP-FPM), `nginx` (web front-end), `db` (MySQL), and a
+Four services: `invoiceninja` (PHP-FPM), `nginx` (web front-end), `db` (MySQL), and a
 one-shot `nginx-config` that seeds the vhost into the `invoiceninja_nginx`
 volume. Cache, sessions and the job queue use the filesystem / database — no
 Redis.
@@ -19,9 +19,9 @@ Copy the whole output (`base64:....`) into `INVOICENINJA_APP_KEY` in `.env`.
 
 ## 2. First start
 
-The `app` container runs migrations and creates the admin account from
+The `invoiceninja` container runs migrations and creates the admin account from
 `INVOICENINJA_ADMIN_EMAIL` / `INVOICENINJA_ADMIN_PASSWORD` on the first boot with
-an empty database. This can take a minute; watch `podman logs -f invoiceninja_app_1`.
+an empty database. This can take a minute; watch the `invoiceninja` service logs.
 
 ## 3. Log in
 

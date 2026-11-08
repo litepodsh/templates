@@ -2,7 +2,7 @@
 # vhost is seeded into a named volume on first start (no bind mounts); edit it in
 # the `invoiceninja_nginx` volume afterwards if needed.
 services:
-  app:
+  invoiceninja:
     image: docker.io/invoiceninja/invoiceninja-debian:latest
     restart: unless-stopped
     environment:
@@ -69,7 +69,7 @@ services:
             error_page 404 /index.php;
 
             location ~ \.php$$ {
-                fastcgi_pass app:9000;
+                fastcgi_pass invoiceninja:9000;
                 fastcgi_param SCRIPT_FILENAME $$realpath_root$$fastcgi_script_name;
                 include fastcgi_params;
             }
@@ -106,7 +106,7 @@ services:
     depends_on:
       nginx-config:
         condition: service_completed_successfully
-      app:
+      invoiceninja:
         condition: service_started
 
   db:

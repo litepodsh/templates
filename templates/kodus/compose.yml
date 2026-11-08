@@ -5,7 +5,7 @@
 #
 # Left out: kodus-mcp-manager (MCP plugins, off via API_MCP_SERVER_ENABLED=false) and
 # worker-analytics (Enterprise cockpit). The API has no public port: the web app reaches
-# it server-side at api:3001 and proxies browser calls through /api/proxy.
+# it server-side at kodus-api:3001 and proxies browser calls through /api/proxy.
 x-kodus-env: &kodus-env
   ENV: production
   NODE_ENV: production
@@ -20,7 +20,7 @@ x-kodus-env: &kodus-env
   KODUS_TELEMETRY_DISABLED: ${KODUS_TELEMETRY_DISABLED}
 
   # Server
-  GLOBAL_API_CONTAINER_NAME: api
+  GLOBAL_API_CONTAINER_NAME: kodus-api
   API_HOST: 0.0.0.0
   API_PORT: "3001"
   API_WEBHOOKS_PORT: "3332"
@@ -119,7 +119,7 @@ x-kodus-env: &kodus-env
 
   # Web frontend
   WEB_NODE_ENV: self-hosted
-  WEB_HOSTNAME_API: api
+  WEB_HOSTNAME_API: kodus-api
   WEB_PORT_API: "3001"
   WEB_PORT: "3000"
   WEB_SUPPORT_DOCS_URL: https://docs.kodus.io
@@ -138,7 +138,7 @@ services:
     expose:
       - "3000"
     depends_on:
-      api:
+      kodus-api:
         condition: service_healthy
     healthcheck:
       test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/api/health',{redirect:'manual'}).then(r=>process.exit(r.ok?0:1),()=>process.exit(1))"]
@@ -147,7 +147,8 @@ services:
       retries: 5
       start_period: 60s
 
-  api:
+  # Not `api`: LitePod reserves that service name on its shared network.
+  kodus-api:
     image: ghcr.io/kodustech/kodus-ai-api:2.2.9
     restart: unless-stopped
     environment: *kodus-env
@@ -181,7 +182,7 @@ services:
     entrypoint: ["env", "WORKER_ROLE=code-review", "/usr/local/bin/prod-entrypoint"]
     command: ["node", "dist/apps/worker/main.js"]
     depends_on:
-      api:
+      kodus-api:
         condition: service_healthy
     healthcheck:
       # The worker's probe checks its RabbitMQ channels.
@@ -198,7 +199,7 @@ services:
     expose:
       - "3332"
     depends_on:
-      api:
+      kodus-api:
         condition: service_healthy
     healthcheck:
       test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3332/health').then(r=>process.exit(r.ok?0:1),()=>process.exit(1))"]

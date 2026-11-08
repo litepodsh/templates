@@ -1,9 +1,9 @@
 # Nextcloud official image (Apache variant) with PostgreSQL and Redis. Based on
 # the upstream docker-compose example, adapted to named volumes and
-# fully-qualified images. `app` and `cron` share nextcloud_html so both see the
+# fully-qualified images. `nextcloud` and `cron` share nextcloud_html so both see the
 # same install, config and data.
 services:
-  app:
+  nextcloud:
     image: docker.io/library/nextcloud:latest
     restart: unless-stopped
     depends_on:
