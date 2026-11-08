@@ -1,0 +1,31 @@
+[template]
+id             = "kodus"
+name           = "Kodus"
+description    = "Open-source AI code review for pull requests on GitHub, GitLab, Bitbucket, Azure DevOps and Forgejo. Bring your own LLM."
+version        = "2.2.9"
+categories     = ["developer-tools", "ai"]
+tags           = ["code-review", "pull-requests", "llm", "github", "gitlab", "bitbucket", "azure-devops", "forgejo", "webhooks"]
+platforms      = ["linux/amd64", "linux/arm64"]
+icon           = "https://github.com/kodustech.png"
+website        = "https://kodus.io"
+docs           = "https://docs.kodus.io"
+source         = "https://github.com/kodustech/kodus-ai"
+license        = "AGPL-3.0"
+requires_https = true
+# Kodus registers each repository's webhook on the Git provider with the URL it has
+# when you connect the provider. Changing the domain later doesn't move those webhooks.
+url_persisted  = true
+
+[files]
+setup = "setup.md"
+
+[[ports]]
+container   = 3000
+service     = "kodus-web"
+description = "Web app"
+primary     = true
+
+[[ports]]
+container   = 3332
+service     = "webhooks"
+description = "Git provider webhooks"

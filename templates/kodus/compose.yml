@@ -1,0 +1,279 @@
+# Trimmed from kodus-installer's docker-compose.yml. Upstream feeds every container the
+# whole .env through `env_file`; LitePod passes its own env file, so the shared env is
+# spelled out once in the `x-kodus-env` anchor. Image tags are literal (LitePod pre-pulls
+# `image:` without .env interpolation) and services avoid `<<:` merge keys.
+#
+# Left out: kodus-mcp-manager (MCP plugins, off via API_MCP_SERVER_ENABLED=false) and
+# worker-analytics (Enterprise cockpit). The API has no public port: the web app reaches
+# it server-side at api:3001 and proxies browser calls through /api/proxy.
+x-kodus-env: &kodus-env
+  ENV: production
+  NODE_ENV: production
+  API_NODE_ENV: production
+  API_CLOUD_MODE: "false"
+  API_DATABASE_ENV: development
+  API_DATABASE_DISABLE_SSL: "true"
+  API_LOG_LEVEL: ${KODUS_LOG_LEVEL}
+  API_LOG_PRETTY: "false"
+  BETA_FEATURES: ${KODUS_BETA_FEATURES}
+  OBSERVABILITY_MONGO_ENABLED: "false"
+  KODUS_TELEMETRY_DISABLED: ${KODUS_TELEMETRY_DISABLED}
+
+  # Server
+  GLOBAL_API_CONTAINER_NAME: api
+  API_HOST: 0.0.0.0
+  API_PORT: "3001"
+  API_WEBHOOKS_PORT: "3332"
+  API_RATE_MAX_REQUEST: "100"
+  API_RATE_INTERVAL: "1000"
+  API_FRONTEND_URL: ${KODUS_URL}
+  API_USER_INVITE_BASE_URL: ${KODUS_URL}
+  API_DOCS_ENABLED: "false"
+  API_DOCTOR_ENABLED: "true"
+  API_DOCTOR_PORT: "3335"
+
+  # Postgres
+  API_PG_DB_HOST: db_kodus_postgres
+  API_PG_DB_PORT: "5432"
+  API_PG_DB_USERNAME: ${KODUS_PG_USER}
+  API_PG_DB_PASSWORD: ${KODUS_PG_PASSWORD}
+  API_PG_DB_DATABASE: ${KODUS_PG_DATABASE}
+
+  # MongoDB
+  API_MG_DB_HOST: db_kodus_mongodb
+  API_MG_DB_PORT: "27017"
+  API_MG_DB_USERNAME: ${KODUS_MONGO_USER}
+  API_MG_DB_PASSWORD: ${KODUS_MONGO_PASSWORD}
+  API_MG_DB_DATABASE: ${KODUS_MONGO_DATABASE}
+  API_MG_DB_AUTH_SOURCE: ""
+  API_MG_DB_PRODUCTION_CONFIG: ""
+
+  # RabbitMQ (the kodus-ai vhost is created by the broker image on boot)
+  API_RABBITMQ_ENABLED: "true"
+  API_RABBITMQ_WAIT: "true"
+  API_RABBITMQ_URI: amqp://${KODUS_RABBITMQ_USER}:${KODUS_RABBITMQ_PASSWORD}@rabbitmq:5672/kodus-ai
+
+  # Auth and encryption
+  API_JWT_SECRET: ${KODUS_JWT_SECRET}
+  API_JWT_REFRESH_SECRET: ${KODUS_JWT_REFRESH_SECRET}
+  API_JWT_EXPIRES_IN: 365d
+  API_JWT_REFRESH_EXPIRES_IN: 7d
+  API_CRYPTO_KEY: ${KODUS_CRYPTO_KEY}
+  NEXTAUTH_URL: ${KODUS_URL}
+  NEXTAUTH_SECRET: ${KODUS_NEXTAUTH_SECRET}
+  WEB_NEXTAUTH_SECRET: ${KODUS_NEXTAUTH_SECRET}
+
+  # LLM
+  API_OPEN_AI_API_KEY: ${OPENAI_API_KEY}
+  API_OPENAI_FORCE_BASE_URL: ${OPENAI_BASE_URL}
+  API_LLM_PROVIDER_MODEL: ${KODUS_LLM_MODEL}
+  API_LLM_TEMPERATURE_OVERRIDE: ${KODUS_LLM_TEMPERATURE_OVERRIDE}
+  API_AGENT_REVIEW_ENABLED: "true"
+  SANDBOX_PROVIDER: local
+
+  # Git providers: one webhook URL each, so any provider can be connected from the UI.
+  API_GITHUB_CODE_MANAGEMENT_WEBHOOK: ${KODUS_WEBHOOKS_URL}/github/webhook
+  API_GITLAB_CODE_MANAGEMENT_WEBHOOK: ${KODUS_WEBHOOKS_URL}/gitlab/webhook
+  GLOBAL_BITBUCKET_CODE_MANAGEMENT_WEBHOOK: ${KODUS_WEBHOOKS_URL}/bitbucket/webhook
+  GLOBAL_AZURE_REPOS_CODE_MANAGEMENT_WEBHOOK: ${KODUS_WEBHOOKS_URL}/azure-repos/webhook
+  API_FORGEJO_CODE_MANAGEMENT_WEBHOOK: ${KODUS_WEBHOOKS_URL}/forgejo/webhook
+  CODE_MANAGEMENT_SECRET: ${KODUS_CODE_MANAGEMENT_SECRET}
+  CODE_MANAGEMENT_WEBHOOK_TOKEN: ${KODUS_WEBHOOK_TOKEN}
+
+  # Email (invites and reports)
+  API_NOTIFICATION_EMAIL_PROVIDER: ${KODUS_EMAIL_PROVIDER}
+  RESEND_API_KEY: ${RESEND_API_KEY}
+  API_SMTP_HOST: ${SMTP_HOST}
+  API_SMTP_PORT: ${SMTP_PORT}
+  API_SMTP_SECURE: ${SMTP_SECURE}
+  API_SMTP_USER: ${SMTP_USER}
+  API_SMTP_PASS: ${SMTP_PASSWORD}
+  API_SMTP_FROM: ${SMTP_FROM}
+
+  # Cron schedules (UTC) and queue tuning, as in upstream's .env. Some crons have no
+  # default in code and the API crashes on boot without them.
+  API_CRON_SYNC_CODE_REVIEW_REACTIONS: "0 0 * * *"
+  API_CRON_KODY_LEARNING: "0 0 * * 6"
+  API_CRON_CHECK_IF_PR_SHOULD_BE_APPROVED: "*/2 * * * *"
+  API_CRON_ORG_REPORT: "0 9 1 * *"
+  API_CRON_REPO_REPORT: "0 9 1,16 * *"
+  API_CRON_KODY_RULES_AUTO_PAUSE: "0 6 * * *"
+  API_CRON_KODY_RULES_AUTO_PAUSE_DIGEST: "0 9 * * 1"
+  API_CRON_SPEND_LIMIT_ALERT: "0 * * * *"
+  API_CRON_CLASSIFY_ORPHANED_SESSIONS: "0 */15 * * * *"
+  API_CRON_STALE_REVIEW_WATCHDOG: "*/30 * * * *"
+  API_CRON_PRUNE_LICENSE_SEATS: "0 4 * * *"
+  WORKFLOW_STALE_JOB_REAPER_CRON: "0 */10 * * * *"
+  WORKFLOW_STALE_JOB_TIMEOUT_MINUTES: "180"
+  WORKFLOW_QUEUE_WORKER_PREFETCH: "20"
+  WORKFLOW_QUEUE_PUBLISHER_PREFETCH: "5"
+  WORKFLOW_QUEUE_WEBHOOK_PREFETCH: "20"
+  WORKFLOW_QUEUE_CODE_REVIEW_PREFETCH: "20"
+  WORKFLOW_QUEUE_WEBHOOK_PROCESS_TIMEOUT_MS: "600000"
+  WORKFLOW_QUEUE_CODE_REVIEW_PROCESS_TIMEOUT_MS: "7200000"
+  WORKFLOW_OUTBOX_MAX_ATTEMPTS: "10"
+  API_WORKER_DRAIN_TIMEOUT_MS: "600000"
+
+  # MCP plugins need kodus-mcp-manager, which this template doesn't run.
+  API_MCP_SERVER_ENABLED: "false"
+
+  # Web frontend
+  WEB_NODE_ENV: self-hosted
+  WEB_HOSTNAME_API: api
+  WEB_PORT_API: "3001"
+  WEB_PORT: "3000"
+  WEB_SUPPORT_DOCS_URL: https://docs.kodus.io
+  WEB_SUPPORT_DISCORD_INVITE_URL: https://discord.gg/QFzwwmNmdN
+  WEB_TOKEN_DOCS_GITHUB: https://docs.kodus.io/how_to_use/en/code_review/general_config/github_pat
+  WEB_TOKEN_DOCS_GITLAB: https://docs.kodus.io/how_to_use/en/code_review/general_config/gitlab_pat
+  WEB_TOKEN_DOCS_BITBUCKET: https://docs.kodus.io/how_to_use/en/code_review/general_config/bitbucket_pat
+  WEB_TOKEN_DOCS_AZUREREPOS: https://docs.kodus.io/how_to_use/en/code_review/general_config/azure_devops_pat
+  WEB_RULE_FILES_DOCS: https://docs.kodus.io/how_to_use/en/code_review/configs/rules_file_detection
+
+services:
+  kodus-web:
+    image: ghcr.io/kodustech/kodus-ai-web:2.2.9
+    restart: unless-stopped
+    environment: *kodus-env
+    expose:
+      - "3000"
+    depends_on:
+      api:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/api/health',{redirect:'manual'}).then(r=>process.exit(r.ok?0:1),()=>process.exit(1))"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+  api:
+    image: ghcr.io/kodustech/kodus-ai-api:2.2.9
+    restart: unless-stopped
+    environment: *kodus-env
+    # Only the API migrates and seeds (prod-entrypoint defaults both to false). Upstream
+    # notes that concurrent migrations from worker/webhooks race and crash-loop first boot.
+    # Setting `entrypoint` drops the image's CMD, so `command` repeats it.
+    entrypoint: ["env", "RUN_MIGRATIONS=true", "RUN_SEEDS=true", "/usr/local/bin/prod-entrypoint"]
+    command: ["node", "dist/apps/api/main.js"]
+    expose:
+      - "3001"
+    depends_on:
+      db_kodus_postgres:
+        condition: service_healthy
+      db_kodus_mongodb:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3001/health').then(r=>process.exit(r.ok?0:1),()=>process.exit(1))"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 300s
+
+  worker:
+    image: ghcr.io/kodustech/kodus-ai-worker:2.2.9
+    restart: unless-stopped
+    environment: *kodus-env
+    # The worker refuses to boot without WORKER_ROLE, and it creates the workflow queues
+    # the API and webhooks bind to.
+    entrypoint: ["env", "WORKER_ROLE=code-review", "/usr/local/bin/prod-entrypoint"]
+    command: ["node", "dist/apps/worker/main.js"]
+    depends_on:
+      api:
+        condition: service_healthy
+    healthcheck:
+      # The worker's probe checks its RabbitMQ channels.
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3334/health').then(r=>process.exit(r.ok?0:1),()=>process.exit(1))"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+  webhooks:
+    image: ghcr.io/kodustech/kodus-ai-webhook:2.2.9
+    restart: unless-stopped
+    environment: *kodus-env
+    expose:
+      - "3332"
+    depends_on:
+      api:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3332/health').then(r=>process.exit(r.ok?0:1),()=>process.exit(1))"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+  rabbitmq:
+    # Kodus' broker image: bundles the delayed-message plugin and creates the kodus-ai
+    # and kodus-ast vhosts from init-definitions.sh.
+    image: ghcr.io/kodustech/kodus-rabbitmq:4.2.2-kodus.1
+    restart: unless-stopped
+    # RabbitMQ names its data directory after the node's hostname, so keep it fixed.
+    hostname: rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: ${KODUS_RABBITMQ_USER}
+      RABBITMQ_DEFAULT_PASS: ${KODUS_RABBITMQ_PASSWORD}
+      RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS: -rabbit heartbeat 60
+    command: /usr/local/bin/init-definitions.sh
+    volumes:
+      - kodus_rabbitmq:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "check_running"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+  db_kodus_postgres:
+    image: docker.io/pgvector/pgvector:0.8.7-pg16
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${KODUS_PG_USER}
+      POSTGRES_PASSWORD: ${KODUS_PG_PASSWORD}
+      POSTGRES_DB: ${KODUS_PG_DATABASE}
+    # Upstream bind-mounts an init.sql; writing it here keeps the stack bind-mount free.
+    # initdb only runs it on an empty volume.
+    command:
+      - sh
+      - -c
+      - |
+        printf '%s\n' 'CREATE EXTENSION IF NOT EXISTS vector;' 'CREATE SCHEMA IF NOT EXISTS analytics;' > /docker-entrypoint-initdb.d/10-kodus.sql
+        exec docker-entrypoint.sh postgres
+    volumes:
+      - kodus_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      # -h 127.0.0.1 forces TCP, so the temporary socket-only server that runs initdb
+      # scripts isn't reported as ready.
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\""]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 30s
+
+  db_kodus_mongodb:
+    # Upstream pins 8.3.13, but no 8.3 release starts on Linux kernels 6.19+ (SERVER-121912)
+    # and its installer falls back to 8.2 there. A new install has no 8.3 data, so 8.2 runs
+    # on every host.
+    image: docker.io/library/mongo:8.2.12
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${KODUS_MONGO_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${KODUS_MONGO_PASSWORD}
+      MONGO_INITDB_DATABASE: ${KODUS_MONGO_DATABASE}
+    volumes:
+      - kodus_mongodata:/data/db
+    healthcheck:
+      test: ["CMD-SHELL", "mongosh --quiet --host 127.0.0.1 -u \"$${MONGO_INITDB_ROOT_USERNAME}\" -p \"$${MONGO_INITDB_ROOT_PASSWORD}\" --authenticationDatabase admin --eval 'db.runCommand({ ping: 1 }).ok' | grep -q 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
+
+volumes:
+  kodus_pgdata:
+  kodus_mongodata:
+  kodus_rabbitmq:
