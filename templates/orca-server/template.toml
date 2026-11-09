@@ -1,0 +1,21 @@
+[template]
+id          = "orca-server"
+name        = "Orca Server"
+description = "Headless Orca runtime: run parallel coding agents in isolated git worktrees on your server and drive them from the Orca desktop, web or mobile app."
+version     = "1.4.254"
+categories  = ["developer-tools", "ai"]
+tags        = ["ai", "agents", "coding-agents", "git-worktrees", "claude-code"]
+platforms   = ["linux/amd64", "linux/arm/v7", "linux/arm64"]
+icon        = "https://github.com/stablyai.png"
+website     = "https://www.onorca.dev"
+docs        = "https://github.com/stablyai/orca/blob/main/docs/reference/headless-linux-server.md"
+source      = "https://github.com/stablyai/orca"
+license     = "MIT"
+
+[files]
+setup = "setup.md"
+
+[[ports]]
+container   = 6768
+description = "Runtime WebSocket and web client"
+primary     = true
