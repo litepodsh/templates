@@ -2,7 +2,7 @@
 id          = "pr-agent"
 name        = "PR-Agent"
 description = "AI code reviewer that describes, reviews and suggests improvements on pull requests from GitHub, GitLab or Gitea webhooks."
-version     = "0.49.0"
+version     = "0.50.0"
 categories  = ["developer-tools", "ai"]
 tags        = ["code-review", "pull-requests", "llm", "github", "gitlab", "gitea", "forgejo", "webhooks"]
 platforms   = ["linux/amd64", "linux/arm64"]
