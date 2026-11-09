@@ -1,0 +1,25 @@
+[template]
+id             = "plane-commercial"
+name           = "Plane Commercial"
+description    = "Self-hosted Plane with the official iOS and Android apps. Free plan for up to 12 users per workspace, with paid plans unlocked by a license key. Closed source."
+version        = "4.0.2"
+categories     = ["productivity", "collaboration"]
+tags           = ["project-management", "issue-tracker", "kanban", "agile", "mobile-app", "jira-alternative", "linear-alternative"]
+platforms      = ["linux/amd64", "linux/arm64"]
+icon           = "https://github.com/makeplane.png"
+website        = "https://plane.so"
+docs           = "https://developers.plane.so/self-hosting/methods/docker-aio"
+source         = "https://hub.docker.com/r/makeplane/plane-aio-commercial"
+license        = "Proprietary"
+requires_https = true
+
+[[ports]]
+container   = 8080
+service     = "plane"
+description = "Web UI and API"
+primary     = true
+
+[[ports]]
+container   = 9000
+service     = "plane-minio"
+description = "File storage; browsers and the mobile app reach attachments here directly"
