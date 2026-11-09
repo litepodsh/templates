@@ -1,0 +1,141 @@
+# Plane's all-in-one image bundles web, API, workers and its own path router on
+# port 80, which fits LitePod's one-domain-per-service routing. The multi-image
+# stack can't run here: its proxy hard-codes a service named `api`, a name
+# LitePod reserves.
+#
+# The image has no route to object storage, so browsers upload straight to MinIO
+# through presigned URLs. That is why MinIO has its own public domain and
+# AWS_S3_ENDPOINT_URL is a public address rather than `plane-minio:9000`.
+services:
+  plane:
+    image: docker.io/makeplane/plane-aio-community:v1.4.3
+    restart: unless-stopped
+    # The scheme comes from the route, so adding a domain with a certificate
+    # switches Plane to https on the next deploy.
+    command: ["sh", "-c", "export APP_PROTOCOL=\"$${PLANE_URL%%://*}\"; exec /app/start.sh"]
+    environment:
+      PLANE_URL: ${PLANE_URL}
+      DOMAIN_NAME: ${PLANE_DOMAIN}
+      SITE_ADDRESS: ":80"
+      SECRET_KEY: ${PLANE_SECRET_KEY}
+      LIVE_SERVER_SECRET_KEY: ${PLANE_LIVE_SECRET_KEY}
+      DATABASE_URL: postgresql://${PLANE_DB_USER}:${PLANE_DB_PASSWORD}@plane-db:5432/${PLANE_DB_NAME}
+      REDIS_URL: redis://:${PLANE_REDIS_PASSWORD}@plane-redis:6379/
+      AMQP_URL: amqp://${PLANE_MQ_USER}:${PLANE_MQ_PASSWORD}@plane-mq:5672/${PLANE_MQ_VHOST}
+      AWS_REGION: ${PLANE_S3_REGION}
+      AWS_ACCESS_KEY_ID: ${PLANE_S3_ACCESS_KEY}
+      AWS_SECRET_ACCESS_KEY: ${PLANE_S3_SECRET_KEY}
+      AWS_S3_BUCKET_NAME: ${PLANE_S3_BUCKET}
+      AWS_S3_ENDPOINT_URL: ${PLANE_S3_PUBLIC_URL}
+      FILE_SIZE_LIMIT: ${PLANE_FILE_SIZE_LIMIT}
+    volumes:
+      - plane_data:/app/data
+      - plane_logs:/app/logs
+    expose:
+      - "80"
+    depends_on:
+      plane-db:
+        condition: service_healthy
+      plane-redis:
+        condition: service_healthy
+      plane-mq:
+        condition: service_healthy
+      plane-minio-provision:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1/api/instances/ > /dev/null || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 300s
+
+  plane-db:
+    image: docker.io/library/postgres:15.19-alpine
+    restart: unless-stopped
+    command: ["postgres", "-c", "max_connections=${PLANE_DB_MAX_CONNECTIONS}"]
+    environment:
+      POSTGRES_DB: ${PLANE_DB_NAME}
+      POSTGRES_USER: ${PLANE_DB_USER}
+      POSTGRES_PASSWORD: ${PLANE_DB_PASSWORD}
+    volumes:
+      - plane_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${PLANE_DB_USER} -d ${PLANE_DB_NAME}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  plane-redis:
+    image: docker.io/valkey/valkey:7.2.15-alpine
+    restart: unless-stopped
+    command: ["sh", "-c", "exec valkey-server --requirepass \"$$REDIS_PASSWORD\""]
+    environment:
+      REDIS_PASSWORD: ${PLANE_REDIS_PASSWORD}
+      REDISCLI_AUTH: ${PLANE_REDIS_PASSWORD}
+    volumes:
+      - plane_redis_data:/data
+    healthcheck:
+      test: ["CMD", "valkey-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  plane-mq:
+    image: docker.io/library/rabbitmq:3.13.7-alpine
+    restart: unless-stopped
+    # RabbitMQ names its data directory after the hostname; a fixed one keeps
+    # queues across container recreation.
+    hostname: plane-mq
+    environment:
+      RABBITMQ_DEFAULT_USER: ${PLANE_MQ_USER}
+      RABBITMQ_DEFAULT_PASS: ${PLANE_MQ_PASSWORD}
+      RABBITMQ_DEFAULT_VHOST: ${PLANE_MQ_VHOST}
+    volumes:
+      - plane_rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 30s
+
+  plane-minio:
+    image: docker.io/pgsty/silo:RELEASE.2026-10-26T00-00-00Z
+    restart: unless-stopped
+    command: ["server", "/export", "--address", ":9000"]
+    environment:
+      MINIO_ROOT_USER: ${PLANE_S3_ACCESS_KEY}
+      MINIO_ROOT_PASSWORD: ${PLANE_S3_SECRET_KEY}
+    volumes:
+      - plane_uploads:/export
+    expose:
+      - "9000"
+
+  # Plane's own bucket check goes through the public address, which has no route
+  # yet on first deploy, so the bucket is created over the internal network.
+  plane-minio-provision:
+    image: docker.io/pgsty/mc:RELEASE.2026-11-09T00-00-00Z
+    restart: on-failure
+    entrypoint:
+      - /bin/sh
+      - -c
+      - |
+        until mc alias set plane http://plane-minio:9000 "$${MINIO_ROOT_USER}" "$${MINIO_ROOT_PASSWORD}"; do
+          echo "waiting for minio..."; sleep 2;
+        done
+        mc mb -p "plane/$${PLANE_S3_BUCKET}"
+    environment:
+      MINIO_ROOT_USER: ${PLANE_S3_ACCESS_KEY}
+      MINIO_ROOT_PASSWORD: ${PLANE_S3_SECRET_KEY}
+      PLANE_S3_BUCKET: ${PLANE_S3_BUCKET}
+    depends_on:
+      plane-minio:
+        condition: service_started
+
+volumes:
+  plane_data:
+  plane_logs:
+  plane_postgres_data:
+  plane_redis_data:
+  plane_rabbitmq_data:
+  plane_uploads:

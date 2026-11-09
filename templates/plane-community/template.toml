@@ -1,0 +1,24 @@
+[template]
+id          = "plane-community"
+name        = "Plane Community"
+description = "Open-source project tracker with work items, cycles, modules, pages and intake. Free with unlimited users; an alternative to Jira and Linear. The official mobile app doesn't support this edition."
+version     = "1.4.3"
+categories  = ["productivity", "collaboration"]
+tags        = ["project-management", "issue-tracker", "kanban", "agile", "jira-alternative", "linear-alternative"]
+platforms   = ["linux/amd64", "linux/arm64"]
+icon        = "https://github.com/makeplane.png"
+website     = "https://plane.so"
+docs        = "https://developers.plane.so/self-hosting/overview"
+source      = "https://github.com/makeplane/plane"
+license     = "AGPL-3.0"
+
+[[ports]]
+container   = 80
+service     = "plane"
+description = "Web UI and API"
+primary     = true
+
+[[ports]]
+container   = 9000
+service     = "plane-minio"
+description = "File storage; browsers upload and download attachments here directly"
