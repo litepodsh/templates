@@ -44,13 +44,8 @@ services:
         condition: service_healthy
       plane-minio-provision:
         condition: service_completed_successfully
-    healthcheck:
-      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:8080/api/instances/ > /dev/null || exit 1"]
-      interval: 30s
-      timeout: 10s
-      retries: 10
-      # First-boot migrations took about 9 minutes on an 8-core test machine.
-      start_period: 1200s
+    # No healthcheck: first-boot migrations took 9 to 25 minutes in testing, longer
+    # than LitePod waits for a new release before giving up on it.
 
   plane-db:
     image: docker.io/library/postgres:15.19-alpine
@@ -116,9 +111,9 @@ services:
 
   # Plane's own bucket check goes through the public address, which has no route
   # yet on first deploy, so the bucket is created over the internal network.
+  # One-shot job: no restart policy, so it stays exited once the bucket exists.
   plane-minio-provision:
     image: docker.io/pgsty/mc:RELEASE.2026-11-09T00-00-00Z
-    restart: on-failure
     entrypoint:
       - /bin/sh
       - -c
@@ -135,6 +130,47 @@ services:
       plane-minio:
         condition: service_started
 
+  # Optional MCP server for Claude, ChatGPT and other AI clients. It needs an OAuth
+  # app that only exists once Plane is running, so it stays off by default: see
+  # "Connect Claude and ChatGPT" in setup.md. The server exits without a client ID.
+  #
+  # plane-mcp:
+  #   image: docker.io/makeplane/plane-mcp-server:v0.3.5
+  #   restart: unless-stopped
+  #   environment:
+  #     PLANE_BASE_URL: ${PLANE_URL}
+  #     PLANE_OAUTH_PROVIDER_BASE_URL: ${PLANE_MCP_URL}
+  #     PLANE_OAUTH_PROVIDER_CLIENT_ID: ${PLANE_MCP_CLIENT_ID}
+  #     PLANE_OAUTH_PROVIDER_CLIENT_SECRET: ${PLANE_MCP_CLIENT_SECRET}
+  #     REDIS_URL: redis://:${PLANE_REDIS_PASSWORD}@plane-mcp-valkey:6379/0
+  #   expose:
+  #     - "8211"
+  #   depends_on:
+  #     plane-mcp-valkey:
+  #       condition: service_healthy
+  #   healthcheck:
+  #     # No -f: the OAuth endpoint answers 401 to anonymous requests.
+  #     test: ["CMD", "curl", "-sS", "-o", "/dev/null", "http://127.0.0.1:8211/http/mcp"]
+  #     interval: 30s
+  #     timeout: 10s
+  #     retries: 5
+  #     start_period: 30s
+  #
+  # plane-mcp-valkey:
+  #   image: docker.io/valkey/valkey:8.1.11-alpine
+  #   restart: unless-stopped
+  #   command: ["sh", "-c", "exec valkey-server --requirepass \"$$REDIS_PASSWORD\""]
+  #   environment:
+  #     REDIS_PASSWORD: ${PLANE_REDIS_PASSWORD}
+  #     REDISCLI_AUTH: ${PLANE_REDIS_PASSWORD}
+  #   volumes:
+  #     - plane_mcp_valkey_data:/data
+  #   healthcheck:
+  #     test: ["CMD", "valkey-cli", "ping"]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 10
+
 volumes:
   plane_data:
   plane_logs:
@@ -142,3 +178,4 @@ volumes:
   plane_redis_data:
   plane_rabbitmq_data:
   plane_uploads:
+  # plane_mcp_valkey_data:
