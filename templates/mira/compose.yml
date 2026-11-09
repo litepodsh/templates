@@ -1,0 +1,53 @@
+services:
+  mira:
+    # 0.11.0 has a release but no published image yet, so this is the newest tag available.
+    image: ghcr.io/miracodeai/mira:0.10.1
+    restart: unless-stopped
+    expose:
+      - "8000"
+    environment:
+      # Upstream's two default paths disagree without this, which would put the SQLite
+      # database outside the volume.
+      MIRA_INDEX_DIR: /data/indexes
+      ADMIN_PASSWORD: ${MIRA_ADMIN_PASSWORD}
+      MIRA_MODEL: ${MIRA_MODEL}
+      MIRA_LLM_BASE_URL: ${MIRA_LLM_BASE_URL}
+      OPENROUTER_API_KEY: ${MIRA_LLM_API_KEY}
+      MIRA_BOT_NAME: ${MIRA_BOT_NAME}
+      MIRA_GITHUB_APP_ID: ${MIRA_GITHUB_APP_ID}
+      MIRA_GITHUB_PRIVATE_KEY_BASE64: ${MIRA_GITHUB_PRIVATE_KEY_BASE64}
+      MIRA_WEBHOOK_SECRET: ${MIRA_GITHUB_WEBHOOK_SECRET}
+      MIRA_GITLAB_TOKEN: ${MIRA_GITLAB_TOKEN}
+      MIRA_GITLAB_WEBHOOK_SECRET: ${MIRA_GITLAB_WEBHOOK_SECRET}
+      MIRA_GITLAB_API_URL: ${MIRA_GITLAB_API_URL}
+      MIRA_FORGEJO_TOKEN: ${MIRA_FORGEJO_TOKEN}
+      MIRA_FORGEJO_WEBHOOK_SECRET: ${MIRA_FORGEJO_WEBHOOK_SECRET}
+      MIRA_FORGEJO_API_URL: ${MIRA_FORGEJO_API_URL}
+    volumes:
+      - mira_data:/data
+    entrypoint:
+      - sh
+      - -c
+      - |
+        # LitePod env values can't hold newlines, so the PEM key arrives base64-encoded.
+        if [ -n "$$MIRA_GITHUB_PRIVATE_KEY_BASE64" ]; then
+          MIRA_GITHUB_PRIVATE_KEY="$$(printf %s "$$MIRA_GITHUB_PRIVATE_KEY_BASE64" | base64 -d)"
+          export MIRA_GITHUB_PRIVATE_KEY
+        fi
+        unset MIRA_GITHUB_PRIVATE_KEY_BASE64
+        # Upstream only reads a custom LLM endpoint from a config file.
+        if [ -n "$$MIRA_LLM_BASE_URL" ]; then
+          printf 'llm:\n  base_url: "%s"\n' "$$MIRA_LLM_BASE_URL" > /data/mira.yaml
+          export MIRA_CONFIG=/data/mira.yaml
+        fi
+        exec mira serve
+    healthcheck:
+      # CMD-SHELL: podman-compose 1.3.0 breaks the quoting of a CMD list holding code.
+      test: ["CMD-SHELL", "python -c \"import urllib.request as u; u.urlopen('http://127.0.0.1:8000/health', timeout=5)\""]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
+
+volumes:
+  mira_data:
