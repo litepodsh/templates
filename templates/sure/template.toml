@@ -2,7 +2,7 @@
 id          = "sure"
 name        = "Sure"
 description = "Self-hosted personal finance app for tracking accounts, budgets, investments and net worth. Community fork of Maybe Finance."
-version     = "0.7.5-hotfix.2"
+version     = "0.7.6-hotfix.1"
 categories  = ["finance"]
 tags        = ["personal-finance", "budgeting", "net-worth", "rails", "postgresql", "redis"]
 platforms   = ["linux/amd64", "linux/arm64"]
