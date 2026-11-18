@@ -2,7 +2,7 @@
 id             = "kodus"
 name           = "Kodus"
 description    = "Open-source AI code review for pull requests on GitHub, GitLab, Bitbucket, Azure DevOps and Forgejo. Bring your own LLM."
-version        = "2.2.9"
+version        = "2.2.11"
 categories     = ["developer-tools", "ai"]
 tags           = ["code-review", "pull-requests", "llm", "github", "gitlab", "bitbucket", "azure-devops", "forgejo", "webhooks"]
 platforms      = ["linux/amd64", "linux/arm64"]

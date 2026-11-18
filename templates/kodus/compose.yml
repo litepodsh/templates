@@ -132,7 +132,7 @@ x-kodus-env: &kodus-env
 
 services:
   kodus-web:
-    image: ghcr.io/kodustech/kodus-ai-web:2.2.9
+    image: ghcr.io/kodustech/kodus-ai-web:2.2.11
     restart: unless-stopped
     environment: *kodus-env
     expose:
@@ -150,7 +150,7 @@ services:
 
   # Not `api`: LitePod reserves that service name on its shared network.
   kodus-api:
-    image: ghcr.io/kodustech/kodus-ai-api:2.2.9
+    image: ghcr.io/kodustech/kodus-ai-api:2.2.11
     restart: unless-stopped
     environment: *kodus-env
     # Only the API migrates and seeds (prod-entrypoint defaults both to false). Upstream
@@ -175,7 +175,7 @@ services:
       start_period: 300s
 
   worker:
-    image: ghcr.io/kodustech/kodus-ai-worker:2.2.9
+    image: ghcr.io/kodustech/kodus-ai-worker:2.2.11
     restart: unless-stopped
     environment: *kodus-env
     # The worker refuses to boot without WORKER_ROLE, and it creates the workflow queues
@@ -194,7 +194,7 @@ services:
       start_period: 60s
 
   webhooks:
-    image: ghcr.io/kodustech/kodus-ai-webhook:2.2.9
+    image: ghcr.io/kodustech/kodus-ai-webhook:2.2.11
     restart: unless-stopped
     environment: *kodus-env
     expose:
