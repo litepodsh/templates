@@ -2,7 +2,7 @@
 id          = "libredb-studio"
 name        = "LibreDB Studio"
 description = "Self-hosted database IDE for 40+ engines — PostgreSQL, MySQL, MongoDB, Redis, SQLite, ClickHouse and more — with ER diagrams, schema diff, SSO and an AI query agent."
-version     = "1.2.0"
+version     = "1.3.0"
 categories  = ["database", "developer-tools"]
 tags        = ["sql", "database", "ide", "postgresql", "mysql", "mongodb", "redis", "clickhouse", "admin"]
 platforms   = ["linux/amd64", "linux/arm64"]
