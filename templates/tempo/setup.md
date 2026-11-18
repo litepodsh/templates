@@ -100,7 +100,7 @@ Published ports are all above 1024.
 
 # Why the version is pinned
 
-The image tag is `3.0.3`, not `latest`. Tempo 3.0 replaced the ingester and compactor with
+The image tag is `3.1.1`, not `latest`. Tempo 3.0 replaced the ingester and compactor with
 the live-store, block-builder and backend-scheduler, so a major bump is a config-breaking
 event — pin it and upgrade deliberately.
 

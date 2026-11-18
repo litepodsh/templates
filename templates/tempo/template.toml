@@ -2,7 +2,7 @@
 id          = "tempo"
 name        = "Grafana Tempo"
 description = "Distributed tracing backend — OTLP ingest, TraceQL search and TraceQL metrics (rate, quantile_over_time) straight over the traces, no Prometheus and no Kafka required."
-version     = "3.0.3"
+version     = "3.1.1"
 categories  = ["monitoring", "devops"]
 tags        = ["tracing", "traces", "traceql", "otlp", "opentelemetry", "observability", "metrics"]
 platforms   = ["linux/amd64", "linux/arm64"]
