@@ -34,7 +34,7 @@ x-chatwoot-env: &chatwoot-env
 
 services:
   chatwoot:
-    image: docker.io/chatwoot/chatwoot:v4.18.0
+    image: docker.io/chatwoot/chatwoot:v4.19.1
     restart: unless-stopped
     environment: *chatwoot-env
     volumes:
@@ -56,7 +56,7 @@ services:
       start_period: 180s
 
   chatwoot-worker:
-    image: docker.io/chatwoot/chatwoot:v4.18.0
+    image: docker.io/chatwoot/chatwoot:v4.19.1
     restart: unless-stopped
     environment: *chatwoot-env
     volumes:
