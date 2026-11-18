@@ -2,7 +2,7 @@
 id          = "mira"
 name        = "Mira"
 description = "Self-hosted AI code reviewer with a dashboard, codebase indexing and CVE scanning for GitHub, GitLab and Forgejo. Bring your own LLM."
-version     = "0.10.1"
+version     = "0.11.1"
 categories  = ["developer-tools", "ai"]
 tags        = ["code-review", "pull-requests", "llm", "github", "gitlab", "forgejo", "gitea", "webhooks", "security"]
 platforms   = ["linux/amd64"]
