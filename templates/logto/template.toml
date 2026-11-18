@@ -2,7 +2,7 @@
 id          = "logto"
 name        = "Logto"
 description = "Open-source auth infrastructure for apps — OIDC, OAuth 2.0, SAML, social sign-in, MFA and multi-tenancy, with a hosted sign-in UI."
-version     = "1.44.0"
+version     = "1.46.0"
 categories  = ["security"]
 tags        = ["sso", "oidc", "oauth2", "saml", "iam", "identity", "auth"]
 platforms   = ["linux/amd64", "linux/arm64"]
