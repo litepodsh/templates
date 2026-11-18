@@ -2,7 +2,7 @@
 id          = "hermes"
 name        = "Hermes Agent"
 description = "Open agent runtime from Nous Research with an OpenAI-compatible gateway API and a supervised web dashboard."
-version     = "v2026.9.24"
+version     = "v0.23.2"
 categories  = ["ai", "developer-tools"]
 tags        = ["agent", "llm", "openai-compatible", "chatbot"]
 platforms   = ["linux/amd64", "linux/arm64"]

@@ -69,6 +69,12 @@ primary     = true
 
 Only `[template].id` and `[template].name` are required; everything else has a default.
 
+`version` drives update notices in LitePod: an application created from the template remembers the
+version (and the compose/`.env` it shipped with), and when the catalog publishes a different one the
+app shows "Template update available" with a diff. So bump `version` whenever the compose or `.env`
+changes, not only when the image tag does. New `.env` keys are offered to existing apps; values they
+already set are never overwritten.
+
 `platforms` lists the OCI platforms that **every** image in the compose file publishes, limited to
 `linux/amd64`, `linux/arm64` and `linux/arm/v7`. Don't edit it by hand: `just platforms [id…]`
 reads each image's manifest from its registry and rewrites the line in place. `just
