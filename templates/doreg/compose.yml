@@ -1,0 +1,23 @@
+services:
+  doreg:
+    # The upstream author publishes releases to their own registry; the GHCR
+    # package is not public.
+    image: doreg.allthing.eu/doreg/doreg:0.4.0
+    restart: unless-stopped
+    expose:
+      - "8080"
+    # Uncomment to publish the registry directly on the host.
+    # ports:
+    #   - "${DOREG_PORT}:8080"
+    environment:
+      DOREG_ADDR: ":8080"
+      DOREG_DATA: /data
+      DOREG_ADMIN_USER: ${DOREG_ADMIN_USER}
+      DOREG_ADMIN_PASSWORD: ${DOREG_ADMIN_PASSWORD}
+      DOREG_PUBLIC_BROWSE: ${DOREG_PUBLIC_BROWSE}
+      DOREG_WEBHOOK_ALLOW_PRIVATE: ${DOREG_WEBHOOK_ALLOW_PRIVATE}
+    volumes:
+      - doreg_data:/data
+
+volumes:
+  doreg_data:
