@@ -1,0 +1,53 @@
+# Adapted from paperclip's docker/docker-compose.yml: the server plus a PostgreSQL service,
+# using the image the project publishes to GHCR instead of building it. Authenticated
+# public deployments refuse to start on the embedded database, so Postgres is separate.
+# Upstream keeps data in a bind mount; this uses named volumes. The server's volume holds
+# uploads, the local secrets key and agent workspaces.
+services:
+  paperclip-db:
+    image: docker.io/library/postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${PAPERCLIP_DB_USER}
+      POSTGRES_PASSWORD: ${PAPERCLIP_DB_PASSWORD}
+      POSTGRES_DB: ${PAPERCLIP_DB_NAME}
+    volumes:
+      - paperclip_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${PAPERCLIP_DB_USER} -d ${PAPERCLIP_DB_NAME}"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+
+  paperclip:
+    image: ghcr.io/paperclipai/paperclip:2026.1117.0
+    restart: unless-stopped
+    # Ceiling on processes; the image runs tini as PID 1 to reap agent children.
+    pids_limit: 2048
+    # Includes the 30s adapter-settlement window and final cleanup.
+    stop_grace_period: 90s
+    expose:
+      - "3100"
+    environment:
+      DATABASE_URL: postgres://${PAPERCLIP_DB_USER}:${PAPERCLIP_DB_PASSWORD}@paperclip-db:5432/${PAPERCLIP_DB_NAME}
+      HOST: 0.0.0.0
+      PORT: "3100"
+      SERVE_UI: "true"
+      PAPERCLIP_HOME: /paperclip
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      PAPERCLIP_DEPLOYMENT_MODE: authenticated
+      PAPERCLIP_DEPLOYMENT_EXPOSURE: public
+      PAPERCLIP_PUBLIC_URL: ${PAPERCLIP_PUBLIC_URL}
+      PAPERCLIP_ALLOWED_HOSTNAMES: ${PAPERCLIP_ALLOWED_HOSTNAMES}
+      BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET}
+      PAPERCLIP_TOOL_ACTION_SIGNING_SECRET: ${PAPERCLIP_TOOL_ACTION_SIGNING_SECRET}
+    volumes:
+      - paperclip_data:/paperclip
+    depends_on:
+      paperclip-db:
+        condition: service_healthy
+
+volumes:
+  paperclip_pgdata:
+  paperclip_data:

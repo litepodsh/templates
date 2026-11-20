@@ -1,0 +1,22 @@
+[template]
+id             = "paperclip"
+name           = "Paperclip"
+description    = "Open-source control plane for AI agents at work: org charts, goals, budgets and approvals for teams of Claude Code, Codex, OpenCode and other agents. Runs with its own PostgreSQL."
+version        = "2026.1117.0"
+categories     = ["ai", "productivity"]
+tags           = ["ai-agents", "orchestration", "claude-code", "codex", "opencode", "governance", "budgets"]
+platforms      = ["linux/amd64", "linux/arm64"]
+icon           = "https://github.com/paperclipai.png"
+website        = "https://paperclip.ing"
+docs           = "https://docs.paperclip.ing"
+source         = "https://github.com/paperclipai/paperclip"
+license        = "MIT"
+requires_https = true
+
+[files]
+setup = "setup.md"
+
+[[ports]]
+container   = 3100
+description = "Web UI and API"
+primary     = true
