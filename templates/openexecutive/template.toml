@@ -1,0 +1,23 @@
+[template]
+id             = "openexecutive"
+name           = "Open Executive"
+description    = "AI virtual executive team: one executive persona backed by eight specialist agents, with company memory, scheduled actions and Slack, email, Google Workspace and Microsoft 365 integrations. Bring your own Anthropic or OpenRouter key."
+version        = "0.7.7"
+categories     = ["ai", "productivity"]
+tags           = ["ai-agents", "executive-assistant", "llm", "claude", "mcp", "chatops", "knowledge-base"]
+platforms      = ["linux/amd64", "linux/arm64"]
+icon           = "https://github.com/ForeactLabs.png"
+website        = "https://openexecutive.ai"
+docs           = "https://github.com/ForeactLabs/OpenExecutive/tree/main/docs"
+source         = "https://github.com/ForeactLabs/OpenExecutive"
+license        = "Apache-2.0"
+requires_https = true
+
+[files]
+setup = "setup.md"
+
+[[ports]]
+container   = 3000
+service     = "openexecutive-ui"
+description = "Web UI"
+primary     = true

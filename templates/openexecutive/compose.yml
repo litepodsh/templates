@@ -1,0 +1,73 @@
+# Adapted from OpenExecutive's docker/docker-compose.yml. Upstream builds the API and runs
+# the UI as a `next dev` server on a bind mount; this uses the images the project publishes
+# to GHCR instead. Upstream also feeds the API the whole .env through `env_file`; LitePod
+# passes its own env file, so the API's variables are spelled out under `environment:`.
+# Image tags are literal (LitePod pre-pulls `image:` without .env interpolation).
+#
+# The API has no public port: the UI proxies browser calls to it at openexecutive-api:8000
+# and stamps the shared secret on each one. It must stay a single replica (its scheduler
+# is not safe across processes).
+services:
+  openexecutive-api:
+    image: ghcr.io/foreactlabs/openexecutive-api:0.7.7
+    restart: unless-stopped
+    expose:
+      - "8000"
+    environment:
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+      ANTHROPIC_WORKSPACE_ID: ${ANTHROPIC_WORKSPACE_ID}
+      OPENROUTER_ENABLED: ${OPENROUTER_ENABLED}
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY}
+      DEFAULT_MODEL: ${DEFAULT_MODEL}
+      DEEP_REASONING_MODEL: ${DEEP_REASONING_MODEL}
+      ROUTING_MODEL: ${ROUTING_MODEL}
+      PUSHBACK_MODEL: ${PUSHBACK_MODEL}
+      ENABLE_CACHING: ${ENABLE_CACHING}
+      EXEC_EMAIL_ADDRESS: ${EXEC_EMAIL_ADDRESS}
+      # Auth between the UI and the API
+      BACKEND_SHARED_SECRET: ${BACKEND_SHARED_SECRET}
+      CALLER_ASSERTION_PUBLIC_KEYS: ${CALLER_ASSERTION_PUBLIC_KEYS}
+      OE_PUBLIC_DEPLOYMENT: "1"
+      BACKEND_ALLOWED_ORIGINS: ${OPENEXECUTIVE_URL}
+      OE_LOCAL_LOGIN: ""
+      # State, all under the /data volume
+      VECTOR_STORE_PATH: /data/chroma_db
+      COMPANY_PROFILE_PATH: /data/company/profile.yaml
+      EPISODIC_DB_PATH: /data/episodic_memory.db
+    volumes:
+      - openexecutive_data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      # A cold start builds the vector index before serving.
+      start_period: 300s
+
+  openexecutive-ui:
+    image: ghcr.io/foreactlabs/openexecutive-ui:0.7.7
+    restart: unless-stopped
+    expose:
+      - "3000"
+    environment:
+      BACKEND_BASE_URL: http://openexecutive-api:8000
+      BACKEND_SHARED_SECRET: ${BACKEND_SHARED_SECRET}
+      CALLER_ASSERTION_PRIVATE_KEY: ${CALLER_ASSERTION_PRIVATE_KEY}
+      OE_PUBLIC_DEPLOYMENT: "1"
+      OE_HOST_ORIGINS: ${OE_HOST_ORIGINS}
+      OE_LOCAL_LOGIN: ""
+      AUTH_SECRET: ${AUTH_SECRET}
+      AUTH_URL: ${OPENEXECUTIVE_URL}
+      AUTH_TRUST_HOST: "true"
+      ALLOWED_EMAILS: ${ALLOWED_EMAILS}
+      AUTH_GOOGLE_ID: ${AUTH_GOOGLE_ID}
+      AUTH_GOOGLE_SECRET: ${AUTH_GOOGLE_SECRET}
+      AUTH_OIDC_ISSUER: ${AUTH_OIDC_ISSUER}
+      AUTH_OIDC_ID: ${AUTH_OIDC_ID}
+      AUTH_OIDC_SECRET: ${AUTH_OIDC_SECRET}
+      AUTH_OIDC_NAME: ${AUTH_OIDC_NAME}
+    depends_on:
+      - openexecutive-api
+
+volumes:
+  openexecutive_data:
