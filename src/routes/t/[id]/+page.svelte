@@ -295,16 +295,15 @@
 
 			<div class="overflow-hidden rounded-xl border bg-background">
 				<!--
-					Keyed so switching files tears the editor down and rebuilds it with
-					the new model, rather than leaving a stale one bound to the old file.
+					Reuse the same editor instance across file switches: the content
+					and language effects below update the model in place, which avoids
+					tearing down and recreating Monaco (and the flash that comes with it).
 				-->
-				{#key active.value}
-					<ReadOnlyCodeEditor
-						content={active.file.content}
-						language={active.language}
-						label={`${template.name} ${active.label}`}
-					/>
-				{/key}
+				<ReadOnlyCodeEditor
+					content={active.file.content}
+					language={active.language}
+					label={`${template.name} ${active.label}`}
+				/>
 			</div>
 		</div>
 

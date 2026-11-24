@@ -13,11 +13,6 @@
 		language?: string;
 		label: string;
 		minHeight?: string;
-		/**
-		 * Size the host to fit the rendered content instead of a fixed
-		 * `minHeight`. Useful for inline code blocks where a 28rem pane would
-		 * dwarf a one-liner. `minHeight` still acts as a lower bound.
-		 */
 		autoSize?: boolean;
 	} = $props();
 
@@ -25,6 +20,13 @@
 	let editor = $state<import('monaco-editor').editor.IStandaloneCodeEditor | null>(null);
 	let monacoApi = $state<typeof import('monaco-editor') | null>(null);
 	let themeObserver: MutationObserver | null = null;
+
+	// Shared across instances so the (megabyte) Monaco chunk is fetched once.
+	let monacoPromise: Promise<typeof import('monaco-editor')> | null = null;
+	function loadMonaco() {
+		if (!monacoPromise) monacoPromise = import('monaco-editor');
+		return monacoPromise;
+	}
 
 	function applyTheme() {
 		monacoApi?.editor.setTheme(
@@ -34,14 +36,10 @@
 
 	function syncSize() {
 		if (!autoSize || !host || !editor) return;
-		// `getContentHeight` accounts for the padding set on the editor and
-		// for any wrapping the line-wrap option introduces, so the host never
-		// clips content. The `minHeight` is still respected as a floor.
 		const height = Math.max(editor.getContentHeight(), parseMinHeight(minHeight));
 		host.style.height = `${height}px`;
 	}
 
-	/** Parses a CSS length like `"3rem"` or `"28rem"` to px. Falls back to 0. */
 	function parseMinHeight(value: string): number {
 		const match = value.trim().match(/^([\d.]+)\s*(px|rem|em)?$/);
 		if (!match) return 0;
@@ -52,15 +50,9 @@
 	}
 
 	onMount(async () => {
-		// Dynamic import: Monaco is megabytes, so it is code-split out of the
-		// catalog page and only fetched when a detail view actually mounts. No
-		// MonacoEnvironment wiring — Vite statically resolves Monaco's own
-		// `new Worker(new URL(...))` calls and emits the worker chunks itself.
-		monacoApi = await import('monaco-editor');
+		monacoApi = await loadMonaco();
 		registerMonacoLanguages(monacoApi);
 		applyTheme();
-		// The theme toggle swaps a class on <html>; Monaco paints its own colours
-		// and has to be told separately.
 		themeObserver = new MutationObserver(applyTheme);
 		themeObserver.observe(document.documentElement, {
 			attributes: true,
@@ -79,7 +71,6 @@
 			domReadOnly: true,
 			wordWrap: 'on',
 			scrollBeyondLastLine: false,
-			// Declared as @font-face in layout.css and served from static/fonts.
 			fontFamily: "'Commit Mono', 'CommitMono Nerd Font Mono', monospace",
 			fontLigatures: false,
 			fontSize: 13,
@@ -105,4 +96,38 @@
 	});
 </script>
 
-<div bind:this={host} style:min-height={minHeight} style:height={autoSize ? '0' : 'auto'}></div>
+<div class="editor-shell" style:min-height={minHeight}>
+	{#if !monacoApi}
+		<pre class="editor-fallback" aria-hidden="true" style:min-height={minHeight}><code>{content}</code></pre>
+	{:else}
+		<div
+			bind:this={host}
+			class="editor-host"
+			style:min-height={minHeight}
+			style:height={autoSize ? '0' : 'auto'}
+		></div>
+	{/if}
+</div>
+
+<style>
+	.editor-shell {
+		position: relative;
+		width: 100%;
+	}
+	.editor-fallback {
+		margin: 0;
+		padding: 12px 12px;
+		font-family: 'Commit Mono', 'CommitMono Nerd Font Mono', ui-monospace, SFMono-Regular, monospace;
+		font-size: 13px;
+		line-height: 1.5;
+		white-space: pre-wrap;
+		word-break: break-word;
+		overflow: hidden;
+		color: var(--foreground);
+		background: var(--card);
+		border-radius: inherit;
+	}
+	.editor-host {
+		width: 100%;
+	}
+</style>
