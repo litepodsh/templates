@@ -1,0 +1,82 @@
+services:
+  monocode-host:
+    # MonoCode publishes no container image, and LitePod's podman-compose can't build a
+    # dockerfile_inline, so this installs the upstream host release at startup. The Node
+    # image only supplies git, curl and npm for the agent CLIs; the host bundles its own Node.
+    image: docker.io/library/node:24-bookworm
+    restart: unless-stopped
+    init: true
+    expose:
+      - "3775"
+    environment:
+      MONOCODE_VERSION: ${MONOCODE_VERSION}
+      HOME: /root
+      # Agent CLIs installed from a terminal land in the home volume and survive redeploys.
+      NPM_CONFIG_PREFIX: /root/.npm-global
+      PATH: /root/.local/bin:/root/.npm-global/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+      # Agents run as root in this container; this lets Claude Code use its bypass permission mode.
+      IS_SANDBOX: "1"
+    volumes:
+      - monocode_home:/root
+      - monocode_app:/opt/monocode
+    entrypoint:
+      - bash
+      - -c
+      - |
+        set -eu
+        # Kept in a volume, so a redeploy only downloads again when the version changes.
+        app="/opt/monocode/$$MONOCODE_VERSION"
+        if [ ! -x "$$app/monocode-host" ]; then
+          case "$$(uname -m)" in
+            x86_64) arch=x64 ;;
+            aarch64) arch=arm64 ;;
+            *) echo "MonoCode has no host release for $$(uname -m)" >&2; exit 1 ;;
+          esac
+          asset="monocode-host-linux-$$arch.tar.gz"
+          base="https://github.com/hardbeat920/monocode/releases/download/v$$MONOCODE_VERSION"
+          tmp=$$(mktemp -d)
+          curl -fsSL --retry 3 -o "$$tmp/$$asset" "$$base/$$asset"
+          curl -fsSL --retry 3 -o "$$tmp/$$asset.sha256" "$$base/$$asset.sha256"
+          (cd "$$tmp" && sha256sum -c "$$asset.sha256")
+          rm -rf /opt/monocode/*
+          mkdir -p "$$app"
+          tar -xzf "$$tmp/$$asset" -C "$$app"
+          rm -rf "$$tmp"
+        fi
+        # A wrapper, not a symlink: the launcher finds its runtime next to its own path.
+        printf '#!/bin/sh\nexec "%s/monocode-host" "$$@"\n' "$$app" > /usr/local/bin/monocode-host
+        chmod +x /usr/local/bin/monocode-host
+
+        # The host only listens on loopback. This forwards the published port to it, so
+        # LitePod's HTTPS proxy can reach it. Every request still needs a device token.
+        node -e '
+          const net = require("net");
+          net.createServer((client) => {
+            const host = net.connect(3774, "127.0.0.1");
+            client.pipe(host).pipe(client);
+            client.on("error", () => host.destroy());
+            host.on("error", () => client.destroy());
+          }).listen(3775, "0.0.0.0");
+        ' &
+        proxy=$$!
+
+        monocode-host serve --port 3774 &
+        host=$$!
+        trap 'kill -TERM $$host $$proxy 2>/dev/null; wait $$host' TERM INT
+        # Stop the container when either process exits, so the restart policy brings both back.
+        wait -n $$host $$proxy
+        status=$$?
+        kill -TERM $$host $$proxy 2>/dev/null || true
+        wait $$host 2>/dev/null || true
+        exit $$status
+    healthcheck:
+      # Goes through the forwarder to the host; an unauthenticated call gets 401.
+      test: ["CMD-SHELL", "[ \"$$(curl -s -o /dev/null -w '%{http_code}' -X POST http://127.0.0.1:3775/rpc)\" = 401 ]"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 120s
+
+volumes:
+  monocode_home:
+  monocode_app:

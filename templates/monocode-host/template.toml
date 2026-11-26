@@ -1,0 +1,22 @@
+[template]
+id             = "monocode-host"
+name           = "MonoCode Host"
+description    = "Headless MonoCode host: run Claude Code, Codex, OpenCode and other coding agents on your server and drive their sessions from the MonoCode desktop app."
+version        = "0.16.0"
+categories     = ["developer-tools", "ai"]
+tags           = ["ai", "agents", "coding-agents", "claude-code", "codex", "opencode", "remote"]
+platforms      = ["linux/amd64", "linux/arm64"]
+icon           = "https://raw.githubusercontent.com/hardbeat920/monocode/main/public/monocode.png"
+website        = "https://usemono.dev"
+docs           = "https://github.com/hardbeat920/monocode/blob/main/docs/remote-access.md"
+source         = "https://github.com/hardbeat920/monocode"
+license        = "MIT"
+requires_https = true
+
+[files]
+setup = "setup.md"
+
+[[ports]]
+container   = 3775
+description = "Host API for the MonoCode desktop app"
+primary     = true
