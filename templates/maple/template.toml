@@ -1,0 +1,22 @@
+[template]
+id             = "maple"
+name           = "Maple"
+description    = "OpenTelemetry observability in one container: OTLP ingest, dashboard and query API for traces, logs and metrics, on an embedded ClickHouse. One team, one replica, no alerting."
+version        = "0.5.0"
+categories     = ["monitoring", "devops"]
+tags           = ["observability", "opentelemetry", "otlp", "tracing", "logs", "metrics", "clickhouse"]
+platforms      = ["linux/amd64", "linux/arm64"]
+icon           = "https://raw.githubusercontent.com/MapleTechLabs/maple/main/apps/landing/public/favicon.svg"
+website        = "https://maple.dev"
+docs           = "https://maple.dev/docs/self-hosting"
+source         = "https://github.com/MapleTechLabs/maple"
+license        = "FSL-1.1-ALv2"
+requires_https = true
+
+[files]
+setup = "setup.md"
+
+[[ports]]
+container   = 4318
+description = "Dashboard, query API and OTLP/HTTP ingest"
+primary     = true
