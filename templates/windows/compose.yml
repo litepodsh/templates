@@ -1,0 +1,39 @@
+services:
+  windows:
+    image: docker.io/dockurr/windows:6.06
+    restart: unless-stopped
+    # Windows runs as a QEMU/KVM guest: the host must expose /dev/kvm and the
+    # (rootless) Podman user must be able to open it. See setup.md.
+    devices:
+      - /dev/kvm
+      - /dev/net/tun
+    cap_add:
+      - NET_ADMIN
+    environment:
+      VERSION: ${WINDOWS_VERSION}
+      RAM_SIZE: ${RAM_SIZE}
+      CPU_CORES: ${CPU_CORES}
+      DISK_SIZE: ${DISK_SIZE}
+      USERNAME: ${WINDOWS_USERNAME}
+      PASSWORD: ${WINDOWS_PASSWORD}
+      LANGUAGE: ${WINDOWS_LANGUAGE}
+      REGION: ${WINDOWS_REGION}
+      KEYBOARD: ${WINDOWS_KEYBOARD}
+    expose:
+      - "8006"
+    ports:
+      - "${RDP_PORT}:3389/tcp"
+      - "${RDP_PORT}:3389/udp"
+    volumes:
+      - windows_storage:/storage
+    # Gives Windows time to shut down cleanly instead of losing the disk state.
+    stop_grace_period: 2m
+    # Hard cap for the whole container (VM RAM + QEMU overhead). If the server runs
+    # short, only Windows is killed instead of the server swapping until it freezes.
+    deploy:
+      resources:
+        limits:
+          memory: ${CONTAINER_MEMORY_LIMIT}
+
+volumes:
+  windows_storage:

@@ -1,0 +1,25 @@
+[template]
+id          = "windows"
+name        = "Windows"
+description = "Windows 11, 10 or Server running as a KVM virtual machine inside a container, with a browser viewer and RDP."
+version     = "6.06"
+categories  = ["developer-tools", "devops"]
+tags        = ["windows", "vm", "virtual-machine", "kvm", "qemu", "rdp", "desktop"]
+platforms   = ["linux/amd64", "linux/arm64"]
+icon        = "https://raw.githubusercontent.com/dockur/windows/master/.github/logo.png"
+website     = "https://github.com/dockur/windows"
+docs        = "https://github.com/dockur/windows#faq"
+source      = "https://github.com/dockur/windows"
+license     = "MIT"
+
+[[ports]]
+container   = 8006
+description = "Web viewer (install progress and console)"
+primary     = true
+
+[[ports]]
+container   = 3389
+description = "Remote Desktop (RDP, TCP + UDP)"
+
+[files]
+setup = "setup.md"
